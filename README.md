@@ -138,12 +138,12 @@ El menú incluye **Instalar herramientas de optimización** y el comando `--inst
 
 - Diagnóstico y hardware: `inxi`, `lshw`, `dmidecode`, `smartmontools`, `lm_sensors`.
 - Gráficos y aceleración: `vulkan-tools`, `mesa-utils`, `libva-utils`, `vdpauinfo`, `nvtop`.
-- CPU y memoria: `power-profiles-daemon`, `cpupower`, `zram-generator`.
-- Gaming y monitorización: `gamemode`, `mangohud`, `gamescope`, `goverlay`.
+- Energía y temperatura: `power-profiles-daemon`, `thermald`, `powertop`, `cpupower`, `zram-generator`.
+- Gaming y monitorización: `gamemode`, `lib32-gamemode`, `mangohud`, `lib32-mangohud`, `gamescope`, `goverlay`, `vkbasalt`.
 
-Antes de empezar, muestra la lista completa y pide confirmación. Después ejecuta `sudo pacman -S --needed` sin `--noconfirm`, por lo que Pacman también presenta su resumen y solicita aprobación. Los paquetes que ya estén instalados se conservan.
+En la primera ejecución, el lanzador solicita elegir idioma (Español, English o Português Brasil) y guarda la preferencia en `~/.config/cachyos-optimizer/language`. La preferencia se conserva para los siguientes inicios. El código visible de la aplicación todavía está principalmente en español; la selección ya prepara el idioma del proceso y del lanzador, pero la traducción completa de todos los menús está pendiente.\n\nAntes de empezar la instalación de herramientas, muestra la lista completa y pide confirmación. Después ejecuta `sudo pacman -S --needed` sin `--noconfirm`, por lo que Pacman también presenta su resumen y solicita aprobación. Los paquetes que ya estén instalados se conservan.
 
-**Alcance importante:** esta opción instala herramientas de usuario; no instala controladores a ciegas ni cambia kernel, servicios o parámetros de arranque. Los cambios de perfil/gobernador se realizan desde el centro con confirmación. Esos cambios dependen del hardware y requieren módulos específicos, comprobaciones y reversión. Si Pacman no encuentra un paquete o una dependencia, la transacción puede cancelarse sin completar.
+**Alcance importante:** esta opción instala herramientas de usuario; no instala controladores a ciegas ni activa servicios automáticamente. `power-profiles-daemon` y `thermald` pueden requerir habilitación manual según el equipo. No se activa TLP junto a otros gestores de energía para evitar conflictos. Los cambios de perfil/gobernador se realizan desde el centro con confirmación. Esos cambios dependen del hardware y requieren módulos específicos, comprobaciones y reversión. Si Pacman no encuentra un paquete o una dependencia, la transacción puede cancelarse sin completar.
 
 Ejecutar directamente:
 
@@ -278,7 +278,7 @@ También puedes usar cualquier cliente Git que permita clonar el repositorio. El
 - Conexión a Internet en la primera ejecución para descargar Java/Maven si no están presentes.
 - Herramientas base del sistema: `bash`, `git`, `curl`, `tar`, `sha256sum`, `sha512sum`, `awk`, `sed`, `python3` y `uname`.
 
-Java 21, Maven y las dependencias Java se guardan dentro del repositorio (`.tools/` y `.cache/`); no se instalan globalmente ni se necesitan permisos de administrador. Las herramientas base de Linux y las herramientas opcionales de diagnóstico no se descargan automáticamente: el programa informa cuando alguna no está disponible.
+Java 21, Maven y las dependencias Java se guardan dentro del repositorio (`.tools/` y `.cache/`); no se instalan globalmente ni se necesitan permisos de administrador. Las herramientas base de Linux no se descargan automáticamente. Las herramientas opcionales se ofrecen mediante el instalador integrado, que solicita aprobación antes de usar Pacman.
 
 ### Compilar, probar y usar Maven manualmente (opcional)
 
