@@ -357,12 +357,17 @@ public final class LinuxOptimizerGui {
                     "Ahorro: prioriza reducir el consumo energético."};
             int index = Math.max(0, selector.getSelectedIndex());
             hint.setText(hints[index]);
-            hint.setForeground(new Color(190, 174, 255));
-            javax.swing.Timer animation = new javax.swing.Timer(20, null);
+            Color start = MUTED;
+            Color finish = new Color(190, 174, 255);
+            javax.swing.Timer animation = new javax.swing.Timer(18, null);
             int[] tick = {0};
             animation.addActionListener(event -> {
-                tick[0]++;
-                if (tick[0] >= 8) animation.stop();
+                float t = Math.min(1f, ++tick[0] / 10f);
+                hint.setForeground(new Color(
+                        (int) (start.getRed() + (finish.getRed() - start.getRed()) * t),
+                        (int) (start.getGreen() + (finish.getGreen() - start.getGreen()) * t),
+                        (int) (start.getBlue() + (finish.getBlue() - start.getBlue()) * t)));
+                if (t >= 1f) animation.stop();
             });
             animation.start();
         });
