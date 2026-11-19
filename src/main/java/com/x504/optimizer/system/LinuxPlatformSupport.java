@@ -31,7 +31,7 @@ public final class LinuxPlatformSupport {
     }
 
     static Family classify(String id, String tokens) {
-        if (List.of("cachyos","arch","manjaro","endeavouros","garuda","arcolinux","artix","rebornos","steamos","holoiso","archcraft","blendos").contains(id) || has(tokens,"arch","manjaro","endeavouros","cachyos")) return Family.ARCH;
+        if (List.of("cachyos","arch","archlinux","manjaro","endeavouros","garuda","arcolinux","artix","rebornos","steamos","holoiso","archcraft","blendos").contains(id) || has(tokens,"arch","manjaro","endeavouros","cachyos")) return Family.ARCH;
         if (List.of("debian","ubuntu","linuxmint","pop","elementary","kali","zorin","mx","deepin","raspbian","parrot","devuan","neon","kubuntu","xubuntu","lubuntu","ubuntu-mate","ubuntu-budgie","bodhi","antix","siduction","trisquel","pureos").contains(id) || has(tokens,"debian","ubuntu","linuxmint","elementary","kali")) return Family.DEBIAN;
         if (List.of("fedora","rhel","centos","rocky","almalinux","ol","oracle","nobara","ultramarine","bazzite","bluefin","silverblue","kinoite").contains(id) || has(tokens,"fedora","rhel","centos","rocky","almalinux")) return Family.FEDORA;
         if (id.startsWith("opensuse") || List.of("sles","sled","tumbleweed","geckolinux").contains(id) || has(tokens,"opensuse","suse")) return Family.SUSE;
@@ -119,7 +119,23 @@ public final class LinuxPlatformSupport {
     public List<String> diagnosticTools(Platform p) {
         return toolCategories(p).values().stream().flatMap(List::stream).distinct().toList();
     }
+
+    /**
+     * Detecta sistemas de imagen inmutable o gestionados por el proveedor.
+     * En ellos no se deben ofrecer instalaciones genéricas con el gestor del host.
+     */
+    public boolean isImmutableOrImageBased(Platform p) {
+        String id = p.id().toLowerCase(Locale.ROOT);
+        if (List.of("steamos", "bazzite", "bluefin", "silverblue", "kinoite",
+                "aurora", "coreos", "fedora-iot").contains(id)) return true;
+        return Files.exists(Path.of("/run/ostree-booted"))
+                || Files.exists(Path.of("/etc/steamos-release"));
+    }
+
     public List<String> installCommand(Platform p, List<String> packages) {
+        if (isImmutableOrImageBased(p)) {
+            throw new IllegalStateException("Sistema inmutable o basado en imagen: usa el método de instalación recomendado por su distribución.");
+        }
         if (packages == null || packages.isEmpty() || packages.stream().anyMatch(x -> !x.matches("[A-Za-z0-9@._+-]+"))) throw new IllegalArgumentException("Lista de paquetes no válida.");
         List<String> cmd = new ArrayList<>();
         switch (p.family()) {
