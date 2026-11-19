@@ -63,7 +63,7 @@ public final class LinuxPlatformSupport {
                 result.put("Diagnóstico y hardware", List.of("inxi","lshw","dmidecode","smartmontools","lm_sensors","pciutils","usbutils"));
                 result.put("Gráficos y vídeo", List.of("vulkan-tools","mesa-utils","libva-utils","vdpauinfo","nvtop"));
                 result.put("Almacenamiento", List.of("nvme-cli","hdparm","iotop"));
-                result.put("Red", List.of("iperf3","ethtool","bind"," traceroute"));
+                result.put("Red", List.of("iperf3","ethtool","bind","traceroute"));
                 result.put("Monitorización", List.of("btop","fastfetch","htop","glances","sysstat"));
                 result.put("Gaming", List.of("gamemode","mangohud","gamescope","goverlay","vkbasalt","protontricks","lib32-gamemode","lib32-mangohud"));
             }
@@ -130,7 +130,7 @@ public final class LinuxPlatformSupport {
         List<Path> candidates=List.of(osRelease,Path.of("/usr/lib/os-release"));
         for (Path candidate:candidates) {
             if (!Files.isReadable(candidate) || !Files.isRegularFile(candidate)) continue;
-            try { for(String line:Files.readAllLines(candidate)) { int i=line.indexOf('='); if(i<=0 || line.startsWith("#")) continue; String value=line.substring(i+1).strip(); if(value.length()>=2 && ((value.startsWith("\\\"")&&value.endsWith("\\\""))||(value.startsWith("'")&&value.endsWith("'")))) value=value.substring(1,value.length()-1); values.put(line.substring(0,i),value); } }
+            try { for(String line:Files.readAllLines(candidate)) { int i=line.indexOf('='); if(i<=0 || line.startsWith("#")) continue; String value=line.substring(i+1).strip(); if(value.length()>=2 && ((value.startsWith("\"")&&value.endsWith("\""))||(value.startsWith("'")&&value.endsWith("'")))) value=value.substring(1,value.length()-1); values.put(line.substring(0,i),value); } }
             catch(IOException ignored) { }
             if(!values.isEmpty()) return values;
         }
