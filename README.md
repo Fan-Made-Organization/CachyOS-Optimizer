@@ -1,4 +1,4 @@
-# CachyOS Optimizer
+# Linux Optimizer
 
 <p align="center">
   <strong>Diagnóstico, análisis de compatibilidad y preparación para optimizar Linux con seguridad.</strong><br>
@@ -13,9 +13,9 @@
 
 > **Estado actual: versión temprana (0.1.0-SNAPSHOT).** Incluye diagnósticos y algunas acciones optativas y reversibles para CPU, zram y TRIM, además de un creador de parámetros de Steam. No aplica cambios a escondidas ni promete ganancias fijas de rendimiento. Consulta [el estado real del proyecto](#estado-real-del-proyecto).
 
-## ¿Qué es CachyOS Optimizer?
+## ¿Qué es Linux Optimizer?
 
-CachyOS Optimizer es un proyecto libre y en desarrollo para reunir en una sola herramienta información del sistema, hardware, compatibilidad, kernels y componentes relacionados con el uso diario y los videojuegos en distintas distribuciones Linux.
+Linux Optimizer es un proyecto libre y en desarrollo para reunir en una sola herramienta información del sistema, hardware, compatibilidad, kernels y componentes relacionados con el uso diario y los videojuegos en distintas distribuciones Linux.
 
 Su objetivo es ayudar a entender el equipo antes de cambiar configuraciones: detectar el entorno, mostrar información útil, señalar herramientas que no estén disponibles y preparar recomendaciones que puedan evaluarse de forma segura.
 
@@ -69,13 +69,13 @@ El catálogo incluye seis enfoques: Equilibrado, Rendimiento, Ahorro de energía
 
 ### 6. Interfaz de terminal y panel de análisis del sistema
 
-CachyOS Optimizer utiliza una interfaz de terminal interactiva, sin interfaz gráfica. Al ejecutar `bash scripts/launch.sh` se abre un menú para iniciar el diagnóstico, ejecutar el benchmark CPU o consultar la ayuda. También se pueden usar los comandos directamente desde la terminal.
+Linux Optimizer utiliza una interfaz de terminal interactiva, sin interfaz gráfica. Al ejecutar `bash scripts/launch.sh` se abre un menú para iniciar el diagnóstico, ejecutar el benchmark CPU o consultar la ayuda. También se pueden usar los comandos directamente desde la terminal.
 
 El CLI presenta un panel ASCII con distribución, base inferida, kernel, escritorio, arquitectura, CPU, GPU, RAM y evaluación de compatibilidad. Los valores desconocidos se muestran como tales; el estado no se declara excelente si existen comprobaciones desconocidas.
 
 ```text
 ╔════════════════════════════════════════════╗
-║CACHYOS-OPTIMIZER                     ║
+║LINUX-OPTIMIZER                     ║
 ║SYSTEM ANALYSIS                            ║
 ╠════════════════════════════════════════════╣
 ║Sistema:       CachyOS                     ║
@@ -288,8 +288,8 @@ La idea es que puedas clonar el repositorio y arrancar el programa sin configura
 Abre una terminal en Linux y ejecuta:
 
 ```bash
-git clone https://github.com/Fan-Made-Organization/CachyOS-Optimizer.git
-cd CachyOS-Optimizer
+git clone https://github.com/Fan-Made-Organization/Linux-Optimizer.git
+cd Linux-Optimizer
 bash scripts/launch.sh
 ```
 
@@ -298,7 +298,7 @@ bash scripts/launch.sh
 2. Si faltan, descarga Temurin JDK 21 y/o Maven 3.9.9 dentro de `.tools/` y verifica sus hashes.
 3. Ejecuta la preparación y compilación necesarias.
 4. Genera el JAR si todavía no existe.
-5. Inicia CachyOS Optimizer.
+5. Inicia Linux Optimizer.
 
 En los siguientes inicios, desde la carpeta del proyecto, solo ejecuta:
 
@@ -319,7 +319,7 @@ bash scripts/launch.sh --help
 ```
 ### Opción 2: usar una interfaz gráfica para clonar
 
-En GitHub, pulsa **Code → Open with GitHub Desktop** (si tienes GitHub Desktop configurado), clona el repositorio y abre una terminal dentro de la carpeta `CachyOS-Optimizer`. Después ejecuta:
+En GitHub, pulsa **Code → Open with GitHub Desktop** (si tienes GitHub Desktop configurado), clona el repositorio y abre una terminal dentro de la carpeta `Linux-Optimizer`. Después ejecuta:
 
 ```bash
 bash scripts/launch.sh
@@ -342,7 +342,7 @@ Si ya tienes Java 21 y Maven configurados:
 ```bash
 mvn clean verify
 mvn package
-java -jar target/cachyos-optimizer-0.1.0-SNAPSHOT.jar
+java -jar target/linux-optimizer-0.1.0-SNAPSHOT.jar
 ```
 
 Para respaldar archivos que selecciones explícitamente y restaurarlos en otra carpeta:
@@ -410,4 +410,28 @@ El proyecto se distribuye bajo la **GNU General Public License v3.0 (GPL-3.0-onl
 
 ---
 
-**CachyOS Optimizer** — entender el sistema primero; optimizar con responsabilidad después.
+**Linux Optimizer** — entender el sistema primero; optimizar con responsabilidad después.
+
+
+## Alcance multiplataforma y límites por distribución
+
+Linux Optimizer adopta un enfoque **Linux-first**: la detección del sistema y los diagnósticos intentan funcionar sin depender de un gestor de paquetes concreto. La disponibilidad de una acción depende, en cambio, de la familia, las herramientas instaladas, el sistema de inicio, el kernel y las políticas de la distribución. Detectar una distribución no equivale a certificar todas sus variantes.
+
+### Qué significa cada nivel de soporte
+
+- **Detectada:** se identifica el nombre, versión, familia o gestor a partir de los datos que expone el sistema.
+- **Diagnóstico disponible:** los módulos consultan interfaces estándar como `/proc`, `/sys`, herramientas opcionales y archivos de configuración legibles.
+- **Catálogo de paquetes disponible:** existe una lista de herramientas adaptada a una familia y un comando de instalación revisado.
+- **Acción optimizable disponible:** existe una operación concreta, con validación, confirmación y una forma documentada de revertirla cuando es posible.
+
+Estos niveles no son equivalentes. En particular, Gentoo, Void y NixOS pueden detectarse aunque algunas operaciones de instalación permanezcan deshabilitadas. Las distribuciones inmutables o basadas en imágenes pueden requerir métodos propios y no deben tratarse como instalaciones tradicionales.
+
+### Recomendaciones antes de aplicar cambios
+
+1. Ejecuta primero `--diagnostics` y conserva el informe.
+2. Lee el comando y la lista exacta de paquetes que se muestran antes de aceptar una instalación.
+3. Mantén un kernel conocido como funcional y un medio de recuperación cuando cambies componentes de arranque o gráficos.
+4. No combines perfiles de energía, gobernadores y herramientas de terceros sin comprobar qué servicio administra cada ajuste.
+5. Después de cada cambio, repite el diagnóstico y compara el estado; modifica una sola variable cada vez.
+
+El nombre Linux Optimizer no implica compatibilidad con BSD, Windows, macOS, Android ni con todas las arquitecturas. El soporte actual está centrado en distribuciones GNU/Linux y en las arquitecturas para las que se haya validado el código y el entorno de compilación.
