@@ -41,3 +41,10 @@ La detección inicial no certifica todos los controladores ni módulos. La compa
 ## Interpretación de resultados
 
 La detección de una distribución, la disponibilidad de un gestor y la posibilidad de ejecutar una acción son comprobaciones independientes. Una derivada puede cambiar repositorios, nombres de paquetes, kernel, sistema de inicio o políticas de solo lectura. En equipos híbridos, máquinas virtuales, contenedores y sistemas inmutables, parte del hardware puede estar oculto o gestionado por otra capa. Un dato desconocido no equivale a incompatibilidad; un controlador detectado tampoco garantiza aceleración funcional.
+
+
+## Controladores gráficos por distribución
+
+El catálogo multiplataforma contiene perfiles de paquetes para Intel/AMD y componentes comunes en Arch, Debian, Fedora, SUSE y Alpine. NVIDIA propietario solo se ofrece en perfiles donde se han definido paquetes de repositorio base (Arch y Debian); en Fedora/SUSE/Alpine se mantiene deshabilitado porque puede exigir repositorios externos, módulos compatibles y configuración específica. En Arch el perfil `nvidia-open` no es válido para todas las GPU. Los perfiles no mezclan fabricantes ni eliminan controladores existentes. Gentoo, Void y NixOS permanecen en solo lectura para esta acción.
+
+La disponibilidad de paquetes depende de versión, arquitectura, repositorios y variantes. Una lista de paquetes es un plan revisable, no una certificación de compatibilidad. DXVK/VKD3D son traducción Direct3D→Vulkan y no controladores DirectX nativos.
