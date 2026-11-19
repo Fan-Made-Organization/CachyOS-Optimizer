@@ -250,7 +250,12 @@ public final class LinuxOptimizerGui {
         scroll.getViewport().setBackground(PANEL);
         scroll.getVerticalScrollBar().setUnitIncrement(18);
         body.add(scroll);
-        content.add(body, BorderLayout.CENTER);
+        JScrollPane pageScroll = new JScrollPane(body);
+        pageScroll.setBorder(BorderFactory.createEmptyBorder());
+        pageScroll.setOpaque(false);
+        pageScroll.getViewport().setOpaque(false);
+        pageScroll.getVerticalScrollBar().setUnitIncrement(20);
+        content.add(pageScroll, BorderLayout.CENTER);
         content.revalidate();
         content.repaint();
         renderDetails();
