@@ -9,6 +9,7 @@ import com.x504.optimizer.benchmark.BenchmarkHistory;
 import com.x504.optimizer.core.SystemCore;
 import com.x504.optimizer.monitor.SystemMonitor;
 import com.x504.optimizer.install.OptimizationToolsInstaller;
+import com.x504.optimizer.optimize.OptimizationCenter;
 import com.x504.optimizer.compatibility.CompatibilityAnalyzer;
 import com.x504.optimizer.hardware.HardwareDetector;
 import com.x504.optimizer.modules.*;
@@ -34,6 +35,7 @@ public final class Main {
         if (args.length > 0 && args[0].equals("--benchmark-suite")) { runBenchmarkSuite(args); return; }
         if (args.length > 0 && args[0].equals("--compare-benchmarks")) { compareBenchmarks(args); return; }
         if (args.length > 0 && args[0].equals("--install-tools")) { runInstallTools(); return; }
+        if (args.length > 0 && args[0].equals("--optimizer")) { runOptimizationCenter(); return; }
         if (args.length > 0 && args[0].equals("--help")) {
             printHelp();
             return;
@@ -185,6 +187,112 @@ public final class Main {
         }
     }
 
+    private static void runOptimizationCenter() {
+        try (var scanner = new java.util.Scanner(System.in)) { runOptimizationCenter(scanner); }
+    }
+
+    private static void runOptimizationCenter(java.util.Scanner scanner) {
+        OptimizationCenter center = new OptimizationCenter();
+        while (true) {
+            System.out.println("\n=== CENTRO DE OPTIMIZACIÓN ===");
+            center.categoryStatus().forEach(System.out::println);
+            System.out.println("\n1) CPU: perfiles de energía");
+            System.out.println("2) RAM: revisar memoria y zram");
+            System.out.println("3) GPU: revisar controlador y herramientas");
+            System.out.println("4) Gaming: instalar herramientas");
+            System.out.println("5) Almacenamiento: activar TRIM programado");
+            System.out.println("6) Kernel: información y compatibilidad");
+            System.out.println("0) Volver");
+            System.out.print("Selecciona una categoría: ");
+            if (!scanner.hasNextLine()) return;
+            String choice = scanner.nextLine().strip();
+            try {
+                switch (choice) {
+                    case "1" -> runCpuOptimization(center, scanner);
+                    case "2" -> {
+                        System.out.println("\n=== MEMORIA ===");
+                        System.out.println("zram: " + (java.nio.file.Files.exists(Path.of("/sys/block/zram0")) ? "detectado" : "no detectado"));
+                        System.out.println("No se borrarán cachés ni se finalizarán procesos automáticamente.");
+                        System.out.println("Si zram no está configurado, el instalador de herramientas incluye zram-generator; su activación requiere una configuración revisada y reinicio.");
+                    }
+                    case "3" -> {
+                        System.out.println("\n=== GPU ===");
+                        System.out.println("Se conserva el controlador actual. No se instalarán controladores propietarios sin identificar modelo, kernel y sesión gráfica.");
+                        System.out.println("Ejecuta la opción 1 (diagnóstico) para consultar GPU, Vulkan, OpenGL y módulos asociados.");
+                    }
+                    case "4" -> runInstallTools(scanner);
+                    case "5" -> runStorageOptimization(center, scanner);
+                    case "6" -> {
+                        System.out.println("\nKernel activo: " + System.getProperty("os.version"));
+                        System.out.println("No se sustituye ni elimina el kernel activo automáticamente.");
+                        System.out.println("Primero se verifica compatibilidad de GPU, initramfs, módulos y entradas de arranque.");
+                    }
+                    case "0" -> { return; }
+                    default -> System.out.println("Opción no válida.");
+                }
+            } catch (java.io.IOException ex) {
+                System.err.println("No se pudo completar la operación: " + ex.getMessage());
+            } catch (InterruptedException ex) {
+                Thread.currentThread().interrupt();
+                System.err.println("Operación interrumpida.");
+                return;
+            } catch (IllegalArgumentException | IllegalStateException ex) {
+                System.err.println("Operación no disponible: " + ex.getMessage());
+            }
+        }
+    }
+
+    private static void runCpuOptimization(OptimizationCenter center, java.util.Scanner scanner)
+            throws java.io.IOException, InterruptedException {
+        System.out.println("\nPerfil actual: " + center.currentPowerProfile());
+        System.out.println("1) Equilibrado (recomendado para uso diario)");
+        System.out.println("2) Rendimiento (más consumo y temperatura potencial)");
+        System.out.println("3) Ahorro de energía");
+        System.out.println("4) Restaurar perfil anterior guardado");
+        System.out.print("Elige: ");
+        if (!scanner.hasNextLine()) return;
+        String selected = scanner.nextLine().strip();
+        if (selected.equals("4")) {
+            if (!center.canRestorePowerProfile()) { System.out.println("No hay un perfil anterior guardado."); return; }
+            System.out.print("¿Restaurar el perfil anterior? [s/N]: ");
+            if (scanner.hasNextLine() && scanner.nextLine().strip().equalsIgnoreCase("s")) {
+                center.restorePowerProfile();
+                System.out.println("Perfil anterior restaurado.");
+            }
+            return;
+        }
+        String profile = switch (selected) {
+            case "1" -> "balanced";
+            case "2" -> "performance";
+            case "3" -> "power-saver";
+            default -> null;
+        };
+        if (profile == null) { System.out.println("Selección no válida."); return; }
+        System.out.print("¿Aplicar " + profile + "? Se guardará el perfil anterior para poder revertirlo. [s/N]: ");
+        if (scanner.hasNextLine() && scanner.nextLine().strip().equalsIgnoreCase("s")) {
+            center.applyPowerProfile(profile);
+            writeAuditEvent("power_profile_changed", "Perfil aplicado: " + profile);
+            System.out.println("Perfil aplicado. Puedes revertirlo desde esta misma opción.");
+        }
+    }
+
+    private static void runStorageOptimization(OptimizationCenter center, java.util.Scanner scanner)
+            throws java.io.IOException, InterruptedException {
+        if (!center.hasSolidStateDrive()) {
+            System.out.println("No se detectó SSD/NVMe. No se activará TRIM automáticamente.");
+            return;
+        }
+        System.out.println("Se detectó almacenamiento no rotacional. TRIM programado usa fstrim.timer.");
+        System.out.print("¿Activar el temporizador de TRIM? Requiere sudo y es reversible. [s/N]: ");
+        if (scanner.hasNextLine() && scanner.nextLine().strip().equalsIgnoreCase("s")) {
+            int exit = center.enableTrimTimer();
+            if (exit == 0) {
+                System.out.println("fstrim.timer habilitado.");
+                writeAuditEvent("trim_timer_enabled", "Temporizador TRIM habilitado");
+            } else System.err.println("systemctl terminó con código " + exit);
+        }
+    }
+
     private static void runMonitor(String[] args) {
         int seconds = 15;
         if (args.length > 1) {
@@ -248,7 +356,8 @@ public final class Main {
                 System.out.println("║  3) Mostrar ayuda y comandos             ║");
                 System.out.println("║  4) Monitor CPU/RAM (15 segundos)        ║");
                 System.out.println("║  5) Benchmark completo                   ║");
-                System.out.println("║  6) Instalar herramientas de optimización ║");
+                System.out.println("║  6) Instalar herramientas de optimización ║
+                System.out.println("║  7) Centro de optimización               ║");");
                 System.out.println("║  0) Salir                                ║");
                 System.out.println("╚══════════════════════════════════════════╝");
                 System.out.print("Selecciona una opción: ");
@@ -261,8 +370,9 @@ public final class Main {
                     case "4" -> runMonitor(new String[]{"--monitor", "15"});
                     case "5" -> runBenchmarkSuite(new String[]{"--benchmark-suite"});
                     case "6" -> runInstallTools(scanner);
+                    case "7" -> runOptimizationCenter(scanner);
                     case "0" -> { System.out.println("Hasta luego."); return; }
-                    default -> System.out.println("Opción no válida. Elige 1, 2, 3, 4, 5, 6 o 0.");
+                    default -> System.out.println("Opción no válida. Elige 1, 2, 3, 4, 5, 6, 7 o 0.");
                 }
             }
         }
@@ -334,7 +444,7 @@ public final class Main {
                   --benchmark-storage [MiB] Prueba temporal de disco (8-32 MiB).
                   --monitor [segundos]      Monitor CPU/RAM (1-300 s).
                   --benchmark-suite [MiB]   CPU + RAM + disco; guarda historial.
-                  --compare-benchmarks A B  Compara dos CSV (antes/después).\n                  --install-tools          Instala herramientas recomendadas en Arch/CachyOS.
+                  --compare-benchmarks A B  Compara dos CSV (antes/después).\n                  --install-tools          Instala herramientas recomendadas en Arch/CachyOS.\n                  --optimizer              Abre el centro de optimización guiada.
                   --backup DIR ARCHIVO... 
                                Respalda archivos elegidos en un directorio nuevo.
                   --restore COPIA DESTINO
