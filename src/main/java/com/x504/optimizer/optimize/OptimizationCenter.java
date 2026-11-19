@@ -128,11 +128,11 @@ public final class OptimizationCenter {
         Files.createDirectories(parent);
         if (Files.isSymbolicLink(parent) || Files.isSymbolicLink(swappinessStateFile))
             throw new IOException("Se rechazó una ruta de estado que contiene un enlace simbólico.");
-        if (!canRestoreSwappiness()) Files.writeString(swappinessStateFile, current + System.lineSeparator());
+        boolean createdBackup = !canRestoreSwappiness();
+        if (createdBackup) Files.writeString(swappinessStateFile, current + System.lineSeparator());
         int exit = runInherited(List.of("sudo", "sysctl", "-w", "vm.swappiness=" + value));
         if (exit != 0) {
-            if (!canRestoreSwappiness() || Files.readString(swappinessStateFile).strip().equals(Integer.toString(current)))
-                Files.deleteIfExists(swappinessStateFile);
+            if (createdBackup) Files.deleteIfExists(swappinessStateFile);
             throw new IOException("No se pudo aplicar swappiness (código " + exit + ").");
         }
     }
@@ -244,7 +244,7 @@ public final class OptimizationCenter {
     public List<String> categoryStatus() {
         List<String> lines = new ArrayList<>();
         lines.add("CPU: perfiles de energía y gobernador disponible; cambios reversibles con respaldo del valor anterior.");
-        lines.add("RAM: detección y configuración zram administrada/reversible; no se purgan cachés ni se matan procesos.");
+        lines.add("RAM: zram administrada/reversible y ajuste temporal de vm.swappiness con restauración del valor anterior.");
         lines.add("GPU: inventario DRM, fabricante PCI y controlador; sin cambios automáticos de drivers.");
         lines.add("Gaming: GameMode, MangoHud, Gamescope y herramientas opcionales.");
         lines.add("Almacenamiento: TRIM programado con fstrim.timer si se detecta SSD/NVMe.");
