@@ -60,7 +60,9 @@ La presencia de un módulo no significa que todos los controladores, dispositivo
 ### 5. Catálogo de perfiles
 El proyecto incluye un catálogo inicial de perfiles y descripciones para distintos enfoques de uso. En esta etapa son **referencias informativas**: seleccionarlos no cambia gobernadores, controladores, servicios ni parámetros del sistema.
 
-### 6. Panel de análisis del sistema
+### 6. Interfaz de terminal y panel de análisis del sistema
+
+X504 utiliza una interfaz de terminal interactiva, sin interfaz gráfica. Al ejecutar `bash scripts/launch.sh` se abre un menú para iniciar el diagnóstico, ejecutar el benchmark CPU o consultar la ayuda. También se pueden usar los comandos directamente desde la terminal.
 
 El CLI presenta un panel ASCII con distribución, base inferida, kernel, escritorio, arquitectura, CPU, GPU, RAM y evaluación de compatibilidad. Los valores desconocidos se muestran como tales; el estado no se declara excelente si existen comprobaciones desconocidas.
 
@@ -110,7 +112,7 @@ Los valores anteriores son ilustrativos; el programa muestra los datos reales de
 | Aplicación automática de optimizaciones | **Deshabilitada; no se ejecutan cambios** |
 | Restauración sobre rutas originales y rollback del sistema | **Pendiente** |
 | Registro local de auditoría | Implementado con rotación básica |
-| Interfaz gráfica | **Pendiente** |
+| Interfaz gráfica | No prevista; el proyecto prioriza una interfaz de terminal. |
 | Microbenchmark CPU local | Implementado como prueba opcional; no mide FPS ni GPU |
 
 El código Java que Maven compila se encuentra en `src/main/java`. Los archivos bajo `src/main/resources/java` son recursos heredados y no forman parte del conjunto de clases compiladas por la configuración Maven actual.
@@ -163,8 +165,10 @@ bash scripts/launch.sh
 Puedes pasar opciones directamente al programa:
 
 ```bash
+bash scripts/launch.sh                 # abre el menú de terminal
+bash scripts/launch.sh --diagnostics   # diagnóstico directo
+bash scripts/launch.sh --benchmark     # diagnóstico + microbenchmark CPU
 bash scripts/launch.sh --help
-bash scripts/launch.sh --benchmark
 ```
 
 ### Opción 2: usar una interfaz gráfica para clonar
@@ -235,6 +239,7 @@ La aplicación no debe ejecutarse como root para realizar diagnósticos normales
 - [Desarrollo y contribución](docs/DEVELOPMENT.md)
 - [Solución de problemas](docs/TROUBLESHOOTING.md)
 - [Registro de cambios](docs/CHANGELOG.md)
+- [Hoja de ruta](docs/ROADMAP.md)
 
 ## Desarrollo y contribuciones
 
