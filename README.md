@@ -138,7 +138,6 @@ bash scripts/launch.sh --diagnostics --report-html "$HOME/cachyos-report.html"
 
 Ejemplos:
 ```bash
-bash scripts/launch.sh --monitor 30
 bash scripts/launch.sh --benchmark-memory 32
 bash scripts/launch.sh --benchmark-storage 16
 bash scripts/launch.sh --benchmark-suite 16
@@ -267,7 +266,6 @@ Las opciones son plantillas: no instalan herramientas ni garantizan compatibilid
 | Interfaz gráfica | No prevista; el proyecto prioriza una interfaz de terminal. |
 | Microbenchmark CPU local | Implementado como prueba opcional; no mide FPS ni GPU |
 | Exportación de informes JSON/HTML | Implementación inicial |
-| Monitor CPU/RAM y carga en vivo | Implementación inicial, sesión limitada a 5 minutos |
 | Benchmarks sintéticos de RAM y almacenamiento | Implementación inicial, tamaños acotados |
 | Historial y comparación antes/después de benchmarks | Implementación inicial, CSV |
 | Inventario PCI/USB y revisión indicativa de controladores | Implementación inicial |
@@ -478,7 +476,7 @@ Las releases se publican al crear y subir una etiqueta Git con formato `vX.Y.Z`.
 Linux Optimizer comparte el mismo código Java y la misma interfaz Swing en Linux, Windows y macOS. No hay una reescritura de la interfaz por sistema operativo.
 
 - **Linux:** diagnóstico avanzado de distro, kernel, controladores, servicios, almacenamiento, red y herramientas de gaming; las capacidades concretas dependen de la distribución.
-- **Windows y macOS:** interfaz gráfica, navegación animada, actualización desde GitHub y monitorización de CPU/RAM mediante Java MXBeans. Las métricas de temperatura y GPU se muestran solo cuando existe una fuente compatible; los módulos Linux de sysfs, systemd, DRM y gestores de paquetes no se ejecutan en esos sistemas.
+- **Windows y macOS:** interfaz gráfica, navegación animada y actualización desde GitHub. Las funciones de optimización específicas de Linux se habilitan únicamente en distribuciones compatibles; la detección del sistema no implica que se apliquen ajustes Linux en otros sistemas.
 - **Otras distribuciones Linux:** la interfaz y el núcleo Java son comunes. Los perfiles de instalación de paquetes se habilitan únicamente en familias con comandos y nombres de paquetes conocidos; NixOS, Gentoo, Void y sistemas inmutables mantienen sus limitaciones documentadas.
 
 ### Instalar en Windows
