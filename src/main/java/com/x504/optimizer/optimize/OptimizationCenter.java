@@ -14,12 +14,16 @@ import java.util.concurrent.TimeUnit;
 public final class OptimizationCenter {
     private static final List<String> POWER_PROFILES = List.of("balanced", "performance", "power-saver");
     private final Path stateFile;
+    private final Path governorStateFile;
 
     public OptimizationCenter() {
         this(Path.of(System.getProperty("user.home"), ".local", "state", "cachyos-optimizer", "previous-power-profile"));
     }
 
-    OptimizationCenter(Path stateFile) { this.stateFile = stateFile; }
+    OptimizationCenter(Path stateFile) {
+        this.stateFile = stateFile;
+        this.governorStateFile = stateFile.resolveSibling("previous-cpu-governor");
+    }
 
     public static List<String> powerProfiles() { return POWER_PROFILES; }
     public static boolean isValidPowerProfile(String profile) {
@@ -63,6 +67,45 @@ public final class OptimizationCenter {
         Files.delete(stateFile);
     }
 
+    public String currentGovernor() throws IOException {
+        Path file = Path.of("/sys/devices/system/cpu/cpu0/cpufreq/scaling_governor");
+        if (!Files.isRegularFile(file)) throw new IOException("El kernel no expone un gobernador CPU modificable.");
+        return Files.readString(file).strip();
+    }
+
+    public List<String> availableGovernors() throws IOException {
+        Path file = Path.of("/sys/devices/system/cpu/cpu0/cpufreq/scaling_available_governors");
+        if (!Files.isRegularFile(file)) throw new IOException("No hay lista de gobernadores disponible para este controlador CPU.");
+        return List.of(Files.readString(file).strip().split("\\s+"));
+    }
+
+    public void applyGovernor(String governor) throws IOException, InterruptedException {
+        if (governor == null || !List.of("performance", "powersave", "schedutil", "ondemand", "conservative").contains(governor))
+            throw new IllegalArgumentException("Gobernador no permitido.");
+        if (!availableGovernors().contains(governor)) throw new IllegalArgumentException("Ese gobernador no está disponible en este kernel/controlador.");
+        String current = currentGovernor();
+        Path parent = governorStateFile.getParent();
+        Files.createDirectories(parent);
+        if (Files.isSymbolicLink(parent) || Files.isSymbolicLink(governorStateFile)) throw new IOException("Se rechazó una ruta de estado con enlace simbólico.");
+        if (!canRestoreGovernor()) Files.writeString(governorStateFile, current + System.lineSeparator());
+        int exit = runInherited(List.of("sudo", "cpupower", "frequency-set", "-g", governor));
+        if (exit != 0) throw new IOException("cpupower no pudo aplicar el gobernador (código " + exit + ").");
+    }
+
+    public boolean canRestoreGovernor() {
+        return Files.isRegularFile(governorStateFile, LinkOption.NOFOLLOW_LINKS) && !Files.isSymbolicLink(governorStateFile);
+    }
+
+    public void restoreGovernor() throws IOException, InterruptedException {
+        if (!canRestoreGovernor()) throw new IOException("No hay un gobernador anterior guardado.");
+        String previous = Files.readString(governorStateFile).strip();
+        if (!List.of("performance", "powersave", "schedutil", "ondemand", "conservative").contains(previous) || !availableGovernors().contains(previous))
+            throw new IOException("El gobernador guardado no está disponible; no se aplicó ningún cambio.");
+        int exit = runInherited(List.of("sudo", "cpupower", "frequency-set", "-g", previous));
+        if (exit != 0) throw new IOException("No se pudo restaurar el gobernador (código " + exit + ").");
+        Files.delete(governorStateFile);
+    }
+
     public boolean hasSolidStateDrive() throws IOException {
         Path block = Path.of("/sys/block");
         if (!Files.isDirectory(block)) return false;
@@ -94,7 +137,7 @@ public final class OptimizationCenter {
 
     public List<String> categoryStatus() {
         List<String> lines = new ArrayList<>();
-        lines.add("CPU: perfiles de energía mediante power-profiles-daemon; cambio reversible.");
+        lines.add("CPU: perfiles de energía y gobernador disponible; cambios reversibles con respaldo del valor anterior.");
         lines.add("RAM: inspección de zram y memoria; no se fuerza la liberación de cachés ni se mata procesos.");
         lines.add("GPU: detección y herramientas; no se cambian controladores ni parámetros gráficos a ciegas.");
         lines.add("Gaming: GameMode, MangoHud, Gamescope y herramientas opcionales.");
