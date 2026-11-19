@@ -18,7 +18,7 @@ class SteamLaunchOptionsBuilderTest {
     }
 
     @Test void rejectsNullOptionsAndProvidesPresets() {
-        assertThrows(IllegalArgumentException.class, () -> builder.build(null));
+        assertThrows(IllegalArgumentException.class, () -> builder.build((SteamLaunchOptionsBuilder.Options) null));
         assertEquals(7, builder.presets().size());
     }
     @Test void buildsGamescopeResolutionAndRefreshRate() {
