@@ -62,8 +62,8 @@ Su objetivo es ayudar a entender el equipo antes de cambiar configuraciones: det
 
 La presencia de un módulo no significa que todos los controladores, dispositivos o herramientas estén instalados. Cada módulo depende de lo que el sistema permita detectar.
 
-### 5. Catálogo de perfiles
-El proyecto incluye un catálogo inicial de perfiles y descripciones para distintos enfoques de uso. En esta etapa son **referencias informativas**: seleccionarlos no cambia gobernadores, controladores, servicios ni parámetros del sistema.
+### 5. Perfiles de optimización
+El catálogo incluye seis enfoques: Equilibrado, Rendimiento, Ahorro de energía, Gaming, Diagnóstico y Mantenimiento. Son guías de comprobaciones y siguientes pasos; no aplican cambios en lote ni prometen FPS. Las acciones disponibles se realizan por separado desde el centro de optimización, con confirmación y reversión cuando corresponde.
 
 ### 6. Interfaz de terminal y panel de análisis del sistema
 
@@ -132,7 +132,11 @@ Los benchmarks de RAM y almacenamiento son sintéticos: influyen JIT, cachés, s
 
 El inventario sin controlador asociado no demuestra por sí solo un fallo o conflicto. Para confirmar problemas se necesita correlacionar modelo, kernel y registros.
 
-### 10. Instalador de herramientas de optimización
+### 10. Limpiador conservador de caché
+
+El menú ofrece **Limpiador seguro de caché** y el comando `--cleaner`. Primero presenta una vista previa de archivos antiguos (más de 30 días) dentro de `~/.cache/thumbnails` y `~/.cache/fontconfig`. Solo elimina la categoría que el usuario escribe y confirma. Rechaza enlaces simbólicos y rutas fuera de las carpetas permitidas. No toca cachés de shaders, navegadores, paquetes, juegos ni archivos personales.
+
+### 11. Instalador de herramientas de optimización
 
 El menú incluye **Instalar herramientas de optimización** y el comando `--install-tools`. En CachyOS/Arch instala un conjunto aprobado de utilidades:
 
@@ -175,7 +179,7 @@ Las operaciones CPU y TRIM solicitan confirmación. El perfil de energía se pue
 
 **Importante:** zram, perfiles de energía, gobernadores y TRIM requieren confirmación; zram solo puede revertirse automáticamente si la configuración sigue coincidiendo con la que creó la app. La gestión de controladores GPU y la sustitución/eliminación de kernels siguen siendo informativas: requieren selección manual y recuperación específica para cada equipo.
 
-### 12. Creador de parámetros de Steam
+### 13. Creador de parámetros de Steam
 
 Desde el menú principal (opción 8), el centro de optimización (opción 7) o con `bash scripts/launch.sh --steam-options`, abre un asistente para generar una línea lista para pegar en **Steam → Propiedades → General → Parámetros de lanzamiento**. Incluye plantillas para `%command%`, GameMode, MangoHud, Gamescope, registro de Proton, FSR de Proton y WineD3D (`PROTON_USE_WINED3D=1`), combinaciones personalizadas, resolución y frecuencia objetivo de Gamescope, y perfiles de juego (competitivo, equilibrado, diagnóstico y escalado). Puede guardar la línea en `~/.local/share/cachyos-optimizer/` sin sobrescribir archivos existentes.
 
