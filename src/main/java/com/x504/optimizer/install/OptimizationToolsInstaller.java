@@ -13,7 +13,8 @@ public final class OptimizationToolsInstaller {
             "vulkan-tools", "mesa-utils", "libva-utils", "vdpauinfo", "nvtop",
             "power-profiles-daemon", "zram-generator", "cpupower", "thermald", "powertop");
     private static final List<String> GAMING = List.of(
-            "gamemode", "mangohud", "gamescope", "goverlay", "vkbasalt", "lib32-gamemode", "lib32-mangohud",\n            "lib32-vkbasalt", "protontricks", "intel-gpu-tools", "radeontop");
+            "gamemode", "mangohud", "gamescope", "goverlay", "vkbasalt", "lib32-gamemode", "lib32-mangohud",
+            "lib32-vkbasalt", "protontricks", "intel-gpu-tools", "radeontop");
 
     public List<String> packages(boolean includeGaming) {
         List<String> result = new ArrayList<>(DIAGNOSTIC);
