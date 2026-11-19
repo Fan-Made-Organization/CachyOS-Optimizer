@@ -44,3 +44,7 @@ Antes de implementar optimizaciones de mayor riesgo, cada módulo básico debe t
 5. Documentación que describa qué se inspecciona realmente y sus limitaciones.
 
 Las capacidades marcadas como pendientes no deben presentarse como funciones ya disponibles.
+
+## Mantenimiento de esta auditoría
+
+Esta auditoría describe el estado observado en una revisión concreta y debe actualizarse cuando cambie el comportamiento. Cada función marcada como disponible necesita una ruta ejecutable, pruebas y documentación de sus condiciones. La detección de una distribución no demuestra que todas sus acciones estén soportadas. Para validar cambios multiplataforma registra distribución, versión, arquitectura, kernel, gestor y herramientas disponibles; las pruebas simuladas no sustituyen pruebas de integración reales.
