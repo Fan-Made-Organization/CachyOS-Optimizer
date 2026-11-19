@@ -15,6 +15,7 @@ public final class OptimizationCenter {
     private static final List<String> POWER_PROFILES = List.of("balanced", "performance", "power-saver");
     private final Path stateFile;
     private final Path governorStateFile;
+    private final Path swappinessStateFile;
 
     public OptimizationCenter() {
         this(Path.of(System.getProperty("user.home"), ".local", "state", "cachyos-optimizer", "previous-power-profile"));
@@ -23,6 +24,7 @@ public final class OptimizationCenter {
     OptimizationCenter(Path stateFile) {
         this.stateFile = stateFile;
         this.governorStateFile = stateFile.resolveSibling("previous-cpu-governor");
+        this.swappinessStateFile = stateFile.resolveSibling("previous-swappiness");
     }
 
     public static List<String> powerProfiles() { return POWER_PROFILES; }
@@ -108,6 +110,47 @@ public final class OptimizationCenter {
         int exit = runInherited(List.of("sudo", "cpupower", "frequency-set", "-g", previous));
         if (exit != 0) throw new IOException("No se pudo restaurar el gobernador (código " + exit + ").");
         Files.delete(governorStateFile);
+    }
+
+    /** Lee el valor actual de vm.swappiness expuesto por procps/sysctl. */
+    public int currentSwappiness() throws IOException, InterruptedException {
+        CommandResult result = run(List.of("sysctl", "-n", "vm.swappiness"), 10);
+        if (result.exitCode() != 0) throw new IOException("No se pudo consultar vm.swappiness: " + result.output());
+        try { return Integer.parseInt(result.output().strip()); }
+        catch (NumberFormatException ex) { throw new IOException("El kernel devolvió un valor de swappiness no válido.", ex); }
+    }
+
+    /** Aplica un valor temporal y conserva el valor anterior para revertirlo. */
+    public void applySwappiness(int value) throws IOException, InterruptedException {
+        if (value < 0 || value > 200) throw new IllegalArgumentException("Swappiness debe estar entre 0 y 200.");
+        int current = currentSwappiness();
+        Path parent = swappinessStateFile.getParent();
+        Files.createDirectories(parent);
+        if (Files.isSymbolicLink(parent) || Files.isSymbolicLink(swappinessStateFile))
+            throw new IOException("Se rechazó una ruta de estado que contiene un enlace simbólico.");
+        if (!canRestoreSwappiness()) Files.writeString(swappinessStateFile, current + System.lineSeparator());
+        int exit = runInherited(List.of("sudo", "sysctl", "-w", "vm.swappiness=" + value));
+        if (exit != 0) {
+            if (!canRestoreSwappiness() || Files.readString(swappinessStateFile).strip().equals(Integer.toString(current)))
+                Files.deleteIfExists(swappinessStateFile);
+            throw new IOException("No se pudo aplicar swappiness (código " + exit + ").");
+        }
+    }
+
+    public boolean canRestoreSwappiness() {
+        return Files.isRegularFile(swappinessStateFile, LinkOption.NOFOLLOW_LINKS) && !Files.isSymbolicLink(swappinessStateFile);
+    }
+
+    public void restoreSwappiness() throws IOException, InterruptedException {
+        if (!canRestoreSwappiness()) throw new IOException("No hay un valor anterior de swappiness guardado.");
+        String previous = Files.readString(swappinessStateFile).strip();
+        int value;
+        try { value = Integer.parseInt(previous); }
+        catch (NumberFormatException ex) { throw new IOException("El valor guardado no es válido; no se modificó el sistema.", ex); }
+        if (value < 0 || value > 200) throw new IOException("El valor guardado está fuera de rango.");
+        int exit = runInherited(List.of("sudo", "sysctl", "-w", "vm.swappiness=" + value));
+        if (exit != 0) throw new IOException("No se pudo restaurar swappiness (código " + exit + ").");
+        Files.delete(swappinessStateFile);
     }
 
     public boolean isManagedZram() {
