@@ -135,41 +135,82 @@ Si falta Java 21, el bootstrap descarga Temurin JDK 21 y verifica SHA-256; si fa
 
 ## Instalación y ejecución
 
-Clona el repositorio:
+La idea es que puedas clonar el repositorio y arrancar el programa sin configurar Java ni Maven manualmente.
+
+### Opción 1: clonar y ejecutar (recomendada)
+
+Abre una terminal en Linux y ejecuta:
 
 ```bash
 git clone https://github.com/Fan-Made-Organization/CachyOS-Optimizer.git
 cd CachyOS-Optimizer
+bash scripts/launch.sh
 ```
 
-Prepara el entorno y ejecuta las pruebas:
+**Eso es todo para la primera ejecución.** El lanzador:
+1. Comprueba si Java 21 y Maven están disponibles.
+2. Si faltan, descarga Temurin JDK 21 y/o Maven 3.9.9 dentro de `.tools/` y verifica sus hashes.
+3. Ejecuta la preparación y compilación necesarias.
+4. Genera el JAR si todavía no existe.
+5. Inicia X504 CachyOS Optimizer.
+
+En los siguientes inicios, desde la carpeta del proyecto, solo ejecuta:
 
 ```bash
-bash scripts/bootstrap.sh
+bash scripts/launch.sh
 ```
 
-También puedes usar Maven instalado en tu sistema:
+Puedes pasar opciones directamente al programa:
+
+```bash
+bash scripts/launch.sh --help
+bash scripts/launch.sh --benchmark
+```
+
+### Opción 2: usar una interfaz gráfica para clonar
+
+En GitHub, pulsa **Code → Open with GitHub Desktop** (si tienes GitHub Desktop configurado), clona el repositorio y abre una terminal dentro de la carpeta `CachyOS-Optimizer`. Después ejecuta:
+
+```bash
+bash scripts/launch.sh
+```
+
+También puedes usar cualquier cliente Git que permita clonar el repositorio. El paso importante es ejecutar el lanzador desde la carpeta clonada.
+
+### Requisitos del equipo
+
+- Linux x86_64 o ARM64.
+- Conexión a Internet en la primera ejecución para descargar Java/Maven si no están presentes.
+- Herramientas base del sistema: `bash`, `git`, `curl`, `tar`, `sha256sum`, `sha512sum`, `awk`, `sed`, `python3` y `uname`.
+
+Java 21, Maven y las dependencias Java se guardan dentro del repositorio (`.tools/` y `.cache/`); no se instalan globalmente ni se necesitan permisos de administrador. Las herramientas base de Linux y las herramientas opcionales de diagnóstico no se descargan automáticamente: el programa informa cuando alguna no está disponible.
+
+### Compilar, probar y usar Maven manualmente (opcional)
+
+Si ya tienes Java 21 y Maven configurados:
 
 ```bash
 mvn clean verify
 mvn package
 java -jar target/cachyos-optimizer-0.1.0-SNAPSHOT.jar
-
-# Respalda archivos que selecciones explícitamente
-java -jar target/cachyos-optimizer-0.1.0-SNAPSHOT.jar --backup "$HOME/x504-backups" "$HOME/.config/example.conf"
-
-# Restaura la copia verificada en otra carpeta, sin sobrescribir
-java -jar target/cachyos-optimizer-0.1.0-SNAPSHOT.jar --restore "$HOME/x504-backups/backup-..." "$HOME/x504-restored"
 ```
 
-Scripts auxiliares disponibles:
-- `scripts/build.sh`: compilar el proyecto.
+Para respaldar archivos que selecciones explícitamente y restaurarlos en otra carpeta:
+
+```bash
+bash scripts/launch.sh --backup "$HOME/x504-backups" "$HOME/.config/example.conf"
+bash scripts/launch.sh --restore "$HOME/x504-backups/backup-..." "$HOME/x504-restored"
+```
+
+Scripts auxiliares:
+- `scripts/bootstrap.sh`: prepara Java/Maven locales y ejecuta verificación y pruebas.
+- `scripts/build.sh`: compilar y verificar.
 - `scripts/test.sh`: ejecutar las pruebas.
-- `scripts/package.sh`: generar el paquete JAR.
-- `scripts/launch.sh`: iniciar la aplicación empaquetada.
+- `scripts/package.sh`: generar el JAR.
+- `scripts/launch.sh`: preparar lo necesario, empaquetar si hace falta e iniciar la aplicación.
 - `scripts/clean.sh`: limpiar archivos generados.
 
-Si un comando falla, revisa [Instalación](docs/INSTALLATION.md), [Dependencias](docs/DEPENDENCIES.md) y [Solución de problemas](docs/TROUBLESHOOTING.md).
+Si algo falla, revisa [Instalación](docs/INSTALLATION.md), [Dependencias](docs/DEPENDENCIES.md) y [Solución de problemas](docs/TROUBLESHOOTING.md).
 
 ## Seguridad: cómo pretende trabajar
 
