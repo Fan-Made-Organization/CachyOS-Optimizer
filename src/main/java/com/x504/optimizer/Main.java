@@ -302,17 +302,45 @@ public final class Main {
     }
     private static void runCpuOptimization(OptimizationCenter center, java.util.Scanner scanner)
             throws java.io.IOException, InterruptedException {
-        System.out.println("\nPerfil actual: " + center.currentPowerProfile());
+        System.out.println("\nPerfil de energía actual: " + center.currentPowerProfile());
         System.out.println("1) Equilibrado (recomendado para uso diario)");
         System.out.println("2) Rendimiento (más consumo y temperatura potencial)");
         System.out.println("3) Ahorro de energía");
-        System.out.println("4) Restaurar perfil anterior guardado");
+        System.out.println("4) Consultar/cambiar gobernador CPU");
+        System.out.println("5) Restaurar gobernador anterior");
+        System.out.println("6) Restaurar perfil de energía anterior");
         System.out.print("Elige: ");
         if (!scanner.hasNextLine()) return;
         String selected = scanner.nextLine().strip();
         if (selected.equals("4")) {
+            System.out.println("Gobernador actual: " + center.currentGovernor());
+            var available = center.availableGovernors();
+            System.out.println("Disponibles: " + String.join(", ", available));
+            System.out.print("Escribe uno de los gobernadores disponibles (o Enter para cancelar): ");
+            if (!scanner.hasNextLine()) return;
+            String governor = scanner.nextLine().strip();
+            if (governor.isEmpty()) return;
+            System.out.print("Aplicar '" + governor + "'? Requiere sudo y guarda el valor anterior. [s/N]: ");
+            if (scanner.hasNextLine() && scanner.nextLine().strip().equalsIgnoreCase("s")) {
+                center.applyGovernor(governor);
+                writeAuditEvent("cpu_governor_changed", "Gobernador aplicado: " + governor);
+                System.out.println("Gobernador aplicado. Puedes restaurarlo desde esta opción.");
+            }
+            return;
+        }
+        if (selected.equals("5")) {
+            if (!center.canRestoreGovernor()) { System.out.println("No hay un gobernador anterior guardado."); return; }
+            System.out.print("¿Restaurar el gobernador anterior? [s/N]: ");
+            if (scanner.hasNextLine() && scanner.nextLine().strip().equalsIgnoreCase("s")) {
+                center.restoreGovernor();
+                writeAuditEvent("cpu_governor_restored", "Se restauró el gobernador anterior");
+                System.out.println("Gobernador anterior restaurado.");
+            }
+            return;
+        }
+        if (selected.equals("6")) {
             if (!center.canRestorePowerProfile()) { System.out.println("No hay un perfil anterior guardado."); return; }
-            System.out.print("¿Restaurar el perfil anterior? [s/N]: ");
+            System.out.print("¿Restaurar el perfil de energía anterior? [s/N]: ");
             if (scanner.hasNextLine() && scanner.nextLine().strip().equalsIgnoreCase("s")) {
                 center.restorePowerProfile();
                 System.out.println("Perfil anterior restaurado.");
@@ -333,7 +361,6 @@ public final class Main {
             System.out.println("Perfil aplicado. Puedes revertirlo desde esta misma opción.");
         }
     }
-
     private static void runStorageOptimization(OptimizationCenter center, java.util.Scanner scanner)
             throws java.io.IOException, InterruptedException {
         boolean enabled = center.isTrimTimerEnabled();
