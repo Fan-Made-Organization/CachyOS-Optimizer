@@ -80,7 +80,7 @@ class LinuxPlatformSupportTest {
         assertTrue(categories.containsKey("Gráficos y vídeo"));
         assertTrue(categories.containsKey("Almacenamiento"));
         assertTrue(categories.containsKey("Red"));
-        assertTrue(categories.containsKey("Monitorización"));
+        assertFalse(categories.containsKey("Monitorización"));
         assertTrue(categories.containsKey("Gaming"));
         assertTrue(categories.containsKey("Audio y multimedia"));
         assertTrue(categories.containsKey("Desarrollo y depuración"));
