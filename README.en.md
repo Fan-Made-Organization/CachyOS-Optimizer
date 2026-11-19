@@ -2,7 +2,7 @@
 
 <p align="center">
   <strong>Linux diagnostics, compatibility analysis, and a safety-first foundation for optimization.</strong><br>
-  Designed with CachyOS and Arch Linux as the primary targets.
+  Designed for multiple GNU/Linux distribution families, including Arch, Debian, Fedora, SUSE, Alpine, Gentoo, Void and NixOS, with feature availability varying by family.
 </p>
 
 <p align="center">
