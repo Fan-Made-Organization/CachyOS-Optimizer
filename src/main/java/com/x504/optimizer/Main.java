@@ -408,12 +408,16 @@ public final class Main {
 
     private static void runAdvancedDiagnostics() {
         AdvancedDiagnostics.Report report=new AdvancedDiagnostics().inspect();
+        printDiagnosticSection("CPU Y FRECUENCIAS",report.cpu());
+        printDiagnosticSection("MEMORIA, SWAP Y PRESIÓN DEL SISTEMA",report.memory());
         printDiagnosticSection("ALMACENAMIENTO AVANZADO (SSD/NVMe/HDD)",report.storage());
+        printDiagnosticSection("RED E INTERFACES",report.network());
+        printDiagnosticSection("GPU Y PILA GRÁFICA",report.graphics());
         printDiagnosticSection("SERVICIOS FALLIDOS",report.services());
         printDiagnosticSection("KERNEL Y MÓDULOS",report.kernel());
         printDiagnosticSection("GAMING Y CAPAS GRÁFICAS",report.gaming());
         System.out.println("\nDiagnóstico de solo lectura: no se modificó ningún servicio, módulo, disco ni configuración.");
-        writeAuditEvent("advanced_diagnostics_completed","almacenamiento, servicios, kernel y gaming");
+        writeAuditEvent("advanced_diagnostics_completed","cpu, memoria, almacenamiento, red, gráficos, servicios, kernel y gaming");
     }
     private static void printDiagnosticSection(String title,List<String> lines) {
         System.out.println("\n=== "+title+" ===");
