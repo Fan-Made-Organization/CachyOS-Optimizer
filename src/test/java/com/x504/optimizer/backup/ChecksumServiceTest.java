@@ -17,4 +17,41 @@ class ChecksumServiceTest {
             Files.deleteIfExists(file);
         }
     }
+
+    @Test
+    void verifiesMatchingChecksum() throws Exception {
+        var file = Files.createTempFile("x504-checksum-match", ".txt");
+        try {
+            Files.writeString(file, "X504");
+            var service = new ChecksumService();
+            assertTrue(service.matches(file, service.sha256(file).toUpperCase()));
+        } finally {
+            Files.deleteIfExists(file);
+        }
+    }
+
+    @Test
+    void detectsModifiedFile() throws Exception {
+        var file = Files.createTempFile("x504-checksum-change", ".txt");
+        try {
+            Files.writeString(file, "original");
+            var service = new ChecksumService();
+            String original = service.sha256(file);
+            Files.writeString(file, "modified");
+            assertFalse(service.matches(file, original));
+        } finally {
+            Files.deleteIfExists(file);
+        }
+    }
+
+    @Test
+    void rejectsMalformedChecksum() throws Exception {
+        var file = Files.createTempFile("x504-checksum-invalid", ".txt");
+        try {
+            assertThrows(IllegalArgumentException.class,
+                    () -> new ChecksumService().matches(file, "not-a-checksum"));
+        } finally {
+            Files.deleteIfExists(file);
+        }
+    }
 }
