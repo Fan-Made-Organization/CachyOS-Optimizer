@@ -3,6 +3,7 @@ set -Eeuo pipefail
 
 ROOT="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
 JAR="$ROOT/target/linux-optimizer-0.1.0-SNAPSHOT.jar"
+PENDING_UPDATE="${XDG_DATA_HOME:-$HOME/.local/share}/linux-optimizer/pending-update.jar"
 LOCAL_JAVA="$ROOT/.tools/temurin-jdk-21/bin/java"
 LOCAL_MAVEN="$ROOT/.tools/apache-maven-3.9.9/bin/mvn"
 CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/linux-optimizer"
@@ -72,6 +73,15 @@ fi
 if ! command -v mvn >/dev/null 2>&1 && [[ ! -x "$LOCAL_MAVEN" ]]; then
   say "Maven no está disponible; ejecutando la preparación automática..."
   bash "$ROOT/scripts/bootstrap.sh"
+fi
+
+if [[ -f "$PENDING_UPDATE" ]]; then
+  say "Instalando actualización verificada de GitHub..."
+  mkdir -p "$(dirname "$JAR")"
+  install -m 0644 "$PENDING_UPDATE" "$JAR.new"
+  mv -f "$JAR.new" "$JAR"
+  rm -f "$PENDING_UPDATE"
+  say "Actualización aplicada correctamente."
 fi
 
 if [[ ! -f "$JAR" ]] || find "$ROOT/src/main" "$ROOT/pom.xml" -type f -newer "$JAR" -print -quit | grep -q .; then
