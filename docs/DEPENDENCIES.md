@@ -19,3 +19,7 @@ Los directorios `.tools/`, `.cache/` y `target/` están excluidos de Git. Las he
 ## Herramientas opcionales
 
 Herramientas como `vulkaninfo`, `glxinfo` e `inxi` no son necesarias para compilar. Si faltan, los diagnósticos lo informan; no se instalan controladores ni paquetes del sistema automáticamente.
+
+## Alcance de las descargas
+
+La preparación local instala herramientas de desarrollo dentro de `.tools/` y guarda dependencias Maven en un repositorio local. No instala controladores, paquetes del sistema, servicios ni bibliotecas gráficas globales. Las descargas requieren HTTPS y espacio temporal; las sumas de verificación ayudan a detectar archivos alterados, pero no sustituyen la revisión de fuentes oficiales. Para problemas de descarga comprueba certificados TLS, proxy, arquitectura (`x86_64` o `aarch64`) y espacio libre.
