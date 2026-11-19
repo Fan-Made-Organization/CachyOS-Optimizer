@@ -33,3 +33,11 @@ Las entradas deben describir cambios verificables, indicar limitaciones relevant
 - Se añadió `--advanced-diagnostics` y la opción 11 del menú para revisar dispositivos de bloque, unidades systemd fallidas, módulos del kernel y herramientas de gaming.
 - Se ampliaron pruebas automatizadas para el catálogo gráfico multidistribución y las recomendaciones energéticas.
 - Estas funciones son diagnósticos y planes guiados; no cambian sistemas de archivos, parámetros NVMe, servicios, kernels ni controladores sin una acción explícita y validada.
+
+
+## Estabilización — 2026-11-19
+
+- Se registró la ejecución CI Linux/Java 21 que completó correctamente validación Bash, `git diff --check` y `mvn clean verify` para el generador de parámetros de Steam y su límite opcional de FPS DXVK.
+- Se añadió `docs/STABILIZATION.md` con el estado comprobado, los límites de la CI y la lista de validaciones manuales necesarias antes de publicar una versión estable.
+- La auditoría base ahora distingue explícitamente compilación/pruebas automatizadas de verificación visual en KDE Plasma y pruebas sobre hardware/distribuciones reales.
+- No se añadieron cambios automáticos ni agresivos al sistema durante esta fase de estabilización.
