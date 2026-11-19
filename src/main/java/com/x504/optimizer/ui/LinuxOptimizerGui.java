@@ -26,7 +26,7 @@ public final class LinuxOptimizerGui {
     private static final Color TEXT = new Color(235, 239, 249);
     private static final Color MUTED = new Color(151, 162, 184);
     private final JFrame frame = new JFrame("Linux Optimizer");
-    private final JPanel content = new JPanel(new BorderLayout(0, 18));
+    private final AnimatedPanel content = new AnimatedPanel();
     private final JLabel status = new JLabel("Preparado");
     private final JLabel distro = new JLabel("Detectando sistema…");
     private final JLabel cpu = new JLabel("—");
@@ -257,7 +257,7 @@ public final class LinuxOptimizerGui {
         pageScroll.getVerticalScrollBar().setUnitIncrement(20);
         content.add(pageScroll, BorderLayout.CENTER);
         content.revalidate();
-        content.repaint();
+        content.startFade();
         renderDetails();
     }
 
@@ -407,6 +407,28 @@ public final class LinuxOptimizerGui {
             result.add("");
         }
         return result;
+    }
+
+    private static final class AnimatedPanel extends JPanel {
+        private float alpha = 1f;
+        private javax.swing.Timer fadeTimer;
+        AnimatedPanel() { super(new BorderLayout(0, 18)); setOpaque(false); }
+        void startFade() {
+            if (fadeTimer != null) fadeTimer.stop();
+            alpha = 0f;
+            fadeTimer = new javax.swing.Timer(16, event -> {
+                alpha = Math.min(1f, alpha + 0.12f);
+                repaint();
+                if (alpha >= 1f) fadeTimer.stop();
+            });
+            fadeTimer.start();
+        }
+        @Override protected void paintChildren(Graphics graphics) {
+            Graphics2D g = (Graphics2D) graphics.create();
+            g.setComposite(AlphaComposite.SrcOver.derive(alpha));
+            super.paintChildren(g);
+            g.dispose();
+        }
     }
 
     private static final class ChartPanel extends JPanel {
