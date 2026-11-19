@@ -231,12 +231,11 @@ public final class Main {
                     case "8" -> runGraphicsDriverInstaller(scanner);
                     case "5" -> runStorageOptimization(center, scanner);
                     case "6" -> {
-                        System.out.println("\nKernel activo: " + System.getProperty("os.version"));
-                        System.out.println("Kernels instalados en /usr/lib/modules:");
-                        var kernels = center.installedKernels();
-                        if (kernels.isEmpty()) System.out.println("  No se encontraron directorios de módulos.");
-                        else kernels.forEach(kernel -> System.out.println("  • " + kernel));
-                        System.out.println("No se elimina ni reemplaza ningún kernel. Conserva siempre un kernel de respaldo arrancable.");
+                        System.out.println("\n=== INSPECTOR DE KERNEL Y ARRANQUE ===");
+                        var report = new KernelModule().inspect();
+                        report.findings().forEach(line -> System.out.println("  • " + line));
+                        report.warnings().forEach(line -> System.out.println("  ! " + line));
+                        System.out.println("No se instala, elimina ni reemplaza ningún kernel. Conserva siempre un kernel de respaldo arrancable.");
                     }
                     case "7" -> runSteamOptions(scanner);
                     case "0" -> { return; }
