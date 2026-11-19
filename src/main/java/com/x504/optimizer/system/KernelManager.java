@@ -48,7 +48,7 @@ public final class KernelManager {
                     List.of("kernel", "kernel-devel"), "Instala el kernel mantenido por Fedora y los paquetes de desarrollo; kernel-devel puede no coincidir hasta completar actualizaciones."));
             case SUSE -> List.of(new KernelOption("default", "Kernel estándar openSUSE",
                     List.of("kernel-default", "kernel-devel"), "Usa los paquetes oficiales de la distribución; revisa patrones/repositorios habilitados."));
-            case UNKNOWN -> List.of();
+            case ALPINE, GENTOO, VOID, NIXOS, UNKNOWN -> List.of();
         };
     }
 
@@ -66,7 +66,7 @@ public final class KernelManager {
             case DEBIAN -> List.of("dpkg-query", "-W", "-f=${Status}", "--", packageName);
             case FEDORA -> List.of("rpm", "-q", packageName);
             case SUSE -> List.of("zypper", "search", "--installed-only", "--match-exact", "--type", "package", packageName);
-            case UNKNOWN -> throw new IllegalStateException("No hay consulta de paquetes para esta distribución.");
+            case ALPINE, GENTOO, VOID, NIXOS, UNKNOWN -> throw new IllegalStateException("No hay consulta de paquetes para esta distribución.");
         };
     }
 
