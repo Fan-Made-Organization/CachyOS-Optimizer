@@ -10,6 +10,7 @@ import com.x504.optimizer.core.SystemCore;
 import com.x504.optimizer.monitor.SystemMonitor;
 import com.x504.optimizer.install.OptimizationToolsInstaller;
 import com.x504.optimizer.install.GraphicsDriverInstaller;
+import com.x504.optimizer.cleaner.SystemCleaner;
 import com.x504.optimizer.optimize.OptimizationCenter;
 import com.x504.optimizer.steam.SteamLaunchOptionsBuilder;
 import com.x504.optimizer.compatibility.CompatibilityAnalyzer;
@@ -39,6 +40,7 @@ public final class Main {
         if (args.length > 0 && args[0].equals("--install-tools")) { runInstallTools(); return; }
         if (args.length > 0 && args[0].equals("--optimizer")) { runOptimizationCenter(); return; }
         if (args.length > 0 && args[0].equals("--steam-options")) { runSteamOptions(); return; }
+        if (args.length > 0 && args[0].equals("--cleaner")) { runCleaner(); return; }
         if (args.length > 0 && args[0].equals("--help")) {
             printHelp();
             return;
@@ -523,6 +525,29 @@ public final class Main {
         }
     }
 
+    private static void runCleaner() {
+        try (var scanner = new java.util.Scanner(System.in)) {
+            System.out.println("\\n=== LIMPIADOR CONSERVADOR ===");
+            System.out.println("Solo revisa miniaturas y caché de fuentes del usuario con más de 30 días.");
+            System.out.println("No toca cachés de shaders, navegadores, paquetes, juegos ni archivos personales.");
+            var cleaner = new SystemCleaner();
+            var entries = cleaner.preview();
+            if (entries.isEmpty()) { System.out.println("No hay archivos antiguos permitidos para limpiar."); return; }
+            for (var entry : entries) System.out.printf("- %s: %d archivos, %.2f MiB\\n", entry.category(), entry.files(), entry.bytes() / 1048576.0);
+            System.out.print("Escribe el nombre exacto de una categoría para limpiarla (Enter cancela): ");
+            if (!scanner.hasNextLine()) return;
+            String category = scanner.nextLine().strip();
+            if (category.isEmpty()) return;
+            if (entries.stream().noneMatch(e -> e.category().equals(category))) { System.out.println("Categoría no incluida en la vista previa."); return; }
+            System.out.print("¿Eliminar solo archivos de más de 30 días de esa categoría? [s/N]: ");
+            if (scanner.hasNextLine() && scanner.nextLine().strip().equalsIgnoreCase("s")) {
+                int deleted = cleaner.clean(category);
+                writeAuditEvent("user_cache_cleaned", category + "; archivos eliminados: " + deleted);
+                System.out.println("Archivos eliminados: " + deleted);
+            }
+        } catch (java.io.IOException | RuntimeException ex) { System.err.println("No se pudo completar la limpieza: " + ex.getMessage()); }
+    }
+
     private static void runMonitor(String[] args) {
         int seconds = 15;
         if (args.length > 1) {
@@ -589,6 +614,7 @@ public final class Main {
                 System.out.println("║  6) Instalar herramientas de optimización ║");
                 System.out.println("║  7) Centro de optimización               ║");
                 System.out.println("║  8) Creador de parámetros de Steam       ║");
+                System.out.println("║  9) Limpiador seguro de caché             ║");
                 System.out.println("║  0) Salir                                ║");
                 System.out.println("╚══════════════════════════════════════════╝");
                 System.out.print("Selecciona una opción: ");
@@ -603,6 +629,7 @@ public final class Main {
                     case "6" -> runInstallTools(scanner);
                     case "7" -> runOptimizationCenter(scanner);
                     case "8" -> runSteamOptions(scanner);
+                    case "9" -> runCleaner();
                     case "0" -> { System.out.println("Hasta luego."); return; }
                     default -> System.out.println("Opción no válida. Elige una opción del 0 al 8.");
                 }
@@ -679,7 +706,7 @@ public final class Main {
                   --compare-benchmarks A B  Compara dos CSV (antes/después).
                   --install-tools          Instala herramientas recomendadas en Arch/CachyOS.
                   --optimizer              Abre el centro de optimización guiada.
-                  --steam-options          Crea parámetros de lanzamiento para Steam.
+                  --steam-options          Crea parámetros de lanzamiento para Steam.\n                  --cleaner               Vista previa y limpieza de cachés seguras del usuario.
                   --backup DIR ARCHIVO... 
                                Respalda archivos elegidos en un directorio nuevo.
                   --restore COPIA DESTINO
