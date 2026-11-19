@@ -109,8 +109,8 @@ El script puede descargar Maven 3.9.9 en la copia local del proyecto y verificar
 Clona el repositorio:
 
 ```bash
-git clone https://github.com/Fan-Made-Organization/X504-CachyOS-Optimizer.git
-cd X504-CachyOS-Optimizer
+git clone https://github.com/Fan-Made-Organization/CachyOS-Optimizer.git
+cd CachyOS-Optimizer
 ```
 
 Prepara el entorno y ejecuta las pruebas:
@@ -177,7 +177,7 @@ mvn clean verify
 
 ## Licencia
 
-**La licencia del proyecto todavía no ha sido seleccionada.** El archivo [LICENSE](LICENSE) explica esta situación. Hasta que los mantenedores incorporen una licencia explícita, no debe asumirse que el proyecto puede redistribuirse o modificarse libremente.
+El proyecto se distribuye bajo la **GNU General Public License v3.0 (GPL-3.0-only)**. Consulta el texto completo en [LICENSE](LICENSE) y la explicación oficial en https://www.gnu.org/licenses/gpl-3.0.html.
 
 ---
 
