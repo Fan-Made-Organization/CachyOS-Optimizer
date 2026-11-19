@@ -106,6 +106,53 @@ public final class OptimizationCenter {
         Files.delete(governorStateFile);
     }
 
+    public boolean isZramActive() throws IOException {
+        Path zram = Path.of("/sys/block/zram0");
+        if (!Files.exists(zram)) return false;
+        Path swaps = Path.of("/proc/swaps");
+        return Files.isRegularFile(swaps) && Files.readAllLines(swaps).stream().skip(1).anyMatch(line -> line.startsWith("/dev/zram"));
+    }
+
+    public int configureManagedZram(boolean enable) throws IOException, InterruptedException {
+        Path script = Path.of("scripts", enable ? "zram-enable.sh" : "zram-disable.sh").toAbsolutePath().normalize();
+        if (!Files.isRegularFile(script) || Files.isSymbolicLink(script))
+            throw new IOException("No se encontró el script de configuración zram del proyecto.");
+        return runInherited(List.of("sudo", "bash", script.toString()));
+    }
+
+    public List<String> installedKernels() throws IOException {
+        Path modules = Path.of("/usr/lib/modules");
+        if (!Files.isDirectory(modules)) return List.of();
+        try (var dirs = Files.list(modules)) {
+            return dirs.filter(Files::isDirectory).map(p -> p.getFileName().toString()).sorted().toList();
+        }
+    }
+
+    public List<String> gpuSummary() throws IOException {
+        Path drm = Path.of("/sys/class/drm");
+        if (!Files.isDirectory(drm)) return List.of("No se encontró la interfaz DRM del kernel.");
+        try (var cards = Files.list(drm)) {
+            List<Path> devices = cards.filter(p -> p.getFileName().toString().matches("card[0-9]+") && Files.exists(p.resolve("device"))).toList();
+            if (devices.isEmpty()) return List.of("No se detectaron tarjetas DRM.");
+            List<String> result = new ArrayList<>();
+            for (Path card : devices) {
+                Path device = card.resolve("device");
+                String driver = "desconocido";
+                String vendor = "desconocido";
+                try { driver = device.resolve("driver").toRealPath().getFileName().toString(); } catch (IOException ignored) { }
+                try { vendor = Files.readString(device.resolve("vendor")).strip(); } catch (IOException ignored) { }
+                String family = switch (vendor.toLowerCase(Locale.ROOT)) {
+                    case "0x8086" -> "Intel";
+                    case "0x1002" -> "AMD";
+                    case "0x10de" -> "NVIDIA";
+                    default -> "Fabricante no identificado";
+                };
+                result.add(card.getFileName() + ": " + family + " | controlador: " + driver + " | vendor PCI: " + vendor);
+            }
+            return List.copyOf(result);
+        }
+    }
+
     public boolean hasSolidStateDrive() throws IOException {
         Path block = Path.of("/sys/block");
         if (!Files.isDirectory(block)) return false;
