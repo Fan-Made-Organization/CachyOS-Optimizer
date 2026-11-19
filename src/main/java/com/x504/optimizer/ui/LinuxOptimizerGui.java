@@ -250,12 +250,17 @@ public final class LinuxOptimizerGui {
         details.setBorder(new EmptyBorder(17, 18, 17, 18));
         JScrollPane scroll = new JScrollPane(details);
         scroll.setBorder(BorderFactory.createEmptyBorder());
+        scroll.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        scroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
         scroll.getViewport().setBackground(PANEL);
         scroll.getVerticalScrollBar().setUnitIncrement(18);
+        details.setWrapStyleWord(true);
         body.add(scroll);
         JScrollPane pageScroll = new JScrollPane(body);
         pageScroll.setBorder(BorderFactory.createEmptyBorder());
         pageScroll.setOpaque(false);
+        pageScroll.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        pageScroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
         pageScroll.getViewport().setOpaque(false);
         pageScroll.getVerticalScrollBar().setUnitIncrement(20);
         content.add(pageScroll, BorderLayout.CENTER);
