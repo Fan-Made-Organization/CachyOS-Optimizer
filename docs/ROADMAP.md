@@ -1,10 +1,10 @@
-# Hoja de ruta de X504 CachyOS Optimizer
+# Hoja de ruta de CachyOS Optimizer
 
 Este documento separa las funciones disponibles de los objetivos de desarrollo. Una carpeta, clase o archivo de configuración no significa que una función esté terminada.
 
 ## Dirección del proyecto
 
-X504 será una herramienta **Linux-first, terminal-first**, con prioridad de compatibilidad para CachyOS y Arch Linux. No se planea una interfaz gráfica: la experiencia principal será un CLI claro, con menú interactivo opcional, salida legible y comandos automatizables.
+CachyOS Optimizer será una herramienta **Linux-first, terminal-first**, con prioridad de compatibilidad para CachyOS y Arch Linux. No se planea una interfaz gráfica: la experiencia principal será un CLI claro, con menú interactivo opcional, salida legible y comandos automatizables.
 
 La meta es que una persona pueda clonar el repositorio y ejecutar `bash scripts/launch.sh` sin instalar Java ni Maven globalmente.
 
