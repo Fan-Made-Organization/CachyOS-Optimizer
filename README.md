@@ -156,7 +156,8 @@ El inventario sin controlador asociado no demuestra por sí solo un fallo o conf
 | Microbenchmark CPU local | Implementado como prueba opcional; no mide FPS ni GPU |
 | Exportación de informes JSON/HTML | Implementación inicial |
 | Monitor CPU/RAM y carga en vivo | Implementación inicial, sesión limitada a 5 minutos |
-| Benchmarks sintéticos de RAM y almacenamiento | Implementación inicial, tamaños acotados |\n| Historial y comparación antes/después de benchmarks | Implementación inicial, CSV |
+| Benchmarks sintéticos de RAM y almacenamiento | Implementación inicial, tamaños acotados |
+| Historial y comparación antes/después de benchmarks | Implementación inicial, CSV |
 | Inventario PCI/USB y revisión indicativa de controladores | Implementación inicial |
 | System Core y captura común de módulos | Implementación inicial |
 
