@@ -1,7 +1,7 @@
 # Arquitectura del proyecto
 
 ## Objetivo
-CachyOS Optimizer es una aplicación Java 21 para diagnosticar Linux, analizar compatibilidad y preparar recomendaciones con un enfoque de seguridad primero.
+Linux Optimizer es una aplicación Java 21 para diagnosticar Linux, analizar compatibilidad y preparar recomendaciones con un enfoque de seguridad primero.
 
 ## Capas principales
 - `system`: detección del sistema, panel ASCII y ejecución acotada de consultas.
@@ -40,3 +40,9 @@ CachyOS Optimizer es una aplicación Java 21 para diagnosticar Linux, analizar c
 
 ## Convenciones
 El código Java vive en `src/main/java`; recursos y configuraciones viven en `src/main/resources`; pruebas en `src/test/java`. Código y nombres técnicos están en inglés; la interfaz y documentación para usuarios están en español.
+
+## Portabilidad y límites de las capas
+
+La capa de plataforma identifica distribución y gestor de paquetes sin asumir que ambos determinan por completo las capacidades del sistema. Los módulos de diagnóstico deben preferir interfaces estándar de Linux (`/proc`, `/sys`, `os-release`) y tratar las herramientas externas como dependencias opcionales. Las operaciones de instalación y modificación permanecen en componentes separados y deben declarar explícitamente las familias compatibles.
+
+Las dependencias entre capas deben mantenerse unidireccionales: los módulos producen hallazgos; el asesor interpreta hallazgos; los motores de acción validan y ejecutan solo operaciones permitidas. Una falla de una herramienta externa no debe invalidar el informe completo. Las pruebas deben cubrir datos ausentes, comandos no disponibles, permisos insuficientes, tiempos de espera y salidas inesperadas.
