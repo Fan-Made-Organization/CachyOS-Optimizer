@@ -1,4 +1,4 @@
-# CachyOS Optimizer
+# Linux Optimizer
 
 <p align="center">
   <strong>Diagnóstico Linux, análise de compatibilidade e uma base de otimização com foco em segurança.</strong><br>
@@ -13,9 +13,9 @@
 
 > **Estado atual: desenvolvimento inicial (0.1.0-SNAPSHOT).** O código executável disponível concentra-se em inspeção e diagnóstico somente leitura. O projeto possui bases para perfis, validação de segurança e backups, mas ainda não aplica ajustes de desempenho automaticamente. Consulte [o estado real do projeto](#estado-real-do-projeto).
 
-## O que é o CachyOS Optimizer?
+## O que é o Linux Optimizer?
 
-CachyOS Optimizer é um projeto de software livre em desenvolvimento que pretende reunir em uma única ferramenta informações do sistema, hardware, compatibilidade e componentes relacionados ao uso diário e a jogos no Linux.
+Linux Optimizer é um projeto de software livre em desenvolvimento que pretende reunir em uma única ferramenta informações do sistema, hardware, compatibilidade e componentes relacionados ao uso diário e a jogos no Linux.
 
 O objetivo é ajudar a entender o computador antes de alterar configurações: detectar o ambiente, mostrar informações úteis, indicar ferramentas indisponíveis e preparar recomendações que possam ser avaliadas com segurança.
 
@@ -123,8 +123,8 @@ Se o Java 21 estiver ausente, o bootstrap baixa o Temurin JDK 21 e verifica o SH
 Clone o repositório:
 
 ```bash
-git clone https://github.com/Fan-Made-Organization/CachyOS-Optimizer.git
-cd CachyOS-Optimizer
+git clone https://github.com/Fan-Made-Organization/Linux-Optimizer.git
+cd Linux-Optimizer
 ```
 
 Prepare o ambiente e execute os testes:
@@ -138,13 +138,13 @@ Também é possível usar o Maven instalado no sistema:
 ```bash
 mvn clean verify
 mvn package
-java -jar target/cachyos-optimizer-0.1.0-SNAPSHOT.jar
+java -jar target/linux-optimizer-0.1.0-SNAPSHOT.jar
 
 # Faça backup somente dos arquivos escolhidos explicitamente
-java -jar target/cachyos-optimizer-0.1.0-SNAPSHOT.jar --backup "$HOME/x504-backups" "$HOME/.config/example.conf"
+java -jar target/linux-optimizer-0.1.0-SNAPSHOT.jar --backup "$HOME/x504-backups" "$HOME/.config/example.conf"
 
 # Restaure cópias verificadas em outra pasta, sem sobrescrever arquivos existentes
-java -jar target/cachyos-optimizer-0.1.0-SNAPSHOT.jar --restore "$HOME/x504-backups/backup-..." "$HOME/x504-restored"
+java -jar target/linux-optimizer-0.1.0-SNAPSHOT.jar --restore "$HOME/x504-backups/backup-..." "$HOME/x504-restored"
 ```
 
 Scripts auxiliares disponíveis:
@@ -204,4 +204,12 @@ Este projeto é licenciado sob a **GNU General Public License v3.0 (GPL-3.0-only
 
 ---
 
-**CachyOS Optimizer** — primeiro entenda o sistema; depois otimize com responsabilidade.
+**Linux Optimizer** — primeiro entenda o sistema; depois otimize com responsabilidade.
+
+## Níveis de suporte e limites por distribuição
+
+O Linux Optimizer segue uma abordagem **Linux-first**. A detecção da distribuição e os diagnósticos somente leitura procuram usar interfaces comuns do Linux. Instaladores e ações que alteram o sistema têm escopo menor e dependem da família da distribuição, dos repositórios, do sistema de inicialização, do kernel, do hardware e das políticas locais.
+
+Os níveis de suporte são diferentes: uma distribuição pode ser identificada sem possuir um catálogo de pacotes validado, e um catálogo não significa que todas as otimizações estejam disponíveis. Gentoo, Void e NixOS são reconhecidos, mas alguns fluxos de instalação permanecem somente para leitura. Sistemas imutáveis ou baseados em imagens exigem tratamento específico.
+
+Antes de aplicar alterações, execute o diagnóstico, revise a transação exata de pacotes, mantenha um kernel funcional conhecido, altere uma configuração por vez e execute o diagnóstico novamente. O nome Linux não significa suporte a BSD, Windows, macOS, Android ou todas as arquiteturas; o foco atual é GNU/Linux nos ambientes validados pelo projeto.
