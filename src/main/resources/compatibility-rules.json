@@ -1,1 +1,11 @@
-
+{
+  "version": 1,
+  "description": "Comprobaciones iniciales de compatibilidad; los datos desconocidos no se consideran compatibles.",
+  "checks": [
+    {"id": "linux", "weight": 25, "required": true},
+    {"id": "os_release", "weight": 25, "required": false},
+    {"id": "architecture", "weight": 25, "required": false},
+    {"id": "desktop", "weight": 25, "required": false}
+  ],
+  "unknown_policy": "zero_points"
+}
