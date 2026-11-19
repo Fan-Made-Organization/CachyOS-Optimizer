@@ -256,13 +256,12 @@ Puedes pasar opciones directamente al programa:
 ```bash
 bash scripts/launch.sh                 # abre el menú de terminal
 bash scripts/launch.sh --diagnostics   # diagnóstico directo
-bash scripts/launch.sh --benchmark      # diagnóstico + microbenchmark CPU
-bash scripts/launch.sh --install-tools  # instala herramientas recomendadas
-bash scripts/launch.sh --optimizer      # centro de optimización
-bash scripts/launch.sh --steam-options  # creador de parámetros de Steamdas (Arch/CachyOS)\nbash scripts/launch.sh --optimizer     # centro de optimización guiada
+bash scripts/launch.sh --benchmark     # diagnóstico + microbenchmark CPU
+bash scripts/launch.sh --install-tools # instala herramientas recomendadas
+bash scripts/launch.sh --optimizer     # centro de optimización
+bash scripts/launch.sh --steam-options # creador de parámetros de Steam
 bash scripts/launch.sh --help
 ```
-
 ### Opción 2: usar una interfaz gráfica para clonar
 
 En GitHub, pulsa **Code → Open with GitHub Desktop** (si tienes GitHub Desktop configurado), clona el repositorio y abre una terminal dentro de la carpeta `CachyOS-Optimizer`. Después ejecuta:
