@@ -177,7 +177,7 @@ mvn clean verify
 
 ## Licencia
 
-Consulta el archivo [LICENSE](LICENSE) para conocer los términos de uso y distribución.
+**La licencia del proyecto todavía no ha sido seleccionada.** El archivo [LICENSE](LICENSE) explica esta situación. Hasta que los mantenedores incorporen una licencia explícita, no debe asumirse que el proyecto puede redistribuirse o modificarse libremente.
 
 ---
 
