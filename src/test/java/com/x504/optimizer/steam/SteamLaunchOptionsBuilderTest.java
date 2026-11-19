@@ -37,9 +37,13 @@ class SteamLaunchOptionsBuilderTest {
     }
 
     @Test void addsWineD3DEnvironmentFlagWhenRequested() {
-        assertEquals("PROTON_USE_WINED3D=1 %command%",\n                builder.build(new SteamLaunchOptionsBuilder.Options(false,false,false,false,false,true)));
-        assertEquals("PROTON_USE_WINED3D=1 gamemoderun %command%",\n                builder.build(new SteamLaunchOptionsBuilder.Options(true,false,false,false,false,true)));\n    }
-\n    @Test void providesGameUsageProfiles() {
+        assertEquals("PROTON_USE_WINED3D=1 %command%",
+                builder.build(new SteamLaunchOptionsBuilder.Options(false,false,false,false,false,true)));
+        assertEquals("PROTON_USE_WINED3D=1 gamemoderun %command%",
+                builder.build(new SteamLaunchOptionsBuilder.Options(true,false,false,false,false,true)));
+    }
+
+    @Test void providesGameUsageProfiles() {
         assertEquals(4, builder.gameProfiles().size());
     }
 
