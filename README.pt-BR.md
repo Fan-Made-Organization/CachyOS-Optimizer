@@ -110,11 +110,11 @@ O código Java compilado pelo Maven fica em `src/main/java`. Os arquivos em `src
 ## Requisitos
 
 - Linux para diagnósticos completos.
-- **JDK 21** (não apenas o runtime Java).
-- Acesso à Internet durante a preparação inicial para baixar o Maven ou dependências ausentes.
-- Ferramentas básicas para o script de preparação: `curl`, `tar`, `sha512sum`, `awk` e `sed`.
+- Linux x86_64 ou ARM64 para a preparação automática do JDK.
+- Acesso à Internet durante a preparação inicial.
+- Ferramentas básicas: `curl`, `tar`, `sha256sum`, `sha512sum`, `awk`, `sed`, `python3` e `uname`.
 
-O script de preparação pode baixar o Maven 3.9.9 para a cópia local do projeto e verificar o arquivo com SHA-512. O Maven baixa as dependências Java para um cache local. **O Java 21 deve ser instalado previamente**; o script não instala o JDK nem executa comandos de administrador. Ferramentas opcionais de diagnóstico não são instaladas automaticamente.
+Se o Java 21 estiver ausente, o bootstrap baixa o Temurin JDK 21 e verifica o SHA-256; se o Maven estiver ausente, baixa o Maven 3.9.9 e verifica o SHA-512. Ambos ficam em `.tools/` na cópia local do repositório. As dependências Java ficam em `.cache/`. O script não instala software globalmente nem executa comandos de administrador. Ferramentas opcionais de diagnóstico não são instaladas automaticamente.
 
 ## Instalação e execução
 
