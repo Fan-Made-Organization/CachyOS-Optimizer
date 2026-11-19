@@ -117,7 +117,8 @@ public final class BackupManager {
             if (!checksums.matches(source, entry.sha256())) {
                 throw new IOException("La verificación SHA-256 falló; no se restauró: " + entry.backupPath());
             }
-            String name = Path.of(entry.originalPath()).getFileName().toString();
+            Path originalName = Path.of(entry.originalPath()).getFileName();
+            String name = originalName == null ? "restored-file" : originalName.toString();
             Path target = destinationRoot.resolve(String.format("%04d-", ++index) + name).normalize();
             if (!target.startsWith(destinationRoot)) throw new SecurityException("Destino de restauración no válido.");
             if (Files.exists(target, LinkOption.NOFOLLOW_LINKS)) {
