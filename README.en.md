@@ -167,6 +167,7 @@ The application should not run as root for normal diagnostics. Silent privileged
 ## Documentation
 
 - [Architecture](docs/ARCHITECTURE.md)
+- [Backup manager](docs/BACKUPS.md)
 - [Modules](docs/MODULES.md)
 - [Compatibility](docs/COMPATIBILITY.md)
 - [Dependencies and setup](docs/DEPENDENCIES.md)
