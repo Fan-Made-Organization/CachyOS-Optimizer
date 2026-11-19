@@ -12,13 +12,25 @@ public final class OptimizationToolsInstaller {
             "inxi", "lshw", "dmidecode", "smartmontools", "lm_sensors", "fastfetch",
             "vulkan-tools", "mesa-utils", "libva-utils", "vdpauinfo",
             "power-profiles-daemon", "zram-generator", "cpupower", "thermald");
-    private static final List<String> GAMING = List.of(
-            "gamemode", "mangohud", "gamescope", "goverlay", "vkbasalt", "lib32-gamemode", "lib32-mangohud",
-            "lib32-vkbasalt", "protontricks", "intel-gpu-tools", "radeontop");
+    private static final List<String> GAMING_BASE = List.of(
+            "gamemode", "mangohud", "gamescope", "goverlay");
+    private static final List<String> GAMING_TAIL = List.of(
+            "lib32-gamemode", "lib32-mangohud", "protontricks", "intel-gpu-tools", "radeontop");
 
     public List<String> packages(boolean includeGaming) {
+        return packagesFor(includeGaming, isCachyOS());
+    }
+
+    /** Package names differ because CachyOS ships VKBasalt as vkbasalt-cli. */
+    static List<String> packagesFor(boolean includeGaming, boolean cachyOS) {
         List<String> result = new ArrayList<>(DIAGNOSTIC);
-        if (includeGaming) result.addAll(GAMING);
+        if (includeGaming) {
+            result.addAll(GAMING_BASE);
+            result.add(cachyOS ? "vkbasalt-cli" : "vkbasalt");
+            result.addAll(GAMING_TAIL);
+            // No lib32-vkbasalt package is advertised by the CachyOS repositories.
+            if (!cachyOS) result.add("lib32-vkbasalt");
+        }
         return List.copyOf(result);
     }
 
@@ -33,6 +45,17 @@ public final class OptimizationToolsInstaller {
         try {
             String osRelease = Files.readString(Path.of("/etc/os-release")).toLowerCase(java.util.Locale.ROOT);
             return osRelease.contains("id_like=\"arch") || osRelease.contains("id_like=arch");
+        } catch (IOException | RuntimeException ex) {
+            return false;
+        }
+    }
+
+    private boolean isCachyOS() {
+        if (Files.exists(Path.of("/etc/cachyos-release"))) return true;
+        try {
+            String osRelease = Files.readString(Path.of("/etc/os-release")).toLowerCase(java.util.Locale.ROOT);
+            return osRelease.lines().anyMatch(line -> line.strip().equals("id=cachyos")
+                    || line.strip().equals("id=\"cachyos\""));
         } catch (IOException | RuntimeException ex) {
             return false;
         }
