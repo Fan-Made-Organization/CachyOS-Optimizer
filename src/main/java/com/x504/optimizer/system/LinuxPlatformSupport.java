@@ -11,6 +11,10 @@ import java.util.Locale;
 public final class LinuxPlatformSupport {
     public enum Family { ARCH, DEBIAN, FEDORA, SUSE, UNKNOWN }
     public record Platform(String id, String name, String version, String idLike, Family family, String packageManager) {}
+    private final Path osRelease;
+
+    public LinuxPlatformSupport() { this(Path.of("/etc/os-release")); }
+    public LinuxPlatformSupport(Path osRelease) { this.osRelease = osRelease.toAbsolutePath().normalize(); }
 
     public Platform detect() {
         var values = readRelease();
@@ -64,12 +68,19 @@ public final class LinuxPlatformSupport {
         return process.waitFor();
     }
 
-    private static java.util.Map<String,String> readRelease() {
+    private java.util.Map<String,String> readRelease() {
         var values = new java.util.HashMap<String,String>();
-        Path path = Path.of("/etc/os-release");
-        if (!Files.isReadable(path)) return values;
-        try { for (String line : Files.readAllLines(path)) { int i=line.indexOf('='); if(i<=0 || line.startsWith("#")) continue; String v=line.substring(i+1).strip(); if(v.length()>=2 && v.startsWith("\"") && v.endsWith("\"")) v=v.substring(1,v.length()-1); values.put(line.substring(0,i),v); } }
-        catch (IOException ignored) { }
+        if (!Files.isReadable(osRelease) || Files.isSymbolicLink(osRelease)) return values;
+        try {
+            for (String line : Files.readAllLines(osRelease)) {
+                int i = line.indexOf('=');
+                if (i <= 0 || line.startsWith("#")) continue;
+                String value = line.substring(i + 1).strip();
+                if (value.length() >= 2 && value.startsWith("\"") && value.endsWith("\""))
+                    value = value.substring(1, value.length() - 1);
+                values.put(line.substring(0, i), value);
+            }
+        } catch (IOException ignored) { }
         return values;
     }
     private static boolean executable(String name) {
