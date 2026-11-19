@@ -88,6 +88,7 @@ public final class LinuxOptimizerGui {
         side.add(caption);
         for (String page : List.of("Resumen", "CPU y memoria", "Gráficos", "Almacenamiento", "Red", "Sistema", "Gaming")) {
             JToggleButton button = new JToggleButton(page);
+            button.setUI(new javax.swing.plaf.basic.BasicButtonUI());
             button.setHorizontalAlignment(SwingConstants.LEFT);
             button.setMaximumSize(new Dimension(Integer.MAX_VALUE, 43));
             button.setPreferredSize(new Dimension(190, 43));
@@ -95,6 +96,7 @@ public final class LinuxOptimizerGui {
             button.setForeground(MUTED);
             button.setBackground(side.getBackground());
             button.setBorder(new EmptyBorder(0, 13, 0, 10));
+            button.setRolloverEnabled(true);
             button.setFocusPainted(false);
             button.setOpaque(true);
             button.setContentAreaFilled(true);
