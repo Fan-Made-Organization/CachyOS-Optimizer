@@ -3,6 +3,7 @@ package com.x504.optimizer;
 import com.x504.optimizer.compatibility.CompatibilityAnalyzer;
 import com.x504.optimizer.hardware.HardwareDetector;
 import com.x504.optimizer.modules.*;
+import com.x504.optimizer.profiles.ProfileCatalog;
 import com.x504.optimizer.system.LinuxSystemDetector;
 import com.x504.optimizer.system.SystemInfo;
 import java.util.List;
@@ -23,7 +24,7 @@ public final class Main {
         ModuleManager manager = new ModuleManager(List.of(
                 new CpuModule(), new MemoryModule(), new GpuModule(), new StorageModule(),
                 new PowerModule(), new NetworkModule(), new AudioModule(), new GamingModule(),
-                new KdeModule(), new SteamModule(), new DiagnosticsModule()
+                new KdeModule(), new SteamModule(), new ProtonModule(), new DiagnosticsModule()
         ));
         System.out.println("\n=== Diagnósticos por módulo ===");
         for (DiagnosticModule.ModuleReport report : manager.inspectAll()) {
