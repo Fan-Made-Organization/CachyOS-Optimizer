@@ -15,7 +15,7 @@
 
 ## What is X504 CachyOS Optimizer?
 
-X504 is an open-source project under development that aims to bring system, hardware, compatibility, and Linux gaming diagnostics together in one tool.
+X504 is a free-software project under development that aims to bring system, hardware, compatibility, and Linux gaming diagnostics together in one tool.
 
 Its goal is to help users understand their machines before changing settings: detect the environment, display useful information, identify unavailable tools, and prepare recommendations that can be evaluated safely.
 
@@ -109,8 +109,8 @@ The bootstrap script can download Maven 3.9.9 into the local project checkout an
 Clone the repository:
 
 ```bash
-git clone https://github.com/Fan-Made-Organization/X504-CachyOS-Optimizer.git
-cd X504-CachyOS-Optimizer
+git clone https://github.com/Fan-Made-Organization/CachyOS-Optimizer.git
+cd CachyOS-Optimizer
 ```
 
 Prepare the environment and run the tests:
@@ -177,7 +177,7 @@ mvn clean verify
 
 ## License
 
-**A project license has not been selected yet.** The [LICENSE](LICENSE) file explains this status. Until the maintainers add an explicit license, do not assume that the project may be freely redistributed or modified.
+This project is licensed under the **GNU General Public License v3.0 (GPL-3.0-only)**. See the complete [LICENSE](LICENSE) text and the official explanation at https://www.gnu.org/licenses/gpl-3.0.html.
 
 ---
 
