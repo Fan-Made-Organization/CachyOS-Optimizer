@@ -21,4 +21,23 @@ class SteamLaunchOptionsBuilderTest {
         assertThrows(IllegalArgumentException.class, () -> builder.build(null));
         assertEquals(7, builder.presets().size());
     }
+    @Test void buildsGamescopeResolutionAndRefreshRate() {
+        var advanced = new SteamLaunchOptionsBuilder.AdvancedOptions(true, true, true, false, true, 1280, 720, 120, 3);
+        assertEquals("WINE_FULLSCREEN_FSR=1 WINE_FULLSCREEN_FSR_STRENGTH=3 gamemoderun mangohud gamescope -f -w 1280 -h 720 -r 120 -- %command%",
+                builder.build(advanced));
+    }
+
+    @Test void rejectsUnsafeOrOutOfRangeNumericParameters() {
+        assertThrows(IllegalArgumentException.class, () -> builder.build(
+                new SteamLaunchOptionsBuilder.AdvancedOptions(false,false,true,false,false,1,720,60,2)));
+        assertThrows(IllegalArgumentException.class, () -> builder.build(
+                new SteamLaunchOptionsBuilder.AdvancedOptions(false,false,true,false,false,1920,1080,999,2)));
+        assertThrows(IllegalArgumentException.class, () -> builder.build(
+                new SteamLaunchOptionsBuilder.AdvancedOptions(false,false,false,false,true,1920,1080,60,99)));
+    }
+
+    @Test void providesGameUsageProfiles() {
+        assertEquals(4, builder.gameProfiles().size());
+    }
+
 }
