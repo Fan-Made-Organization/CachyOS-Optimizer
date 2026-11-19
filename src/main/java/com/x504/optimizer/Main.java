@@ -242,7 +242,7 @@ public final class Main {
                             } else System.err.println("El gestor de paquetes terminó con código " + exit + ". No reinicies hasta revisar sus mensajes.");
                         } else System.out.println("Instalación cancelada.");
                     }
-                } catch (NumberFormatException | IllegalArgumentException ex) {
+                } catch (IllegalArgumentException ex) {
                     System.err.println("Selección inválida: " + ex.getMessage());
                 } catch (IOException ex) {
                     System.err.println("No se pudo iniciar el gestor de paquetes: " + ex.getMessage());
@@ -700,7 +700,7 @@ public final class Main {
                     case "7" -> runOptimizationCenter(scanner);
                     case "8" -> runSteamOptions(scanner);
                     case "9" -> runCleaner(scanner);
-                    case "10" -> runLinuxSupport();
+                    case "10" -> runLinuxSupport(scanner);
                     case "0" -> { System.out.println("Hasta luego."); return; }
                     default -> System.out.println("Opción no válida. Elige una opción del 0 al 10.");
                 }
