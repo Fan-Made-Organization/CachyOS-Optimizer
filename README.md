@@ -150,7 +150,22 @@ Ejecutar directamente:
 bash scripts/launch.sh --install-tools
 ```
 
-### 11. Límites de seguridad
+### 11. Centro de optimización guiada
+
+Abre el centro desde el menú principal (opción 7) o ejecuta `bash scripts/launch.sh --optimizer`. Reúne seis áreas:
+
+- **CPU:** consulta y cambia entre `balanced`, `performance` y `power-saver` mediante `power-profiles-daemon`. Guarda el perfil anterior en `~/.local/state/cachyos-optimizer/previous-power-profile` y permite restaurarlo.
+- **RAM:** comprueba si existe zram. El instalador incluye `zram-generator`, pero no escribe una configuración de memoria ni fuerza la limpieza de cachés.
+- **GPU:** mantiene el controlador existente y dirige al diagnóstico de Vulkan/OpenGL; no instala controladores sin identificar hardware y compatibilidad.
+- **Gaming:** instala el conjunto de herramientas opcionales (GameMode, MangoHud, Gamescope, GOverlay y utilidades de diagnóstico).
+- **Almacenamiento:** si detecta un dispositivo no rotacional, permite habilitar `fstrim.timer` con `sudo systemctl enable --now fstrim.timer`. Se puede revertir con `sudo systemctl disable --now fstrim.timer`.
+- **Kernel:** muestra la versión activa y evita sustituir o eliminar kernels automáticamente.
+
+Las operaciones CPU y TRIM solicitan confirmación. El perfil de energía se puede restaurar desde el mismo centro; TRIM se revierte deshabilitando el temporizador. No se prometen ganancias fijas de rendimiento.
+
+**Importante:** RAM, GPU y kernel incluyen inspección y preparación, no cambios automáticos. La configuración de zram y la instalación/cambio de controladores o kernels requieren una implementación específica para cada equipo, revisión de compatibilidad y un plan de recuperación.
+
+### 12. Límites de seguridad
 - Las acciones se validan y preparan, pero el motor no ejecuta modificaciones del sistema.
 - Las operaciones críticas se bloquean.
 - Los cambios requieren aprobación explícita y las operaciones administrativas requieren respaldo.
@@ -168,7 +183,7 @@ bash scripts/launch.sh --install-tools
 | Validación y preparación de acciones | Implementada; las modificaciones reales siguen deshabilitadas |
 | Backup de archivos seleccionados y restauración verificada a otra carpeta | Implementado |
 | Instalación guiada de herramientas de diagnóstico y gaming en Arch/CachyOS | Implementada; confirmación previa y Pacman interactivo |
-| Ajustes automáticos de rendimiento (CPU, energía, kernel, servicios y controladores) | **Pendientes; no se aplican** |
+| Centro guiado CPU/RAM/GPU/Gaming/almacenamiento/kernel | Implementación inicial; CPU y TRIM tienen acciones reversibles; RAM/GPU/kernel son inspección guiada |\n| Configuración automática de zram, controladores y kernel | **Pendiente; no se aplica** |
 | Restauración sobre rutas originales y rollback del sistema | **Pendiente** |
 | Registro local de auditoría | Implementado con rotación básica |
 | Interfaz gráfica | No prevista; el proyecto prioriza una interfaz de terminal. |
@@ -232,7 +247,7 @@ Puedes pasar opciones directamente al programa:
 ```bash
 bash scripts/launch.sh                 # abre el menú de terminal
 bash scripts/launch.sh --diagnostics   # diagnóstico directo
-bash scripts/launch.sh --benchmark     # diagnóstico + microbenchmark CPU\nbash scripts/launch.sh --install-tools # instala herramientas recomendadas (Arch/CachyOS)
+bash scripts/launch.sh --benchmark     # diagnóstico + microbenchmark CPU\nbash scripts/launch.sh --install-tools # instala herramientas recomendadas (Arch/CachyOS)\nbash scripts/launch.sh --optimizer     # centro de optimización guiada
 bash scripts/launch.sh --help
 ```
 
