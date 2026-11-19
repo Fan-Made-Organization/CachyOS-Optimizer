@@ -154,6 +154,12 @@ También puedes usar Maven instalado en tu sistema:
 mvn clean verify
 mvn package
 java -jar target/cachyos-optimizer-0.1.0-SNAPSHOT.jar
+
+# Respalda archivos que selecciones explícitamente
+java -jar target/cachyos-optimizer-0.1.0-SNAPSHOT.jar --backup "$HOME/x504-backups" "$HOME/.config/example.conf"
+
+# Restaura la copia verificada en otra carpeta, sin sobrescribir
+java -jar target/cachyos-optimizer-0.1.0-SNAPSHOT.jar --restore "$HOME/x504-backups/backup-..." "$HOME/x504-restored"
 ```
 
 Scripts auxiliares disponibles:
