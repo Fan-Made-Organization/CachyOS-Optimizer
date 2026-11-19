@@ -53,7 +53,7 @@ public final class Main {
 
         ModuleManager manager = new ModuleManager(List.of(
                 new CpuModule(), new MemoryModule(), new GpuModule(), new StorageModule(),
-                new PowerModule(), new NetworkModule(), new AudioModule(), new GamingModule(),
+                new PowerModule(), new NetworkModule(), new AudioModule(), new GamingModule(), new GraphicsStackModule(),
                 new KdeModule(), new SteamModule(), new ProtonModule(), new DiagnosticsModule()
         ));
         System.out.println("\n=== Diagnósticos por módulo ===");
