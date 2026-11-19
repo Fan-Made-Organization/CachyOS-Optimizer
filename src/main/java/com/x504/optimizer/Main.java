@@ -202,7 +202,7 @@ public final class Main {
             System.out.println("2) RAM: revisar memoria y zram");
             System.out.println("3) GPU: revisar controlador y herramientas");
             System.out.println("4) Gaming: instalar herramientas");
-            System.out.println("5) Almacenamiento: activar TRIM programado");
+            System.out.println("5) Almacenamiento: administrar TRIM programado");
             System.out.println("6) Kernel: información y compatibilidad");
             System.out.println("7) Steam: creador de parámetros de lanzamiento");
             System.out.println("0) Volver");
@@ -336,6 +336,19 @@ public final class Main {
 
     private static void runStorageOptimization(OptimizationCenter center, java.util.Scanner scanner)
             throws java.io.IOException, InterruptedException {
+        boolean enabled = center.isTrimTimerEnabled();
+        System.out.println("Estado de fstrim.timer: " + (enabled ? "habilitado" : "deshabilitado o no disponible"));
+        if (enabled) {
+            System.out.print("¿Deshabilitar TRIM programado? Requiere sudo; puedes volver a activarlo. [s/N]: ");
+            if (scanner.hasNextLine() && scanner.nextLine().strip().equalsIgnoreCase("s")) {
+                int exit = center.disableTrimTimer();
+                if (exit == 0) {
+                    System.out.println("fstrim.timer deshabilitado.");
+                    writeAuditEvent("trim_timer_disabled", "Temporizador TRIM deshabilitado");
+                } else System.err.println("systemctl terminó con código " + exit);
+            }
+            return;
+        }
         if (!center.hasSolidStateDrive()) {
             System.out.println("No se detectó SSD/NVMe. No se activará TRIM automáticamente.");
             return;
