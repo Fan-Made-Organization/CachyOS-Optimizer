@@ -95,6 +95,7 @@ These are development foundations, not a complete backup, restore, or automatic 
 | Automatic optimization application | **Disabled; no changes are executed** |
 | Restore to original system paths and full system rollback | **Planned** |
 | Local audit log | Implemented with basic rotation |
+| Graphical user interface | **Planned** |
 | Local CPU microbenchmark | Implemented as an optional test; does not measure FPS or GPU |
 
 The Java source compiled by Maven is located in `src/main/java`. Files under `src/main/resources/java` are legacy resources and are not compiled as Java classes by the current Maven configuration.
