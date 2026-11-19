@@ -1,0 +1,35 @@
+name: Publicar release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Obtener código
+        uses: actions/checkout@v4
+      - name: Configurar Java 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+          cache: maven
+      - name: Compilar y ejecutar pruebas
+        run: mvn -B clean verify
+      - name: Preparar artefactos
+        run: |
+          cp target/linux-optimizer-0.1.0-SNAPSHOT.jar linux-optimizer.jar
+          sha256sum linux-optimizer.jar > linux-optimizer.jar.sha256
+      - name: Crear GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true
+          files: |
+            linux-optimizer.jar
+            linux-optimizer.jar.sha256
