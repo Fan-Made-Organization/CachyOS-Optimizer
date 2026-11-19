@@ -34,11 +34,11 @@ public final class GitHubUpdater {
         if (tag == null || jarUrl == null || sumUrl == null)
             return new Result(false, "La última release no contiene el JAR y su SHA-256.");
         String current = currentVersion();
-        if (tag.equalsIgnoreCase("v" + current) || tag.equalsIgnoreCase(current))
+        if (tag.equalsIgnoreCase("v" + current.replace("-SNAPSHOT", "")) || tag.equalsIgnoreCase(current))
             return new Result(false, "Linux Optimizer ya está actualizado (" + tag + ").");
         byte[] jar = download(jarUrl);
         String expected = new String(download(sumUrl), java.nio.charset.StandardCharsets.UTF_8).trim().split("\\s+")[0];
-        String actual = HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256").digest(jar));
+        String actual = sha256(jar);
         if (!actual.equalsIgnoreCase(expected)) throw new IOException("La verificación SHA-256 no coincide; actualización descartada.");
         Files.createDirectories(UPDATE_DIR);
         Path temp = UPDATE_DIR.resolve("pending-update.tmp");
@@ -59,6 +59,10 @@ public final class GitHubUpdater {
         return true;
     }
 
+    private static String sha256(byte[] data) {
+        try { return HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256").digest(data)); }
+        catch (java.security.NoSuchAlgorithmException ex) { throw new IllegalStateException("SHA-256 no disponible", ex); }
+    }
     private static String currentVersion() {
         String version = GitHubUpdater.class.getPackage().getImplementationVersion();
         return version == null ? "0.1.0-SNAPSHOT" : version;
