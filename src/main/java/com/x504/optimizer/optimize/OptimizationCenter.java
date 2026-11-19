@@ -106,6 +106,10 @@ public final class OptimizationCenter {
         Files.delete(governorStateFile);
     }
 
+    public boolean isManagedZram() {
+        return Files.isRegularFile(Path.of("/var/lib/cachyos-optimizer/zram-managed"), LinkOption.NOFOLLOW_LINKS);
+    }
+
     public boolean isZramActive() throws IOException {
         Path zram = Path.of("/sys/block/zram0");
         if (!Files.exists(zram)) return false;
