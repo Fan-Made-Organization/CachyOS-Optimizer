@@ -71,7 +71,7 @@ public final class LinuxPlatformSupport {
                 result.put("Gaming", List.copyOf(gaming));
                 result.put("Audio y multimedia", List.of("alsa-utils","pavucontrol","ffmpeg","v4l-utils"));
                 result.put("Desarrollo y depuración", List.of("strace","gdb","valgrind"));
-                result.put("Energía y sensores", List.of("acpi","upower"));
+                result.put("Energía y sensores", List.of("acpi","upower","power-profiles-daemon","tlp","tuned","thermald","auto-cpufreq"));
             }
             case DEBIAN -> {
                 result.put("Diagnóstico y hardware", List.of("inxi","lshw","dmidecode","smartmontools","lm-sensors","pciutils","usbutils"));
