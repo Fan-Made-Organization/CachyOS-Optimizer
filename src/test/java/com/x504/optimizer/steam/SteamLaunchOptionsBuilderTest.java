@@ -9,7 +9,7 @@ class SteamLaunchOptionsBuilderTest {
     @Test void createsBasicAndCombinedOptions() {
         assertEquals("%command%", builder.build(new SteamLaunchOptionsBuilder.Options(false,false,false,false,false)));
         assertEquals("gamemoderun mangohud %command%", builder.build(new SteamLaunchOptionsBuilder.Options(true,true,false,false,false)));
-        assertEquals("gamescope -f -- %command%", builder.build(new SteamLaunchOptionsBuilder.Options(false,false,true,false,false)));
+        assertEquals("gamescope -f -w 1920 -h 1080 -r 60 -- %command%", builder.build(new SteamLaunchOptionsBuilder.Options(false,false,true,false,false)));
     }
 
     @Test void addsProtonEnvironmentFlagsWithoutReplacingSteamPlaceholder() {
