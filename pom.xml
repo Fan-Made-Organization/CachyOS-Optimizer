@@ -4,11 +4,11 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.x504</groupId>
-    <artifactId>cachyos-optimizer</artifactId>
+    <artifactId>linux-optimizer</artifactId>
     <version>0.1.0-SNAPSHOT</version>
-    <name>CachyOS Optimizer</name>
+    <name>Linux Optimizer</name>
     <description>Diagnóstico y optimización segura de sistemas Linux.</description>
-    <url>https://github.com/Fan-Made-Organization/CachyOS-Optimizer</url>
+    <url>https://github.com/Fan-Made-Organization/Linux-Optimizer</url>
     <licenses>
         <license>
             <name>GNU General Public License v3.0 only</name>
