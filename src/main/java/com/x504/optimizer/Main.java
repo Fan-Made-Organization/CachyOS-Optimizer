@@ -16,7 +16,7 @@ import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
 
-/** Punto de entrada de X504 CachyOS Optimizer. */
+/** Punto de entrada de CachyOS Optimizer. */
 public final class Main {
     private Main() {}
 
@@ -106,7 +106,7 @@ public final class Main {
             while (true) {
                 System.out.println();
                 System.out.println("╔══════════════════════════════════════════╗");
-                System.out.println("║       X504-CACHYOS-OPTIMIZER             ║");
+                System.out.println("║       CACHYOS-OPTIMIZER             ║");
                 System.out.println("║             TERMINAL                    ║");
                 System.out.println("╠══════════════════════════════════════════╣");
                 System.out.println("║  1) Analizar y diagnosticar el sistema   ║");
@@ -180,7 +180,7 @@ public final class Main {
 
     private static void printHelp() {
         System.out.println("""
-                X504 CachyOS Optimizer
+                CachyOS Optimizer
                 Uso: java -jar cachyos-optimizer.jar [opciones]
 
                 Opciones:
