@@ -2,7 +2,7 @@
 
 <p align="center">
   <strong>Diagnóstico, análisis de compatibilidad y preparación para optimizar Linux con seguridad.</strong><br>
-  Diseñado para Linux: soporte ampliado para Arch/CachyOS, Debian/Ubuntu, Fedora y openSUSE.
+  Diseñado para Linux: detección ampliada para Arch, Debian, Fedora, SUSE, Alpine, Gentoo, Void y NixOS.
 </p>
 
 <p align="center">
@@ -168,12 +168,16 @@ El proyecto ya no limita sus diagnósticos a CachyOS/Arch. Detecta la distribuci
 
 | Familia | Distribuciones de referencia | Gestor reconocido |
 |---|---|---|
-| Arch | CachyOS, Arch, Manjaro, EndeavourOS y derivadas identificadas | pacman |
-| Debian | Debian, Ubuntu, Linux Mint, Pop!_OS y derivadas identificadas | apt / apt-get |
-| Fedora / RHEL | Fedora, RHEL, CentOS Stream, Rocky y AlmaLinux cuando declaran esa familia | dnf / yum |
-| SUSE | openSUSE Leap y Tumbleweed, y derivadas identificadas | zypper |
+| Arch | CachyOS, Arch, Manjaro, EndeavourOS, Garuda, Artix, SteamOS y derivadas identificadas | pacman |
+| Debian | Debian, Ubuntu, Mint, Pop!_OS, Kali, Zorin, Deepin, MX y derivadas identificadas | apt / apt-get |
+| Fedora / RHEL | Fedora, Nobara, Bazzite, RHEL, CentOS, Rocky, AlmaLinux y derivadas identificadas | dnf5 / dnf / yum |
+| SUSE | openSUSE Leap/Tumbleweed, SLES/SLED y derivadas identificadas | zypper |
+| Alpine | Alpine Linux | apk |
+| Gentoo | Gentoo y Calculate | emerge |
+| Void | Void Linux | xbps-install |
+| NixOS | NixOS | nix (detección; sin instalación automática) |
 
-La clasificación usa `ID` y `ID_LIKE`; no significa que cada derivada tenga exactamente los mismos repositorios o nombres de paquetes. Distribuciones no reconocidas siguen pudiendo ejecutar los diagnósticos Linux de solo lectura, pero no reciben una instalación automática de paquetes.
+La clasificación usa `ID` y `ID_LIKE`, permite enlaces simbólicos estándar de `/etc/os-release` y consulta marcadores clásicos si no hay datos. No significa que cada derivada tenga los mismos repositorios o nombres de paquetes. Gentoo, Void y NixOS se reconocen pero permanecen en solo lectura para el instalador de herramientas; las familias desconocidas también.
 
 El instalador de herramientas usa listas pequeñas y específicas por familia. Muestra los paquetes antes de empezar y deja que APT, DNF/YUM, Pacman o Zypper muestren su transacción y soliciten aprobación. No usa opciones de confirmación automática. No instala controladores, kernels, servicios ni gestores de energía.
 
