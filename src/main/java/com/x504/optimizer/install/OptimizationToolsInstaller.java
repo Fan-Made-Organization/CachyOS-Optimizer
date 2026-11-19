@@ -10,8 +10,8 @@ import java.util.List;
 public final class OptimizationToolsInstaller {
     private static final List<String> DIAGNOSTIC = List.of(
             "inxi", "lshw", "dmidecode", "smartmontools", "lm_sensors", "fastfetch",
-            "vulkan-tools", "mesa-utils", "libva-utils", "vdpauinfo", "nvtop",
-            "power-profiles-daemon", "zram-generator", "cpupower", "thermald", "powertop");
+            "vulkan-tools", "mesa-utils", "libva-utils", "vdpauinfo",
+            "power-profiles-daemon", "zram-generator", "cpupower", "thermald");
     private static final List<String> GAMING = List.of(
             "gamemode", "mangohud", "gamescope", "goverlay", "vkbasalt", "lib32-gamemode", "lib32-mangohud",
             "lib32-vkbasalt", "protontricks", "intel-gpu-tools", "radeontop");
