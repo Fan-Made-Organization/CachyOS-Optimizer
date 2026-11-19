@@ -10,7 +10,7 @@ if [[ ! -f "$config" ]] || [[ "$(cat "$config")" != "$expected" ]]; then
   echo 'La configuración cambió desde que fue creada. No se eliminará para evitar borrar cambios del usuario.' >&2
   exit 3
 fi
-systemctl stop dev-zram0.swap || true
+if systemctl is-active --quiet dev-zram0.swap; then systemctl stop dev-zram0.swap; fi
 rm -f "$config" "$marker"
 systemctl daemon-reload
 echo 'Configuración zram administrada eliminada. El cambio es reversible; otros ajustes de swap no se modificaron.'
