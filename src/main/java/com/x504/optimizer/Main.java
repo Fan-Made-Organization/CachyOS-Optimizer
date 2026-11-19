@@ -4,6 +4,9 @@ import com.x504.optimizer.advisor.OptimizationAdvisor;
 import com.x504.optimizer.audit.AuditLogger;
 import com.x504.optimizer.backup.BackupManager;
 import com.x504.optimizer.benchmark.BenchmarkEngine;
+import com.x504.optimizer.benchmark.BenchmarkSuite;
+import com.x504.optimizer.core.SystemCore;
+import com.x504.optimizer.monitor.SystemMonitor;
 import com.x504.optimizer.compatibility.CompatibilityAnalyzer;
 import com.x504.optimizer.hardware.HardwareDetector;
 import com.x504.optimizer.modules.*;
@@ -23,7 +26,9 @@ public final class Main {
 
     public static void main(String[] args) {
         if (args.length == 0 || args[0].equals("--menu")) { runTerminalMenu(); return; }
-        if (args.length > 0 && (args[0].equals("--diagnostics") || args[0].equals("--benchmark"))) { runDiagnostics(args); return; }
+        if (args.length > 0 && (args[0].equals("--diagnostics") || args[0].equals("--benchmark") || args[0].equals("--report-json") || args[0].equals("--report-html"))) { runDiagnostics(args); return; }
+        if (args.length > 0 && args[0].equals("--monitor")) { runMonitor(args); return; }
+        if (args.length > 0 && (args[0].equals("--benchmark-memory") || args[0].equals("--benchmark-storage"))) { runExtendedBenchmark(args); return; }
         if (args.length > 0 && args[0].equals("--help")) {
             printHelp();
             return;
@@ -57,10 +62,12 @@ public final class Main {
                 new PowerModule(), new NetworkModule(), new AudioModule(), new GamingModule(), new GraphicsStackModule(),
                 new HardwareIntelligenceModule(), new DriverInspectorModule(), new SystemHealthModule(),
                 new PowerIntelligenceModule(), new PackageIntelligenceModule(),
+                new DeviceInventoryModule(), new DriverConflictModule(),
                 new KdeModule(), new SteamModule(), new ProtonModule(), new DiagnosticsModule()
         ));
         System.out.println("\n=== Diagnósticos por módulo ===");
-        var reports = manager.inspectAll();
+        var snapshot = new SystemCore(manager).capture();
+        var reports = snapshot.reports();
         for (DiagnosticModule.ModuleReport report : reports) {
             System.out.println("\n[" + report.title() + "]");
             report.findings().forEach(line -> System.out.println("  • " + line));
@@ -106,6 +113,40 @@ public final class Main {
         System.out.println("Usa --benchmark para la prueba CPU, --backup/--restore para copias verificadas o --help.");
     }
 
+    private static void runMonitor(String[] args) {
+        int seconds = 15;
+        if (args.length > 1) {
+            try { seconds = Integer.parseInt(args[1]); }
+            catch (NumberFormatException ex) { System.err.println("Duración inválida. Usa --monitor 15."); return; }
+        }
+        try {
+            System.out.println("Monitor en vivo; duración máxima: 300 segundos.");
+            for (var sample : new SystemMonitor().monitor(java.time.Duration.ofSeconds(seconds), java.time.Duration.ofSeconds(1))) {
+                System.out.printf("%s | CPU: %s | RAM: %s | Carga: %s%n", sample.time(),
+                    sample.cpuPercent() < 0 ? "N/D" : String.format("%.1f%%", sample.cpuPercent()),
+                    sample.memoryPercent() < 0 ? "N/D" : String.format("%.1f%%", sample.memoryPercent()), sample.loadAverage());
+            }
+        } catch (InterruptedException ex) { Thread.currentThread().interrupt(); System.out.println("Monitor interrumpido."); }
+        catch (IllegalArgumentException ex) { System.err.println(ex.getMessage()); }
+    }
+
+    private static void runExtendedBenchmark(String[] args) {
+        int mib = 16;
+        if (args.length > 1) try { mib = Integer.parseInt(args[1]); }
+        catch (NumberFormatException ex) { System.err.println("Tamaño inválido en MiB."); return; }
+        BenchmarkSuite suite = new BenchmarkSuite();
+        try {
+            if (args[0].equals("--benchmark-memory")) {
+                var r = suite.benchmarkMemory(mib);
+                System.out.printf("RAM sintética (%d MiB): escritura %.1f MiB/s; lectura %.1f MiB/s%n", r.mebibytes(), r.writeMiBs(), r.readMiBs());
+                System.out.println(r.note());
+            } else {
+                var r = suite.benchmarkStorage(mib);
+                System.out.printf("Almacenamiento temporal (%d MiB): escritura %.1f MiB/s; lectura %.1f MiB/s%n", r.mebibytes(), r.writeMiBs(), r.readMiBs());
+                System.out.println(r.note());
+            }
+        } catch (IOException | IllegalArgumentException ex) { System.err.println("Benchmark no completado: " + ex.getMessage()); }
+    }
     private static void exportRequestedReports(String[] args, List<DiagnosticModule.ModuleReport> reports) {
         for (int i = 0; i < args.length - 1; i++) {
             if (!args[i].equals("--report-json") && !args[i].equals("--report-html")) continue;
@@ -211,7 +252,9 @@ public final class Main {
                   --report-html ARCHIVO  Exporta el diagnóstico a HTML.
                   --help       Muestra esta ayuda.
                   --benchmark  Ejecuta un microbenchmark breve de CPU.
-                               No mide FPS ni rendimiento de GPU/juegos.
+                  --benchmark-memory [MiB]  Prueba RAM sintética (8-64 MiB).
+                  --benchmark-storage [MiB] Prueba temporal de disco (8-32 MiB).
+                  --monitor [segundos]      Monitor CPU/RAM (1-300 s).
                   --backup DIR ARCHIVO... 
                                Respalda archivos elegidos en un directorio nuevo.
                   --restore COPIA DESTINO
