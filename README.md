@@ -1,4 +1,4 @@
-# X504 CachyOS Optimizer
+# CachyOS Optimizer
 
 <p align="center">
   <strong>Diagnóstico, análisis de compatibilidad y preparación para optimizar Linux con seguridad.</strong><br>
@@ -13,9 +13,9 @@
 
 > **Estado actual: versión temprana (0.1.0-SNAPSHOT).** El código ejecutable disponible se centra en inspección y diagnóstico de solo lectura. El proyecto incluye bases para perfiles, validación de seguridad y respaldos, pero todavía no aplica automáticamente ajustes de rendimiento. Consulta [qué está implementado y qué está planeado](#estado-real-del-proyecto).
 
-## ¿Qué es X504 CachyOS Optimizer?
+## ¿Qué es CachyOS Optimizer?
 
-X504 es un proyecto libre y en desarrollo para reunir en una sola herramienta información del sistema, hardware, compatibilidad y componentes relacionados con el uso diario y los videojuegos en Linux.
+CachyOS Optimizer es un proyecto libre y en desarrollo para reunir en una sola herramienta información del sistema, hardware, compatibilidad y componentes relacionados con el uso diario y los videojuegos en Linux.
 
 Su objetivo es ayudar a entender el equipo antes de cambiar configuraciones: detectar el entorno, mostrar información útil, señalar herramientas que no estén disponibles y preparar recomendaciones que puedan evaluarse de forma segura.
 
@@ -68,7 +68,7 @@ El CLI presenta un panel ASCII con distribución, base inferida, kernel, escrito
 
 ```text
 ╔════════════════════════════════════════════╗
-║X504-CACHYOS-OPTIMIZER                     ║
+║CACHYOS-OPTIMIZER                     ║
 ║SYSTEM ANALYSIS                            ║
 ╠════════════════════════════════════════════╣
 ║Sistema:       CachyOS                     ║
@@ -154,7 +154,7 @@ bash scripts/launch.sh
 2. Si faltan, descarga Temurin JDK 21 y/o Maven 3.9.9 dentro de `.tools/` y verifica sus hashes.
 3. Ejecuta la preparación y compilación necesarias.
 4. Genera el JAR si todavía no existe.
-5. Inicia X504 CachyOS Optimizer.
+5. Inicia CachyOS Optimizer.
 
 En los siguientes inicios, desde la carpeta del proyecto, solo ejecuta:
 
@@ -264,4 +264,4 @@ El proyecto se distribuye bajo la **GNU General Public License v3.0 (GPL-3.0-onl
 
 ---
 
-**X504 CachyOS Optimizer** — entender el sistema primero; optimizar con responsabilidad después.
+**CachyOS Optimizer** — entender el sistema primero; optimizar con responsabilidad después.
