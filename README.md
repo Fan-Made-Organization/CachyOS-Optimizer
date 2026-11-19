@@ -60,7 +60,36 @@ La presencia de un módulo no significa que todos los controladores, dispositivo
 ### 5. Catálogo de perfiles
 El proyecto incluye un catálogo inicial de perfiles y descripciones para distintos enfoques de uso. En esta etapa son **referencias informativas**: seleccionarlos no cambia gobernadores, controladores, servicios ni parámetros del sistema.
 
-### 6. Bases de seguridad y respaldos
+### 6. Panel de análisis del sistema
+
+El CLI presenta un panel ASCII con distribución, base inferida, kernel, escritorio, arquitectura, CPU, GPU, RAM y evaluación de compatibilidad. Los valores desconocidos se muestran como tales; el estado no se declara excelente si existen comprobaciones desconocidas.
+
+```text
+╔════════════════════════════════════════════╗
+║X504-CACHYOS-OPTIMIZER                     ║
+║SYSTEM ANALYSIS                            ║
+╠════════════════════════════════════════════╣
+║Sistema:       CachyOS                     ║
+║Base:          Arch Linux                  ║
+║Kernel:        Linux 6.x                   ║
+║Escritorio:    KDE Plasma                  ║
+║Arquitectura:  x86_64                      ║
+╠════════════════════════════════════════════╣
+║Compatibilidad: 90% (4 evaluados, 0 desconocidos)║
+║Estado:        EXCELENTE                   ║
+╚════════════════════════════════════════════╝
+```
+
+Los valores anteriores son ilustrativos; el programa muestra los datos reales detectados en cada equipo.
+
+### 7. Respaldos, auditoría y benchmarks
+- `BackupManager`: crea respaldos de archivos seleccionados, genera un manifiesto y verifica SHA-256.
+- Restauración a una carpeta elegida, con verificación de integridad y sin sobrescribir archivos existentes.
+- `AuditLogger`: registra localmente el resumen de diagnósticos en el directorio de estado del usuario.
+- `BenchmarkEngine`: microbenchmark CPU opcional, limitado y sin cambios de configuración.
+- No se respaldan ni restauran archivos del sistema automáticamente; la restauración no escribe sobre las rutas originales.
+
+### 8. Bases de seguridad y respaldos
 - Clasificación de niveles de riesgo para acciones futuras.
 - Validación inicial de acciones antes de considerarlas ejecutables.
 - Clases base para manifiestos de respaldo y comprobación de sumas de verificación.
