@@ -1,1 +1,9 @@
-
+{
+  "version": 1,
+  "default_mode": "diagnostic",
+  "automatic_execution": false,
+  "require_explicit_approval": true,
+  "require_backup_for_privileged_changes": true,
+  "blocked_risk_levels": ["CRITICAL"],
+  "actions": []
+}
