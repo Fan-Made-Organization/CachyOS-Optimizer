@@ -4,7 +4,6 @@ import com.x504.optimizer.hardware.HardwareDetector;
 import com.x504.optimizer.system.AdvancedDiagnostics;
 import com.x504.optimizer.system.LinuxSystemDetector;
 import com.x504.optimizer.system.PlatformHardwareInspector;
-import com.x504.optimizer.monitor.LiveMetrics;
 import com.x504.optimizer.update.GitHubUpdater;
 
 import javax.swing.*;
@@ -15,8 +14,6 @@ import java.util.List;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
-import java.util.ArrayDeque;
-import java.util.Deque;
 
 /** Interfaz gráfica Swing: panel de diagnóstico de solo lectura. */
 public final class LinuxOptimizerGui {
@@ -38,18 +35,6 @@ public final class LinuxOptimizerGui {
     private final Map<String, JToggleButton> navigation = new LinkedHashMap<>();
     private final ButtonGroup navigationGroup = new ButtonGroup();
     private JButton updateButton;
-    private final LiveMetrics liveMetrics = new LiveMetrics();
-    private final Deque<Double> cpuHistory = new ArrayDeque<>();
-    private final Deque<Double> ramHistory = new ArrayDeque<>();
-    private final Deque<Double> gpuHistory = new ArrayDeque<>();
-    private final JLabel liveCpu = new JLabel("—");
-    private final JLabel liveRam = new JLabel("—");
-    private final JLabel liveTemp = new JLabel("No disponible");
-    private final JLabel liveGpu = new JLabel("No expuesta por el controlador");
-    private final ChartPanel cpuChart = new ChartPanel("CPU", cpuHistory);
-    private final ChartPanel ramChart = new ChartPanel("RAM", ramHistory);
-    private final ChartPanel gpuChart = new ChartPanel("GPU", gpuHistory);
-    private javax.swing.Timer liveTimer;
     private AdvancedDiagnostics.Report lastReport;
     private String portableDetails;
     private PlatformHardwareInspector.Report hardwareReport;
@@ -66,7 +51,6 @@ public final class LinuxOptimizerGui {
             catch (Exception ignored) { }
             LinuxOptimizerGui app = new LinuxOptimizerGui();
             app.frame.setVisible(true);
-            app.startLiveMonitoring();
         });
     }
 
@@ -206,42 +190,16 @@ public final class LinuxOptimizerGui {
             body.add(section("Vista general", "Estado detectado del equipo y resumen de los componentes."));
             body.add(section("Diagnóstico", "Selecciona una categoría en el menú lateral para consultar información detallada."));
             body.add(Box.createVerticalStrut(14));
-            JPanel liveCards = new JPanel(new GridLayout(1, 4, 12, 0));
-            liveCards.setOpaque(false);
-            liveCards.add(metricCard("CPU EN VIVO", liveCpu));
-            liveCards.add(metricCard("RAM EN VIVO", liveRam));
-            liveCards.add(metricCard("TEMPERATURA MÁX.", liveTemp));
-            liveCards.add(metricCard("GPU EN VIVO", liveGpu));
-            body.add(liveCards);
-            body.add(Box.createVerticalStrut(14));
-            JPanel charts = new JPanel(new GridLayout(1, 2, 12, 0));
-            charts.setOpaque(false);
-            charts.add(cpuChart);
-            charts.add(ramChart);
-            body.add(charts);
-            body.add(Box.createVerticalStrut(12));
-            body.add(gpuChart);
+            body.add(section("Optimización", "Selecciona un módulo para revisar ajustes compatibles y aplicar únicamente los cambios que autorices."));
         } else {
             body.add(section(page, description(page)));
             body.add(Box.createVerticalStrut(14));
             if (page.equals("CPU y memoria")) {
-                JPanel charts = new JPanel(new GridLayout(1, 2, 12, 0));
-                charts.setOpaque(false);
-                charts.add(cpuChart);
-                charts.add(ramChart);
-                body.add(charts);
-                body.add(Box.createVerticalStrut(12));
-                body.add(metricCard("TEMPERATURA MÁXIMA DETECTADA", liveTemp));
+                body.add(section("Ajustes disponibles", "Revisa gobernador, perfiles de energía y configuración de memoria antes de aplicar cambios."));
             } else if (page.equals("Gráficos")) {
-                body.add(gpuChart);
-                body.add(Box.createVerticalStrut(12));
-                body.add(metricCard("USO GPU", liveGpu));
+                body.add(section("Optimización gráfica", "Revisa controladores, Vulkan, OpenGL y compatibilidad de la pila gráfica."));
             } else {
-                JPanel charts = new JPanel(new GridLayout(1, 2, 12, 0));
-                charts.setOpaque(false);
-                charts.add(cpuChart);
-                charts.add(ramChart);
-                body.add(charts);
+                body.add(section("Mantenimiento", "Revisa TRIM, sistemas de archivos y herramientas disponibles antes de realizar cambios."));
             }
         }
         details.setEditable(false);
@@ -340,29 +298,6 @@ public final class LinuxOptimizerGui {
         }.execute();
     }
 
-    private void startLiveMonitoring() {
-        if (liveTimer != null) liveTimer.stop();
-        liveTimer = new javax.swing.Timer(1000, event -> {
-            LiveMetrics.Sample sample = liveMetrics.sample();
-            addSample(cpuHistory, sample.cpuPercent());
-            addSample(ramHistory, sample.memoryPercent());
-            if (sample.gpuPercent() >= 0) addSample(gpuHistory, sample.gpuPercent());
-            liveCpu.setText(String.format("%.0f%%", sample.cpuPercent()));
-            liveRam.setText(String.format("%.0f%%", sample.memoryPercent()));
-            liveTemp.setText(sample.temperatureCelsius() < 0 ? "No disponible" : String.format("%.1f °C", sample.temperatureCelsius()));
-            liveGpu.setText(sample.gpuPercent() < 0 ? "No expuesta" : String.format("%.0f%%", sample.gpuPercent()));
-            cpuChart.repaint();
-            ramChart.repaint();
-            gpuChart.repaint();
-        });
-        liveTimer.start();
-    }
-
-    private static void addSample(Deque<Double> history, double value) {
-        history.addLast(value);
-        while (history.size() > 60) history.removeFirst();
-    }
-
     private void refresh() {
         if (!isLinuxHost()) {
             refreshPortableHost();
@@ -431,7 +366,7 @@ public final class LinuxOptimizerGui {
                 + "\nArquitectura: " + arch + "\nJava: " + javaVersion
                 + "\nProcesadores lógicos: " + Runtime.getRuntime().availableProcessors()
                 + "\nMemoria física total: " + (total > 0 ? String.format("%.2f GiB", total / 1073741824.0) : "No expuesta por la JVM")
-                + "\n\nLa interfaz, las gráficas de CPU/RAM y el actualizador funcionan en este sistema."
+                + "\n\nLa interfaz y el actualizador funcionan en este sistema."
                 + "\nEl inventario de GPU y almacenamiento usa las herramientas nativas disponibles."
                 + "\nLas métricas de temperatura y uso GPU dependen de los sensores/controladores del fabricante."
                 + "\nNo se ejecutan pruebas de estrés ni se modifican dispositivos."; 
@@ -479,7 +414,7 @@ public final class LinuxOptimizerGui {
         if (hardwareReport != null && (activePage.equals("Gráficos") || activePage.equals("Almacenamiento") || activePage.equals("Resumen"))) {
             lines = new java.util.ArrayList<>(lines);
             if (activePage.equals("Gráficos") || activePage.equals("Resumen")) {
-                lines.add("━━ TELEMETRÍA GRÁFICA ADICIONAL ━━━━━━━━━━━━━━━━━");
+                lines.add("━━ INFORMACIÓN DEL ADAPTADOR GRÁFICO ━━━━━━━━━━━");
                 lines.addAll(hardwareReport.graphics());
                 lines.add("");
             }
@@ -549,59 +484,6 @@ public final class LinuxOptimizerGui {
             g.drawRoundRect(0, 0, w - 5, h - 8, 22, 22);
             g.dispose();
             super.paintComponent(graphics);
-        }
-    }
-
-    private static final class ChartPanel extends JPanel {
-        private final String title;
-        private final Deque<Double> values;
-        ChartPanel(String title, Deque<Double> values) {
-            this.title = title;
-            this.values = values;
-            setOpaque(false);
-            setBorder(new EmptyBorder(14, 15, 12, 15));
-            setPreferredSize(new Dimension(300, 175));
-        }
-        @Override protected void paintComponent(Graphics graphics) {
-            Graphics2D g = (Graphics2D) graphics.create();
-            g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-            g.setColor(new Color(0, 0, 0, 42));
-            g.fillRoundRect(2, 4, getWidth() - 4, getHeight() - 5, 20, 20);
-            g.setPaint(new GradientPaint(0, 0, new Color(35, 42, 60, 248), getWidth(), getHeight(), new Color(19, 25, 39, 248)));
-            g.fillRoundRect(0, 0, getWidth() - 4, getHeight() - 7, 20, 20);
-            g.setColor(new Color(174, 158, 255, 34));
-            g.drawRoundRect(0, 0, getWidth() - 5, getHeight() - 8, 20, 20);
-            g.setColor(TEXT);
-            g.setFont(new Font("SansSerif", Font.BOLD, 13));
-            g.drawString(title + " · últimos 60 segundos", 15, 20);
-            int left=18, top=37, width=getWidth()-36, height=getHeight()-58;
-            g.setColor(new Color(48, 56, 73));
-            for(int i=0;i<4;i++) {
-                int y=top+i*height/3;
-                g.drawLine(left,y,left+width,y);
-            }
-            java.util.List<Double> points = new java.util.ArrayList<>(values);
-            if(points.size()>1) {
-                g.setStroke(new BasicStroke(2.4f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
-                g.setColor(ACCENT);
-                int prevX=left, prevY=top+height-(int)(points.get(0)/100.0*height);
-                for(int i=1;i<points.size();i++) {
-                    int x=left+(i*width/(points.size()-1));
-                    int y=top+height-(int)(points.get(i)/100.0*height);
-                    g.drawLine(prevX,prevY,x,y);
-                    g.fillOval(x-3,y-3,6,6);
-                    prevX=x; prevY=y;
-                }
-            } else {
-                g.setColor(MUTED);
-                g.setFont(new Font("SansSerif", Font.PLAIN, 11));
-                g.drawString("Recopilando muestras…", left, top+height/2);
-            }
-            g.setColor(MUTED);
-            g.setFont(new Font("SansSerif", Font.PLAIN, 10));
-            g.drawString("100%", left, top+9);
-            g.drawString("0%", left, top+height);
-            g.dispose();
         }
     }
 
