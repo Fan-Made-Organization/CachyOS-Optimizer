@@ -57,4 +57,41 @@ class LinuxPlatformSupportTest {
         assertNotNull(platform.packageManager());
         assertFalse(platform.name().isBlank());
     }
+    @Test void recognizesAdditionalDistributionFamilies() throws Exception {
+        assertFamily("ID=nobara\nPRETTY_NAME=\"Nobara Linux\"\n", LinuxPlatformSupport.Family.FEDORA);
+        assertFamily("ID=zorin\nPRETTY_NAME=\"Zorin OS\"\n", LinuxPlatformSupport.Family.DEBIAN);
+        assertFamily("ID=alpine\nPRETTY_NAME=\"Alpine Linux\"\n", LinuxPlatformSupport.Family.ALPINE);
+        assertFamily("ID=gentoo\nPRETTY_NAME=\"Gentoo\"\n", LinuxPlatformSupport.Family.GENTOO);
+        assertFamily("ID=void\nPRETTY_NAME=\"Void Linux\"\n", LinuxPlatformSupport.Family.VOID);
+        assertFamily("ID=nixos\nPRETTY_NAME=\"NixOS\"\n", LinuxPlatformSupport.Family.NIXOS);
+    }
+
+    @Test void buildsSafeAlpineAndGentooCommands() {
+        var alpine = new LinuxPlatformSupport.Platform("alpine", "Alpine", "3.20", "", LinuxPlatformSupport.Family.ALPINE, "apk");
+        var gentoo = new LinuxPlatformSupport.Platform("gentoo", "Gentoo", "", "", LinuxPlatformSupport.Family.GENTOO, "emerge");
+        assertEquals(List.of("sudo", "apk", "add", "btop"), support.installCommand(alpine, List.of("btop")));
+        assertEquals(List.of("sudo", "emerge", "--ask", "btop"), support.installCommand(gentoo, List.of("btop")));
+    }
+
+    @Test void providesSeparateToolCategoriesForSupportedFamilies() {
+        var arch = new LinuxPlatformSupport.Platform("cachyos", "CachyOS", "", "arch", LinuxPlatformSupport.Family.ARCH, "pacman");
+        var categories = support.toolCategories(arch);
+        assertTrue(categories.containsKey("Diagnóstico y hardware"));
+        assertTrue(categories.containsKey("Gráficos y vídeo"));
+        assertTrue(categories.containsKey("Almacenamiento"));
+        assertTrue(categories.containsKey("Red"));
+        assertTrue(categories.containsKey("Monitorización"));
+        assertTrue(categories.containsKey("Gaming"));
+        assertTrue(categories.get("Gaming").contains("gamescope"));
+        assertEquals(support.diagnosticTools(arch).size(), support.diagnosticTools(arch).stream().distinct().count());
+    }
+
+    @Test void quotedOsReleaseValuesAreUnwrapped() throws Exception {
+        Path file = temp.resolve("quoted-os-release");
+        Files.writeString(file, "ID=arch\\nPRETTY_NAME=\\\"Arch Linux\\\"\\nVERSION_ID=\\\"rolling\\\"\\n");
+        var detected = new LinuxPlatformSupport(file).detect();
+        assertEquals("Arch Linux", detected.name());
+        assertEquals("rolling", detected.version());
+    }
+
 }
