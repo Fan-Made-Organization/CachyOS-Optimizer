@@ -27,6 +27,23 @@ public final class AdvancedDiagnostics {
         } catch(IOException ex) { out.add("No se pudo leer el inventario: "+ex.getMessage()); }
         if(out.isEmpty()) out.add("No se detectaron dispositivos de bloque físicos.");
         out.add("La interfaz sysfs no distingue por sí sola SATA SSD de NVMe; usa lsblk/nvme-cli para detalle adicional.");
+
+        java.util.Set<String> filesystems = new java.util.LinkedHashSet<>();
+        for (String mount : List.of("/", "/home", "/boot", "/boot/efi", "/efi")) {
+            Path path = Path.of(mount);
+            if (!Files.exists(path)) continue;
+            try {
+                var store = Files.getFileStore(path);
+                String key = store.name() + "|" + store.type();
+                if (filesystems.add(key)) {
+                    out.add("Sistema de archivos en " + mount + ": " + store.type()
+                            + " | dispositivo: " + store.name()
+                            + " | libre: " + (store.getUsableSpace() / (1024L * 1024L)) + " MiB");
+                }
+            } catch (IOException | SecurityException ignored) {
+                out.add("No se pudo consultar el sistema de archivos de " + mount + ".");
+            }
+        }
         return List.copyOf(out);
     }
     List<String> inspectServices() {
