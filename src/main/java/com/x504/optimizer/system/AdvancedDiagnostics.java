@@ -68,9 +68,10 @@ public final class AdvancedDiagnostics {
                 String state = read(p.resolve("operstate"), "desconocido");
                 String carrier = read(p.resolve("carrier"), "");
                 String mtu = read(p.resolve("mtu"), "n/d");
+                String speed = read(p.resolve("speed"), "n/d");
                 String mac = read(p.resolve("address"), "n/d");
                 String wireless = Files.exists(p.resolve("wireless")) ? "Wi-Fi/radio" : "Ethernet/virtual u otro";
-                out.add(name + ": " + wireless + " | estado " + state + " | carrier " + (carrier.isBlank()?"n/d":carrier) + " | MTU " + mtu + " | MAC " + mac);
+                out.add(name + ": " + wireless + " | estado " + state + " | carrier " + (carrier.isBlank()?"n/d":carrier) + " | MTU " + mtu + " | velocidad anunciada " + speed + " Mb/s | MAC " + mac);
             }
         } catch (IOException ex) { out.add("No se pudo consultar /sys/class/net."); }
         try {
@@ -94,7 +95,10 @@ public final class AdvancedDiagnostics {
                 String driver = "sin enlace de driver visible";
                 try { Path link = device.resolve("driver"); if (Files.isSymbolicLink(link)) driver = Files.readSymbolicLink(link).getFileName().toString(); } catch (IOException ignored) { }
                 String name = switch (vendor.toLowerCase()) { case "0x8086" -> "Intel"; case "0x1002" -> "AMD"; case "0x10de" -> "NVIDIA"; default -> "desconocido"; };
-                out.add(card.getFileName() + ": " + name + " | vendor " + vendor + " | device " + id + " | driver " + driver);
+                String vramTotal = read(device.resolve("mem_info_vram_total"), "");
+                String vramUsed = read(device.resolve("mem_info_vram_used"), "");
+                String vram = vramTotal.isBlank() ? "VRAM no expuesta por sysfs" : "VRAM " + (Long.parseLong(vramTotal) / (1024L * 1024L)) + " MiB" + (vramUsed.isBlank() ? "" : " | usada " + (Long.parseLong(vramUsed) / (1024L * 1024L)) + " MiB");
+                out.add(card.getFileName() + ": " + name + " | vendor " + vendor + " | device " + id + " | driver " + driver + " | " + vram);
             }
         } catch (IOException ex) { out.add("No se pudo consultar el subsistema DRM."); }
         if (out.isEmpty()) out.add("No se detectaron tarjetas DRM en /sys/class/drm.");
@@ -115,7 +119,10 @@ public final class AdvancedDiagnostics {
             }
         } catch(IOException ex) { out.add("No se pudo leer el inventario: "+ex.getMessage()); }
         if(out.isEmpty()) out.add("No se detectaron dispositivos de bloque físicos.");
+        out.add("SMART: " + (available("smartctl") ? "smartctl disponible (no se ejecutan pruebas)" : "smartmontools no detectado"));
+        out.add("NVMe CLI: " + (available("nvme") ? "nvme disponible (solo se detecta la herramienta)" : "nvme-cli no detectado"));
         out.add("La interfaz sysfs no distingue por sí sola SATA SSD de NVMe; usa lsblk/nvme-cli para detalle adicional.");
+        out.add("No se ejecutan pruebas SMART, autodiagnósticos ni escrituras en los discos.");
 
         java.util.Set<String> filesystems = new java.util.LinkedHashSet<>();
         for (String mount : List.of("/", "/home", "/boot", "/boot/efi", "/efi")) {
