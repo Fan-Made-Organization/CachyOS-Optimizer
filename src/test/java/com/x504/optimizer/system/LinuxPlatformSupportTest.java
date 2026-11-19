@@ -86,6 +86,7 @@ class LinuxPlatformSupportTest {
         assertTrue(categories.containsKey("Desarrollo y depuración"));
         assertTrue(categories.containsKey("Energía y sensores"));
         assertTrue(categories.get("Gaming").contains("gamescope"));
+        assertTrue(categories.get("Energía y sensores").containsAll(List.of("power-profiles-daemon", "tlp", "tuned", "thermald", "auto-cpufreq")));
         assertTrue(categories.get("Gaming").contains("vkbasalt-cli"));
         assertFalse(categories.get("Gaming").contains("vkbasalt"));
 
