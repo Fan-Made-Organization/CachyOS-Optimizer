@@ -207,7 +207,9 @@ public final class Main {
                 Opciones:
                   --menu        Abre el menú interactivo de terminal.
                   --diagnostics Ejecuta el análisis completo directamente.
-                  --report-json ARCHIVO  Exporta el diagnóstico a JSON.\n                  --report-html ARCHIVO  Exporta el diagnóstico a HTML.\n                  --help       Muestra esta ayuda.
+                  --report-json ARCHIVO  Exporta el diagnóstico a JSON.
+                  --report-html ARCHIVO  Exporta el diagnóstico a HTML.
+                  --help       Muestra esta ayuda.
                   --benchmark  Ejecuta un microbenchmark breve de CPU.
                                No mide FPS ni rendimiento de GPU/juegos.
                   --backup DIR ARCHIVO... 
