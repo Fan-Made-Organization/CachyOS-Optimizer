@@ -342,7 +342,11 @@ public final class Main {
     }
     private static void runCpuOptimization(OptimizationCenter center, java.util.Scanner scanner)
             throws java.io.IOException, InterruptedException {
-        System.out.println("\nPerfil de energía actual: " + center.currentPowerProfile());
+        try {
+            System.out.println("\nPerfil de energía actual: " + center.currentPowerProfile());
+        } catch (java.io.IOException ex) {
+            System.out.println("\nPerfil de energía no disponible: " + ex.getMessage());
+        }
         System.out.println("1) Equilibrado (recomendado para uso diario)");
         System.out.println("2) Rendimiento (más consumo y temperatura potencial)");
         System.out.println("3) Ahorro de energía");
@@ -354,6 +358,7 @@ public final class Main {
         String selected = scanner.nextLine().strip();
         if (selected.equals("4")) {
             System.out.println("Gobernador actual: " + center.currentGovernor());
+            System.out.println("Aviso: power-profiles-daemon u otros servicios pueden volver a cambiar el gobernador.");
             var available = center.availableGovernors();
             System.out.println("Disponibles: " + String.join(", ", available));
             System.out.print("Escribe uno de los gobernadores disponibles (o Enter para cancelar): ");
