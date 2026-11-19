@@ -17,3 +17,7 @@
 - Añadido microbenchmark CPU opcional y acotado.
 - Añadidas pruebas unitarias para panel, auditoría, respaldo y benchmark.
 - Integradas las nuevas capacidades en el CLI.
+
+## Criterios de registro
+
+Las entradas deben describir cambios verificables, indicar limitaciones relevantes y separar funciones implementadas de trabajo planificado. No se debe anunciar una optimización como disponible cuando solo existe detección o recomendación. Los cambios de nombre del proyecto no migran por sí solos los datos de configuración locales ni amplían automáticamente la compatibilidad.
