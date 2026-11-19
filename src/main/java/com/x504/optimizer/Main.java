@@ -86,8 +86,11 @@ public final class Main {
     }
 
     private static void writeAuditLog(int modules, int recommendations) {
-        Path stateHome = Path.of(System.getenv().getOrDefault("XDG_STATE_HOME",
-                Path.of(System.getProperty("user.home"), ".local", "state").toString()));
+        String configuredStateHome = System.getenv("XDG_STATE_HOME");
+        Path stateHome = configuredStateHome != null && !configuredStateHome.isBlank()
+                && Path.of(configuredStateHome).isAbsolute()
+                ? Path.of(configuredStateHome)
+                : Path.of(System.getProperty("user.home"), ".local", "state");
         Path log = stateHome.resolve("x504-cachyos-optimizer").resolve("audit.log");
         try {
             new AuditLogger(log).record("diagnostic_completed",
