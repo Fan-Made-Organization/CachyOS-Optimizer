@@ -25,7 +25,7 @@ public final class SystemMonitor {
             double cpu = previous == null || current == null ? -1 : current.percentSince(previous);
             previous = current;
             long total = value("MemTotal"), available = value("MemAvailable");
-            double used = total <= 0 ? -1 : (total - available) * 100.0 / total;
+            double used = total <= 0 || available < 0 ? -1 : Math.max(0, Math.min(100, (total - available) * 100.0 / total));
             String load = readFirst(Path.of("/proc/loadavg"));
             samples.add(new Sample(Instant.now(), cpu, used, load));
         } while (System.nanoTime() < end);
