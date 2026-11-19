@@ -11,9 +11,9 @@ public final class OptimizationToolsInstaller {
     private static final List<String> DIAGNOSTIC = List.of(
             "inxi", "lshw", "dmidecode", "smartmontools", "lm_sensors",
             "vulkan-tools", "mesa-utils", "libva-utils", "vdpauinfo", "nvtop",
-            "power-profiles-daemon", "zram-generator", "cpupower");
+            "power-profiles-daemon", "zram-generator", "cpupower", "thermald", "powertop");
     private static final List<String> GAMING = List.of(
-            "gamemode", "mangohud", "gamescope", "goverlay");
+            "gamemode", "mangohud", "gamescope", "goverlay", "vkbasalt", "lib32-gamemode", "lib32-mangohud");
 
     public List<String> packages(boolean includeGaming) {
         List<String> result = new ArrayList<>(DIAGNOSTIC);
