@@ -14,8 +14,9 @@ public final class KernelManager {
     public record BootInventory(List<String> installedModuleTrees, List<String> bootFiles, String activeKernel) {
         public BootInventory { installedModuleTrees = List.copyOf(installedModuleTrees); bootFiles = List.copyOf(bootFiles); }
         public boolean hasPossibleFallback() {
-            return installedModuleTrees.stream().anyMatch(v -> !v.equals(activeKernel))
-                    || bootFiles.stream().anyMatch(v -> v.toLowerCase().contains("vmlinuz") || v.toLowerCase().contains("vmlinux"));
+            long otherKernelTrees = installedModuleTrees.stream().filter(v -> !v.equals(activeKernel)).count();
+            long bootKernelImages = bootFiles.stream().filter(v -> v.startsWith("vmlinuz") || v.startsWith("vmlinux")).count();
+            return otherKernelTrees > 0 || bootKernelImages > 1;
         }
     }
 
