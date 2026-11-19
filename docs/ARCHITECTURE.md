@@ -1,7 +1,7 @@
 # Arquitectura del proyecto
 
 ## Objetivo
-X504 CachyOS Optimizer es una aplicación Java 21 para diagnosticar Linux, analizar compatibilidad y preparar recomendaciones con un enfoque de seguridad primero.
+CachyOS Optimizer es una aplicación Java 21 para diagnosticar Linux, analizar compatibilidad y preparar recomendaciones con un enfoque de seguridad primero.
 
 ## Capas principales
 - `system`: detección del sistema, panel ASCII y ejecución acotada de consultas.
