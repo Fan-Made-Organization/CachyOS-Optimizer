@@ -457,3 +457,10 @@ El centro de optimización incorpora un catálogo gráfico por familia Linux par
 El asesor energético distingue laptops mediante la presencia de una batería en sysfs y escritorios cuando la interfaz de alimentación existe sin batería. Recomienda un perfil conservador, pero nunca cambia el perfil por sí solo. La disponibilidad real depende de `power-profiles-daemon`.
 
 El comando `--advanced-diagnostics` amplía el diagnóstico con CPU (frecuencias y gobernador expuestos), RAM/swap/PSI, almacenamiento (dispositivos, scheduler y sistemas de archivos montados), interfaces de red/ruta predeterminada, GPU mediante DRM y herramientas gráficas, unidades systemd fallidas, módulos del kernel y herramientas de gaming. Es una revisión de solo lectura: no ejecuta pruebas de velocidad ni estrés, no consulta SMART automáticamente y no cambia servicios, drivers o configuraciones. La frecuencia de CPU es una lectura puntual y la clasificación rotacional no distingue por sí sola SATA SSD de NVMe.
+
+
+### Actualizaciones automáticas desde GitHub
+
+La aplicación comprueba en segundo plano la última GitHub Release al abrir la interfaz gráfica. También puedes pulsar **Buscar actualizaciones**. Si encuentra una versión nueva, descarga el JAR y su checksum SHA-256, verifica la integridad y lo prepara en `~/.local/share/linux-optimizer/`. El lanzador aplica el archivo verificado en el siguiente inicio; nunca reemplaza el programa mientras está ejecutándose.
+
+Las releases se publican al crear y subir una etiqueta Git con formato `vX.Y.Z`. El flujo `.github/workflows/release.yml` ejecuta `mvn clean verify` y adjunta `linux-optimizer.jar` más su checksum. Hasta que exista una primera GitHub Release, la aplicación indicará que todavía no hay una versión publicada.
