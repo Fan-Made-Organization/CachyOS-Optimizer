@@ -9,7 +9,7 @@ import java.util.List;
 /** Instala herramientas conocidas de diagnóstico y gaming en Arch/CachyOS. */
 public final class OptimizationToolsInstaller {
     private static final List<String> DIAGNOSTIC = List.of(
-            "inxi", "lshw", "dmidecode", "smartmontools", "lm_sensors", "btop", "fastfetch", "stress-ng",
+            "inxi", "lshw", "dmidecode", "smartmontools", "lm_sensors", "fastfetch",
             "vulkan-tools", "mesa-utils", "libva-utils", "vdpauinfo", "nvtop",
             "power-profiles-daemon", "zram-generator", "cpupower", "thermald", "powertop");
     private static final List<String> GAMING = List.of(
