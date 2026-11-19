@@ -11,7 +11,7 @@
   <a href="README.pt-BR.md">🇧🇷 Português</a>
 </p>
 
-> **Estado actual: versión temprana (0.1.0-SNAPSHOT).** Incluye diagnósticos y algunas acciones optativas y reversibles para CPU, zram y TRIM, además de un creador de parámetros de Steam. No aplica cambios a escondidas ni promete ganancias fijas de rendimiento. Consulta [el estado real del proyecto](#estado-real-del-proyecto).
+> **Estado actual: versión temprana (0.1.0-SNAPSHOT).** Incluye perfiles de energía, gobernadores CPU, ZRAM, ajuste temporal de swappiness, TRIM programado, mantenimiento de cachés, herramientas gráficas y gaming, y un creador de parámetros de Steam. No aplica cambios a escondidas ni promete ganancias fijas de rendimiento. Consulta [el estado real del proyecto](#estado-real-del-proyecto).
 
 ## ¿Qué es Linux Optimizer?
 
@@ -65,7 +65,7 @@ Su objetivo es ayudar a entender el equipo antes de cambiar configuraciones: det
 La presencia de un módulo no significa que todos los controladores, dispositivos o herramientas estén instalados. Cada módulo depende de lo que el sistema permita detectar.
 
 ### 5. Perfiles de optimización
-El catálogo incluye seis enfoques: Equilibrado, Rendimiento, Ahorro de energía, Gaming, Diagnóstico y Mantenimiento. Son guías de comprobaciones y siguientes pasos; no aplican cambios en lote ni prometen FPS. Las acciones disponibles se realizan por separado desde el centro de optimización, con confirmación y reversión cuando corresponde.
+El catálogo incluye seis enfoques: Equilibrado, Rendimiento, Ahorro de energía, Gaming, Diagnóstico y Mantenimiento. Son guías de comprobaciones y siguientes pasos; no aplican cambios en lote ni prometen FPS. Las acciones disponibles incluyen perfiles de energía, gobernador CPU, ZRAM administrada, swappiness temporal y TRIM programado; se realizan por separado desde el centro de optimización, con confirmación y reversión cuando corresponde.
 
 ### 6. Interfaz gráfica y panel de análisis del sistema
 
