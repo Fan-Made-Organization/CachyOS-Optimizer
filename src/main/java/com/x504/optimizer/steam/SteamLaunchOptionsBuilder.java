@@ -29,6 +29,7 @@ public final class SteamLaunchOptionsBuilder {
         validate(options);
         List<String> parts = new ArrayList<>();
         if (options.protonLog()) parts.add("PROTON_LOG=1");
+        if (options.wined3d()) parts.add("PROTON_USE_WINED3D=1");
         if (options.fsr()) {
             parts.add("WINE_FULLSCREEN_FSR=1");
             parts.add("WINE_FULLSCREEN_FSR_STRENGTH=" + options.fsrStrength());
