@@ -28,7 +28,7 @@ import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
 
-/** Punto de entrada de CachyOS Optimizer. */
+/** Punto de entrada de Linux Optimizer. */
 public final class Main {
     private Main() {}
 
@@ -291,7 +291,7 @@ public final class Main {
         }
         System.out.println("\n=== GUÍA DE RECUPERACIÓN ===");
         kernels.recoveryGuide().forEach(line -> System.out.println(" • " + line));
-        System.out.println("\nCachyOS Optimizer nunca elimina kernels, no cambia el bootloader ni edita parámetros de arranque.");
+        System.out.println("\nLinux Optimizer nunca elimina kernels, no cambia el bootloader ni edita parámetros de arranque.");
     }
     private static void runOptimizationCenter() {
         try (var scanner = new java.util.Scanner(System.in)) { runOptimizationCenter(scanner); }
@@ -574,7 +574,7 @@ public final class Main {
         System.out.println("El perfil usa zstd y un tamaño máximo de la mitad de la RAM, limitado a 4 GiB.");
         System.out.println("No se purgan cachés ni se cierran procesos.");
         if (center.isZramActive() && !center.isManagedZram()) {
-            System.out.println("zram ya está activo, pero no fue configurado por CachyOS Optimizer. No se modificará.");
+            System.out.println("zram ya está activo, pero no fue configurado por Linux Optimizer. No se modificará.");
             return;
         }
         if (center.isZramActive()) {
@@ -706,7 +706,7 @@ public final class Main {
             while (true) {
                 System.out.println();
                 System.out.println("╔══════════════════════════════════════════╗");
-                System.out.println("║       CACHYOS-OPTIMIZER             ║");
+                System.out.println("║       LINUX-OPTIMIZER             ║");
                 System.out.println("║             TERMINAL                    ║");
                 System.out.println("╠══════════════════════════════════════════╣");
                 System.out.println("║  1) Analizar y diagnosticar el sistema   ║");
@@ -794,8 +794,8 @@ public final class Main {
 
     private static void printHelp() {
         System.out.println("""
-                CachyOS Optimizer
-                Uso: java -jar cachyos-optimizer.jar [opciones]
+                Linux Optimizer
+                Uso: java -jar linux-optimizer.jar [opciones]
 
                 Opciones:
                   --menu        Abre el menú interactivo de terminal.
