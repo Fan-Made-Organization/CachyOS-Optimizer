@@ -8,6 +8,7 @@ import com.x504.optimizer.compatibility.CompatibilityAnalyzer;
 import com.x504.optimizer.hardware.HardwareDetector;
 import com.x504.optimizer.modules.*;
 import com.x504.optimizer.profiles.ProfileCatalog;
+import com.x504.optimizer.reports.ReportExporter;
 import com.x504.optimizer.system.LinuxSystemDetector;
 import com.x504.optimizer.system.SystemAnalysisDashboard;
 import com.x504.optimizer.system.SystemInfo;
@@ -54,6 +55,8 @@ public final class Main {
         ModuleManager manager = new ModuleManager(List.of(
                 new CpuModule(), new MemoryModule(), new GpuModule(), new StorageModule(),
                 new PowerModule(), new NetworkModule(), new AudioModule(), new GamingModule(), new GraphicsStackModule(),
+                new HardwareIntelligenceModule(), new DriverInspectorModule(), new SystemHealthModule(),
+                new PowerIntelligenceModule(), new PackageIntelligenceModule(),
                 new KdeModule(), new SteamModule(), new ProtonModule(), new DiagnosticsModule()
         ));
         System.out.println("\n=== Diagnósticos por módulo ===");
@@ -63,6 +66,8 @@ public final class Main {
             report.findings().forEach(line -> System.out.println("  • " + line));
             report.warnings().forEach(line -> System.out.println("  ! " + line));
         }
+
+        exportRequestedReports(args, reports);
 
         System.out.println("\n=== Recomendaciones inteligentes (solo lectura) ===");
         var recommendations = new OptimizationAdvisor().analyze(reports);
@@ -101,6 +106,22 @@ public final class Main {
         System.out.println("Usa --benchmark para la prueba CPU, --backup/--restore para copias verificadas o --help.");
     }
 
+    private static void exportRequestedReports(String[] args, List<DiagnosticModule.ModuleReport> reports) {
+        for (int i = 0; i < args.length - 1; i++) {
+            if (!args[i].equals("--report-json") && !args[i].equals("--report-html")) continue;
+            try {
+                Path destination = Path.of(args[i + 1]);
+                ReportExporter exporter = new ReportExporter();
+                Path written = args[i].equals("--report-json")
+                        ? exporter.exportJson(reports, destination)
+                        : exporter.exportHtml(reports, destination);
+                System.out.println("Informe exportado: " + written);
+            } catch (IOException | RuntimeException exception) {
+                System.err.println("No se pudo exportar el informe: " + exception.getMessage());
+            }
+            i++;
+        }
+    }
     private static void runTerminalMenu() {
         try (var scanner = new java.util.Scanner(System.in)) {
             while (true) {
@@ -186,7 +207,7 @@ public final class Main {
                 Opciones:
                   --menu        Abre el menú interactivo de terminal.
                   --diagnostics Ejecuta el análisis completo directamente.
-                  --help       Muestra esta ayuda.
+                  --report-json ARCHIVO  Exporta el diagnóstico a JSON.\n                  --report-html ARCHIVO  Exporta el diagnóstico a HTML.\n                  --help       Muestra esta ayuda.
                   --benchmark  Ejecuta un microbenchmark breve de CPU.
                                No mide FPS ni rendimiento de GPU/juegos.
                   --backup DIR ARCHIVO... 
