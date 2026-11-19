@@ -160,23 +160,51 @@ public final class Main {
     private static void runInstallTools(java.util.Scanner scanner) {
         LinuxPlatformSupport support = new LinuxPlatformSupport();
         var platform = support.detect();
-        List<String> packages = support.diagnosticTools(platform);
-        if (packages.isEmpty()) {
-            System.err.println("Instalación automática no habilitada para esta familia. Distribución: " + platform.name() + "; gestor: " + platform.packageManager());
-            System.err.println("Puedes instalar manualmente herramientas equivalentes desde los repositorios oficiales de tu distribución.");
+        var categories = support.toolCategories(platform);
+        System.out.println("\n=== INSTALADOR DE HERRAMIENTAS LINUX ===");
+        System.out.println("Distribución: " + platform.name() + " | ID: " + platform.id() + (platform.version().isBlank() ? "" : " " + platform.version()));
+        System.out.println("Familia: " + platform.family() + " | Gestor: " + platform.packageManager());
+        if (categories.isEmpty()) {
+            System.out.println("No existe todavía un perfil de paquetes validado para esta familia.");
+            System.out.println("La detección permanece disponible; la instalación automática se mantiene desactivada para evitar paquetes incorrectos.");
+            System.out.println("Puedes usar los diagnósticos de solo lectura y consultar los repositorios oficiales de tu distribución.");
             return;
         }
-        System.out.println("\n=== HERRAMIENTAS PARA LINUX ===");
-        System.out.println("Distribución: " + platform.name() + " | Familia: " + platform.family() + " | Gestor: " + platform.packageManager());
-        System.out.println("Paquetes que se solicitarán:");
+        List<String> names = new java.util.ArrayList<>(categories.keySet());
+        System.out.println("\nPerfiles disponibles:");
+        for (int i = 0; i < names.size(); i++) {
+            String category = names.get(i);
+            System.out.println((i + 1) + ") " + category + " (" + categories.get(category).size() + " paquetes)");
+        }
+        System.out.println("A) Instalar todos los perfiles");
+        System.out.println("0) Volver");
+        System.out.print("Selecciona un perfil: ");
+        if (!scanner.hasNextLine()) return;
+        String choice = scanner.nextLine().strip();
+        if (choice.equals("0") || choice.isEmpty()) { System.out.println("Instalación cancelada."); return; }
+        List<String> packages = new java.util.ArrayList<>();
+        if (choice.equalsIgnoreCase("a")) {
+            categories.values().forEach(packages::addAll);
+        } else {
+            try {
+                int index = Integer.parseInt(choice) - 1;
+                if (index < 0 || index >= names.size()) { System.out.println("Opción no válida."); return; }
+                packages.addAll(categories.get(names.get(index)));
+            } catch (NumberFormatException ex) { System.out.println("Opción no válida."); return; }
+        }
+        packages = packages.stream().distinct().toList();
+        System.out.println("\n=== RESUMEN DE INSTALACIÓN ===");
+        System.out.println("Perfil: " + (choice.equalsIgnoreCase("a") ? "Todos" : names.get(Integer.parseInt(choice) - 1)));
+        System.out.println("Paquetes (" + packages.size() + "):");
         packages.forEach(pkg -> System.out.println("  • " + pkg));
-        System.out.println("No se instalarán controladores gráficos, kernels ni servicios automáticamente.");
-        System.out.println("El gestor de paquetes mostrará su transacción y pedirá aprobación.");
-        System.out.print("\n¿Continuar? [s/N]: ");
-        if (!scanner.hasNextLine() || !scanner.nextLine().strip().equalsIgnoreCase("s")) { System.out.println("Instalación cancelada."); return; }
+        System.out.println("\nNo se instalarán controladores gráficos, kernels ni servicios automáticamente.");
+        System.out.println("No se ejecutarán actualizaciones generales ni se eliminarán paquetes.");
+        System.out.println("El gestor mostrará su transacción y pedirá aprobación.");
+        System.out.print("\nPara continuar escribe INSTALAR: ");
+        if (!scanner.hasNextLine() || !scanner.nextLine().strip().equals("INSTALAR")) { System.out.println("Instalación cancelada."); return; }
         try {
             int exit = support.install(platform, packages);
-            if (exit == 0) { System.out.println("Herramientas instaladas o ya presentes."); writeAuditEvent("linux_tools_installed", platform.family() + ": " + String.join(",", packages)); }
+            if (exit == 0) { System.out.println("Proceso de instalación finalizado correctamente."); writeAuditEvent("linux_tools_installed", platform.family() + ": " + String.join(",", packages)); }
             else System.err.println("El gestor de paquetes terminó con código " + exit + ". Revisa sus mensajes.");
         } catch (IOException ex) { System.err.println("No se pudo iniciar el gestor de paquetes: " + ex.getMessage()); }
         catch (InterruptedException ex) { Thread.currentThread().interrupt(); System.err.println("Instalación interrumpida."); }
