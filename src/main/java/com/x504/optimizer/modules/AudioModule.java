@@ -4,17 +4,17 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
-/** Detecta dispositivos ALSA expuestos por el kernel. */
+/** Detecta dispositivos ALSA y el socket de usuario de PipeWire. */
 public final class AudioModule implements DiagnosticModule {
     public String id() { return "audio"; }
     public String name() { return "Audio"; }
     public ModuleReport inspect() {
-        Path cards = Path.of("/proc/asound/cards");
-        String data = LinuxProbe.read(cards);
+        String data = LinuxProbe.read(Path.of("/proc/asound/cards"));
         List<String> findings = data.isBlank() ? List.of("No se detectaron tarjetas ALSA.") :
                 data.lines().filter(line -> !line.isBlank()).toList();
-        String pipewire = Files.exists(Path.of("/run/user", System.getProperty("user.name", ""), "pipewire-0"))
-                ? "Socket PipeWire detectado" : "Estado PipeWire no confirmado por socket";
-        return new ModuleReport(id(), name(), findings, List.of(pipewire));
+        String runtime = System.getenv("XDG_RUNTIME_DIR");
+        boolean pipewire = runtime != null && Files.exists(Path.of(runtime, "pipewire-0"));
+        return new ModuleReport(id(), name(), findings,
+                List.of(pipewire ? "Socket PipeWire detectado" : "Socket PipeWire no detectado; puede no estar activo."));
     }
 }
