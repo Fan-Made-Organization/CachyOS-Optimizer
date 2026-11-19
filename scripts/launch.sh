@@ -88,7 +88,7 @@ else
 fi
 
 [[ -n "$JAVA_BIN" && -x "$JAVA_BIN" ]] || {
-  printf '[CachyOS Optimizer] ERROR: no se encontró Java 21. Ejecuta: bash scripts/bootstrap.sh\n' >&2
+  printf '[Linux Optimizer] ERROR: no se encontró Java 21. Ejecuta: bash scripts/bootstrap.sh\n' >&2
   exit 1
 }
 
