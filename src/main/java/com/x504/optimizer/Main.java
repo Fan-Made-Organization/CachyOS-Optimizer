@@ -20,6 +20,7 @@ import com.x504.optimizer.profiles.ProfileCatalog;
 import com.x504.optimizer.reports.ReportExporter;
 import com.x504.optimizer.system.LinuxSystemDetector;
 import com.x504.optimizer.system.LinuxPlatformSupport;
+import com.x504.optimizer.system.KernelManager;
 import com.x504.optimizer.system.SystemAnalysisDashboard;
 import com.x504.optimizer.system.SystemInfo;
 import java.io.IOException;
