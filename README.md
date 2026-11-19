@@ -439,3 +439,14 @@ El nombre Linux Optimizer no implica compatibilidad con BSD, Windows, macOS, And
 ### Compatibilidad de datos locales de versiones anteriores
 
 El nombre del repositorio, la aplicación, el artefacto Maven y los mensajes visibles ahora usan **Linux Optimizer**. Para no perder datos de instalaciones anteriores, algunas ubicaciones internas de estado que contienen `cachyos-optimizer` se conservan temporalmente como rutas heredadas (por ejemplo, historiales y marcadores de acciones reversibles). No son el nombre actual del producto. El lanzador usa la nueva carpeta `~/.config/linux-optimizer/` para preferencias y puede leer la preferencia de idioma anterior; el marcador de primera ejecución también reconoce el archivo heredado.
+
+
+## Nuevos módulos de soporte gráfico y diagnóstico avanzado
+
+El centro de optimización incorpora un catálogo gráfico por familia Linux para Intel, AMD y NVIDIA. Los perfiles cubren Mesa/OpenGL, Vulkan y componentes de vídeo cuando existe un conjunto de paquetes validado para la familia detectada. La instalación es interactiva y muestra el comando y los paquetes antes de pedir la palabra exacta `INSTALAR`. Las familias sin catálogo permanecen en modo informativo.
+
+**Limitaciones importantes:** Fedora, SUSE y Alpine no reciben un perfil automático de NVIDIA propietario porque puede requerir repositorios externos, módulos específicos y compatibilidad exacta de kernel/Secure Boot. No se añade un repositorio externo automáticamente. NVIDIA en Arch usa el perfil `nvidia-open`, que no es compatible con todos los modelos. Comprueba el modelo de GPU y la documentación de tu distribución antes de continuar. DXVK/VKD3D son capas de traducción Direct3D a Vulkan, no drivers DirectX nativos; Proton suele incluir sus propias versiones.
+
+El asesor energético distingue laptops mediante la presencia de una batería en sysfs y escritorios cuando la interfaz de alimentación existe sin batería. Recomienda un perfil conservador, pero nunca cambia el perfil por sí solo. La disponibilidad real depende de `power-profiles-daemon`.
+
+El comando `--advanced-diagnostics` agrega inspección de dispositivos de bloque (rotacional/no rotacional, scheduler), unidades systemd fallidas, kernel/módulos relevantes y disponibilidad de herramientas de gaming. Es una revisión de solo lectura; la clasificación de almacenamiento es indicativa y no sustituye `lsblk`, SMART ni diagnósticos del fabricante.
