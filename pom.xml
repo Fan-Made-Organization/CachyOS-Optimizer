@@ -6,7 +6,7 @@
     <groupId>com.x504</groupId>
     <artifactId>cachyos-optimizer</artifactId>
     <version>0.1.0-SNAPSHOT</version>
-    <name>X504 CachyOS Optimizer</name>
+    <name>CachyOS Optimizer</name>
     <description>Diagnóstico y optimización segura de sistemas Linux.</description>
     <url>https://github.com/Fan-Made-Organization/CachyOS-Optimizer</url>
     <licenses>
