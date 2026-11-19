@@ -97,4 +97,18 @@ class LinuxPlatformSupportTest {
         assertEquals("rolling", detected.version());
     }
 
+    @Test void blocksGenericPackageProfilesOnImmutableDistributions() {
+        var bazzite = new LinuxPlatformSupport.Platform("bazzite", "Bazzite", "", "fedora", LinuxPlatformSupport.Family.FEDORA, "dnf");
+        assertTrue(support.isImmutableOrImageBased(bazzite));
+        assertTrue(support.toolCategories(bazzite).isEmpty());
+        assertThrows(IllegalStateException.class, () -> support.installCommand(bazzite, List.of("mesa")));
+
+        var silverblue = new LinuxPlatformSupport.Platform("silverblue", "Fedora Silverblue", "", "fedora", LinuxPlatformSupport.Family.FEDORA, "dnf");
+        assertTrue(support.isImmutableOrImageBased(silverblue));
+
+        var arch = new LinuxPlatformSupport.Platform("arch", "Arch Linux", "", "", LinuxPlatformSupport.Family.ARCH, "pacman");
+        assertFalse(support.isImmutableOrImageBased(arch));
+        assertFalse(support.toolCategories(arch).isEmpty());
+    }
+
 }
