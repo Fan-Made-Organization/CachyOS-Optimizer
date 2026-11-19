@@ -10,6 +10,7 @@ import java.util.Objects;
 
 /** Registro local de eventos sin almacenar contraseñas ni contenido sensible. */
 public final class AuditLogger {
+    private static final long MAX_LOG_BYTES = 5L * 1024 * 1024;
     private final Path logFile;
 
     public AuditLogger(Path logFile) {
