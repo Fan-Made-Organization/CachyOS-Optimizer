@@ -15,7 +15,7 @@ cd CachyOS-Optimizer
 bash scripts/bootstrap.sh
 ```
 
-El bootstrap descarga Maven localmente si no existe y verifica su archivo con SHA-512. No instala Java ni ejecuta comandos privilegiados.
+El bootstrap descarga Temurin JDK 21 si falta, verifica SHA-256 y lo guarda en `.tools/`. También descarga Maven 3.9.9 si falta y verifica SHA-512. No instala software globalmente ni ejecuta comandos privilegiados.
 
 ## Ejecutar
 
