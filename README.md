@@ -240,6 +240,7 @@ La aplicación no debe ejecutarse como root para realizar diagnósticos normales
 - [Solución de problemas](docs/TROUBLESHOOTING.md)
 - [Registro de cambios](docs/CHANGELOG.md)
 - [Hoja de ruta](docs/ROADMAP.md)
+- [Auditoría de la base funcional](docs/BASELINE_AUDIT.md)
 
 ## Desarrollo y contribuciones
 
