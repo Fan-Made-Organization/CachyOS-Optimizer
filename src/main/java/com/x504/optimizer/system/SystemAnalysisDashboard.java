@@ -32,7 +32,7 @@ public final class SystemAnalysisDashboard {
 
         StringBuilder out = new StringBuilder();
         out.append(top()).append('\n');
-        out.append(row("X504-CACHYOS-OPTIMIZER")).append('\n');
+        out.append(row("CACHYOS-OPTIMIZER")).append('\n');
         out.append(row("SYSTEM ANALYSIS")).append('\n');
         out.append(mid()).append('\n');
         out.append(row("Sistema:       " + distro)).append('\n');
