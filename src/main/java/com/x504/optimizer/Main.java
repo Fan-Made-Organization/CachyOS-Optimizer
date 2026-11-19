@@ -252,52 +252,92 @@ public final class Main {
 
     private static void runSteamOptions(java.util.Scanner scanner) {
         SteamLaunchOptionsBuilder builder = new SteamLaunchOptionsBuilder();
-        System.out.println("\n=== CREADOR DE PARÁMETROS DE STEAM ===");
-        System.out.println("Genera opciones para pegar en Steam > Propiedades > General > Parámetros de lanzamiento.");
-        System.out.println("1) Básico");
-        System.out.println("2) GameMode");
-        System.out.println("3) MangoHud");
-        System.out.println("4) GameMode + MangoHud");
-        System.out.println("5) Gamescope (pantalla completa)");
-        System.out.println("6) Registro de Proton (diagnóstico)");
-        System.out.println("7) FSR de Proton (si el juego/versión de Proton lo admite)");
-        System.out.println("8) Personalizado: combinar funciones");
-        System.out.print("Elige una plantilla: ");
+        System.out.println("\n=== CREADOR AVANZADO DE PARÁMETROS DE STEAM ===");
+        System.out.println("1) Básico   2) GameMode   3) MangoHud   4) GameMode + MangoHud");
+        System.out.println("5) Gamescope   6) Registro Proton   7) FSR Proton");
+        System.out.println("8) Combinación personalizada   9) Gamescope con resolución/FPS");
+        System.out.println("10) Perfiles de juego predefinidos");
+        System.out.print("Elige: ");
         if (!scanner.hasNextLine()) return;
         String choice = scanner.nextLine().strip();
-        SteamLaunchOptionsBuilder.Options options = switch (choice) {
-            case "1" -> new SteamLaunchOptionsBuilder.Options(false,false,false,false,false);
-            case "2" -> new SteamLaunchOptionsBuilder.Options(true,false,false,false,false);
-            case "3" -> new SteamLaunchOptionsBuilder.Options(false,true,false,false,false);
-            case "4" -> new SteamLaunchOptionsBuilder.Options(true,true,false,false,false);
-            case "5" -> new SteamLaunchOptionsBuilder.Options(false,false,true,false,false);
-            case "6" -> new SteamLaunchOptionsBuilder.Options(false,false,false,true,false);
-            case "7" -> new SteamLaunchOptionsBuilder.Options(false,false,false,false,true);
+        SteamLaunchOptionsBuilder.Options options = null;
+        SteamLaunchOptionsBuilder.AdvancedOptions advanced = null;
+        switch (choice) {
+            case "1" -> options = new SteamLaunchOptionsBuilder.Options(false,false,false,false,false);
+            case "2" -> options = new SteamLaunchOptionsBuilder.Options(true,false,false,false,false);
+            case "3" -> options = new SteamLaunchOptionsBuilder.Options(false,true,false,false,false);
+            case "4" -> options = new SteamLaunchOptionsBuilder.Options(true,true,false,false,false);
+            case "5" -> options = new SteamLaunchOptionsBuilder.Options(false,false,true,false,false);
+            case "6" -> options = new SteamLaunchOptionsBuilder.Options(false,false,false,true,false);
+            case "7" -> options = new SteamLaunchOptionsBuilder.Options(false,false,false,false,true);
             case "8" -> {
-                System.out.print("¿Activar GameMode? [s/N]: "); boolean gm = scanner.hasNextLine() && scanner.nextLine().strip().equalsIgnoreCase("s");
-                System.out.print("¿Activar MangoHud? [s/N]: "); boolean hud = scanner.hasNextLine() && scanner.nextLine().strip().equalsIgnoreCase("s");
-                System.out.print("¿Usar Gamescope en pantalla completa? [s/N]: "); boolean gs = scanner.hasNextLine() && scanner.nextLine().strip().equalsIgnoreCase("s");
-                System.out.print("¿Activar registro de Proton? [s/N]: "); boolean log = scanner.hasNextLine() && scanner.nextLine().strip().equalsIgnoreCase("s");
-                System.out.print("¿Activar FSR de Proton? [s/N]: "); boolean fsr = scanner.hasNextLine() && scanner.nextLine().strip().equalsIgnoreCase("s");
-                yield new SteamLaunchOptionsBuilder.Options(gm,hud,gs,log,fsr);
+                boolean gm = askYesNo(scanner, "¿Activar GameMode?");
+                boolean hud = askYesNo(scanner, "¿Activar MangoHud?");
+                boolean gs = askYesNo(scanner, "¿Usar Gamescope?");
+                boolean log = askYesNo(scanner, "¿Activar registro de Proton?");
+                boolean fsr = askYesNo(scanner, "¿Activar FSR de Proton?");
+                options = new SteamLaunchOptionsBuilder.Options(gm,hud,gs,log,fsr);
             }
-            default -> null;
-        };
-        if (options == null) { System.out.println("Plantilla no válida."); return; }
-        String launchOptions = builder.build(options);
-        System.out.println("\nCopia esta línea en Steam:");
-        System.out.println("\n" + launchOptions + "\n");
-        System.out.println("Nota: GameMode, MangoHud y Gamescope deben estar instalados; FSR depende de Proton y del juego.");
-        System.out.print("¿Guardar también en un archivo local? [s/N]: ");
-        if (scanner.hasNextLine() && scanner.nextLine().strip().equalsIgnoreCase("s")) {
-            Path directory = Path.of(System.getProperty("user.home"), ".local", "share", "cachyos-optimizer");
-            Path destination = directory.resolve("steam-launch-options-" + java.time.LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss")) + ".txt");
-            try {
+            case "9" -> {
+                boolean gm = askYesNo(scanner, "¿Activar GameMode?");
+                boolean hud = askYesNo(scanner, "¿Activar MangoHud?");
+                boolean fsr = askYesNo(scanner, "¿Activar FSR de Proton?");
+                int width = readBoundedInt(scanner, "Ancho (640-7680)", 1280, 640, 7680);
+                int height = readBoundedInt(scanner, "Alto (480-4320)", 720, 480, 4320);
+                int hz = readBoundedInt(scanner, "Frecuencia objetivo (30-360 Hz)", 60, 30, 360);
+                int strength = readBoundedInt(scanner, "Intensidad FSR (0-5)", 2, 0, 5);
+                advanced = new SteamLaunchOptionsBuilder.AdvancedOptions(gm,hud,true,false,fsr,width,height,hz,strength);
+            }
+            case "10" -> {
+                System.out.println("Perfiles: 1) Competitivo  2) Equilibrado  3) Diagnóstico  4) Escalado");
+                System.out.print("Elige perfil: ");
+                if (!scanner.hasNextLine()) return;
+                String profile = scanner.nextLine().strip();
+                advanced = switch (profile) {
+                    case "1" -> new SteamLaunchOptionsBuilder.AdvancedOptions(true,true,false,false,false,1920,1080,60,2);
+                    case "2" -> new SteamLaunchOptionsBuilder.AdvancedOptions(true,false,false,false,false,1920,1080,60,2);
+                    case "3" -> new SteamLaunchOptionsBuilder.AdvancedOptions(false,true,false,true,false,1920,1080,60,2);
+                    case "4" -> new SteamLaunchOptionsBuilder.AdvancedOptions(true,true,true,false,true,1280,720,60,2);
+                    default -> null;
+                };
+            }
+            default -> { System.out.println("Opción no válida."); return; }
+        }
+        if (advanced == null && options == null) { System.out.println("Perfil no válido."); return; }
+        try {
+            String launchOptions = advanced != null ? builder.build(advanced) : builder.build(options);
+            System.out.println("\nCopia esta línea en Steam → Propiedades → General → Parámetros de lanzamiento:");
+            System.out.println("\n" + launchOptions + "\n");
+            System.out.println("GameMode, MangoHud y Gamescope deben estar instalados si se seleccionaron.");
+            System.out.println("FSR depende de Proton/juego; resolución y Hz son objetivos de Gamescope, no garantizan FPS.");
+            if (askYesNo(scanner, "¿Guardar la línea en un archivo local?")) {
+                Path directory = Path.of(System.getProperty("user.home"), ".local", "share", "cachyos-optimizer");
+                Path destination = directory.resolve("steam-launch-options-" + java.time.LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss")) + ".txt");
                 java.nio.file.Files.createDirectories(directory);
                 java.nio.file.Files.writeString(destination, launchOptions + System.lineSeparator(), java.nio.file.StandardOpenOption.CREATE_NEW, java.nio.file.StandardOpenOption.WRITE);
                 System.out.println("Guardado en: " + destination);
-                writeAuditEvent("steam_launch_options_created", "Se generó una plantilla local de parámetros Steam");
-            } catch (IOException ex) { System.err.println("No se pudo guardar: " + ex.getMessage()); }
+                writeAuditEvent("steam_launch_options_created", "Se generaron parámetros Steam");
+            }
+        } catch (IllegalArgumentException | IOException ex) { System.err.println("No se pudo generar/guardar: " + ex.getMessage()); }
+    }
+
+    private static boolean askYesNo(java.util.Scanner scanner, String prompt) {
+        System.out.print(prompt + " [s/N]: ");
+        return scanner.hasNextLine() && scanner.nextLine().strip().equalsIgnoreCase("s");
+    }
+
+    private static int readBoundedInt(java.util.Scanner scanner, String prompt, int fallback, int minimum, int maximum) {
+        System.out.print(prompt + " [" + fallback + "]: ");
+        if (!scanner.hasNextLine()) return fallback;
+        String value = scanner.nextLine().strip();
+        if (value.isEmpty()) return fallback;
+        try {
+            int parsed = Integer.parseInt(value);
+            if (parsed < minimum || parsed > maximum) throw new NumberFormatException();
+            return parsed;
+        } catch (NumberFormatException ex) {
+            System.out.println("Valor inválido; se usará " + fallback + ".");
+            return fallback;
         }
     }
     private static void runCpuOptimization(OptimizationCenter center, java.util.Scanner scanner)
@@ -368,6 +408,10 @@ public final class Main {
         System.out.println("Configuración administrada por la app: /etc/systemd/zram-generator.conf (si se creó aquí).");
         System.out.println("El perfil usa zstd y un tamaño máximo de la mitad de la RAM, limitado a 4 GiB.");
         System.out.println("No se purgan cachés ni se cierran procesos.");
+        if (center.isZramActive() && !center.isManagedZram()) {
+            System.out.println("zram ya está activo, pero no fue configurado por CachyOS Optimizer. No se modificará.");
+            return;
+        }
         if (center.isZramActive()) {
             System.out.print("¿Desactivar y retirar solamente la configuración creada por esta app? [s/N]: ");
             if (scanner.hasNextLine() && scanner.nextLine().strip().equalsIgnoreCase("s")) {
