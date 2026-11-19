@@ -167,6 +167,7 @@ O aplicativo não deve ser executado como root para diagnósticos normais. Coman
 ## Documentação
 
 - [Arquitetura](docs/ARCHITECTURE.md)
+- [Gerenciador de backup](docs/BACKUPS.md)
 - [Módulos](docs/MODULES.md)
 - [Compatibilidade](docs/COMPATIBILITY.md)
 - [Dependências e preparação](docs/DEPENDENCIES.md)
