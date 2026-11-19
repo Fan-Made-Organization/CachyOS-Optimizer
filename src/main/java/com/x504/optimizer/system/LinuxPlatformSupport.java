@@ -41,7 +41,7 @@ public final class LinuxPlatformSupport {
         if (id.equals("nixos") || has(tokens,"nixos")) return Family.NIXOS;
         return Family.UNKNOWN;
     }
-    private static boolean has(String text, String... words) { for (String word : words) if (java.util.regex.Pattern.compile("(^|\\\\s)" + java.util.regex.Pattern.quote(word) + "(\\\\s|$)").matcher(text).find()) return true; return false; }
+    private static boolean has(String text, String... words) { List<String> tokens = List.of(text.trim().split("\\s+")); for (String word : words) if (tokens.contains(word)) return true; return false; }
     private String managerFor(Family family) {
         return switch (family) {
             case ARCH -> available("pacman") ? "pacman" : "No detectado";
