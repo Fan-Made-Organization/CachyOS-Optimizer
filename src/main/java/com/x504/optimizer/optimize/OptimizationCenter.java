@@ -87,6 +87,11 @@ public final class OptimizationCenter {
         return runInherited(List.of("sudo", "systemctl", "disable", "--now", "fstrim.timer"));
     }
 
+    public boolean isTrimTimerEnabled() throws IOException, InterruptedException {
+        CommandResult result = run(List.of("systemctl", "is-enabled", "fstrim.timer"), 10);
+        return result.exitCode() == 0 && result.output().strip().equals("enabled");
+    }
+
     public List<String> categoryStatus() {
         List<String> lines = new ArrayList<>();
         lines.add("CPU: perfiles de energía mediante power-profiles-daemon; cambio reversible.");
