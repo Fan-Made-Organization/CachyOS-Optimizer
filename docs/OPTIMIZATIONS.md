@@ -42,9 +42,13 @@ Un perfil es una colección de recomendaciones, no una orden para aplicar todos 
 
 El asesor `PowerDeviceAdvisor` busca dispositivos de tipo `Battery` en `/sys/class/power_supply`. Si encuentra uno clasifica el equipo como laptop; si la interfaz existe sin batería, como escritorio; en caso contrario conserva el tipo desconocido. Sugiere `balanced` como punto de partida y explica cuándo considerar ahorro o rendimiento. No cambia automáticamente perfiles ni gobernadores. La aplicación de perfiles sigue dependiendo de `power-profiles-daemon` y requiere aprobación explícita.
 
+## Memoria virtual: ZRAM y swappiness
+
+El centro de optimización permite administrar ZRAM únicamente cuando Linux Optimizer reconoce su propia configuración y ofrece restaurarla sin sobrescribir configuraciones ajenas. También permite ajustar `vm.swappiness` mediante `sysctl`: consulta el valor actual, guarda el valor anterior en el directorio de estado del usuario y aplica el nuevo valor con privilegios administrativos. La modificación de swappiness es temporal (no escribe en `/etc/sysctl.d`) y se revierte con la acción correspondiente; tras reiniciar, el kernel vuelve a cargar el valor configurado por la distribución. Los valores ofrecidos son opciones comunes, no una recomendación universal: el resultado depende de la carga de trabajo, RAM, swap y zram.
+
 ## Almacenamiento y diagnóstico avanzado
 
-El inventario avanzado consulta `/sys/block`, muestra indicador rotacional y scheduler, y excluye dispositivos virtuales comunes. El valor rotacional cero significa dispositivo no rotacional; no prueba por sí solo que sea NVMe. TRIM programado sigue siendo una acción separada y solo se propone cuando se detecta almacenamiento no rotacional. No se cambia scheduler, sistema de archivos, opciones de montaje, firmware ni parámetros NVMe automáticamente.
+El inventario avanzado consulta `/sys/block`, muestra indicador rotacional y scheduler, y excluye dispositivos virtuales comunes. El valor rotacional cero significa dispositivo no rotacional; no prueba por sí solo que sea NVMe. TRIM programado sigue siendo una acción separada y solo se propone cuando se detecta almacenamiento no rotacional. La habilitación y deshabilitación de `fstrim.timer` requieren confirmación y se pueden revertir. No se cambia scheduler, sistema de archivos, opciones de montaje, firmware ni parámetros NVMe automáticamente.
 
 ## Gráficos y gaming entre distribuciones
 
