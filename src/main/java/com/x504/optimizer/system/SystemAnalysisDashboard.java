@@ -16,9 +16,9 @@ public final class SystemAnalysisDashboard {
 
         String distro = system.distro();
         String base = inferBase(distro);
-        String kernel = system.kernel();
-        String desktop = system.desktop();
-        String architecture = system.architecture();
+        String kernel = normalizeKernel(system.kernel(), system.linux());
+        String desktop = normalizeDesktop(system.desktop());
+        String architecture = normalizeArchitecture(system.architecture());
         String state = stateOf(compatibility);
         String score = compatibility.percentage() + "%";
         String checks = compatibility.evaluatedComponents() + " evaluados | "
@@ -60,6 +60,34 @@ public final class SystemAnalysisDashboard {
         if (report.percentage() >= 90) return "EXCELENTE";
         if (report.percentage() >= 70) return "BUENO";
         return "REVISAR COMPATIBILIDAD";
+    }
+
+    private String normalizeKernel(String kernel, boolean linux) {
+        if (!linux || kernel == null || kernel.isBlank()
+                || kernel.equalsIgnoreCase("desconocido")) return kernel;
+        return kernel.toLowerCase(java.util.Locale.ROOT).startsWith("linux")
+                ? kernel : "Linux " + kernel;
+    }
+
+    private String normalizeDesktop(String desktop) {
+        if (desktop == null || desktop.isBlank()) return "No detectado";
+        String normalized = desktop.toLowerCase(java.util.Locale.ROOT);
+        if (normalized.contains("kde") || normalized.contains("plasma")) return "KDE Plasma";
+        if (normalized.contains("gnome")) return "GNOME";
+        if (normalized.contains("xfce")) return "Xfce";
+        if (normalized.contains("cinnamon")) return "Cinnamon";
+        if (normalized.contains("mate")) return "MATE";
+        if (normalized.contains("lxqt")) return "LXQt";
+        return desktop;
+    }
+
+    private String normalizeArchitecture(String architecture) {
+        if (architecture == null) return "Desconocida";
+        return switch (architecture.toLowerCase(java.util.Locale.ROOT)) {
+            case "amd64" -> "x86_64";
+            case "arm64" -> "aarch64";
+            default -> architecture;
+        };
     }
 
     private String inferBase(String distro) {
