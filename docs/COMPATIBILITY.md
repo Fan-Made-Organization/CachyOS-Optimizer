@@ -48,3 +48,9 @@ La detección de una distribución, la disponibilidad de un gestor y la posibili
 El catálogo multiplataforma contiene perfiles de paquetes para Intel/AMD y componentes comunes en Arch, Debian, Fedora, SUSE y Alpine. NVIDIA propietario solo se ofrece en perfiles donde se han definido paquetes de repositorio base (Arch y Debian); en Fedora/SUSE/Alpine se mantiene deshabilitado porque puede exigir repositorios externos, módulos compatibles y configuración específica. En Arch el perfil `nvidia-open` no es válido para todas las GPU. Los perfiles no mezclan fabricantes ni eliminan controladores existentes. Gentoo, Void y NixOS permanecen en solo lectura para esta acción.
 
 La disponibilidad de paquetes depende de versión, arquitectura, repositorios y variantes. Una lista de paquetes es un plan revisable, no una certificación de compatibilidad. DXVK/VKD3D son traducción Direct3D→Vulkan y no controladores DirectX nativos.
+
+## Distribuciones inmutables y basadas en imágenes
+
+SteamOS, Bazzite, Bluefin, Fedora Silverblue/Kinoite, Aurora y Fedora CoreOS se detectan como sistemas donde no debe asumirse que una instalación genérica con gestores como pacman o dnf sea segura. Linux Optimizer bloquea los perfiles genéricos de instalación de herramientas y controladores en estos sistemas, y mantiene disponibles los diagnósticos de solo lectura. Usa el mecanismo de capas, extensiones o imágenes recomendado por el proveedor de la distribución.
+
+La detección también consulta indicadores del sistema como /run/ostree-booted; no pretende reconocer todas las variantes inmutables existentes. Si tu distribución usa un modelo especial de despliegue, trata la instalación automática como no compatible hasta que exista un perfil específico y probado.
