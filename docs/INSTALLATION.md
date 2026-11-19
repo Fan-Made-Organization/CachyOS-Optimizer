@@ -31,6 +31,15 @@ Para ejecutar el microbenchmark CPU opcional:
 java -jar target/cachyos-optimizer-0.1.0-SNAPSHOT.jar --benchmark
 ```
 
+Para respaldar archivos seleccionados y restaurarlos en una carpeta separada:
+
+```bash
+java -jar target/cachyos-optimizer-0.1.0-SNAPSHOT.jar --backup "$HOME/x504-backups" "$HOME/.config/example.conf"
+java -jar target/cachyos-optimizer-0.1.0-SNAPSHOT.jar --restore "$HOME/x504-backups/backup-..." "$HOME/x504-restored"
+```
+
+La ruta exacta del directorio de respaldo aparece al crearlo. La restauración verifica SHA-256 y no sobrescribe archivos existentes. Consulta [Gestor de respaldos](BACKUPS.md).
+
 Para ver opciones:
 
 ```bash
