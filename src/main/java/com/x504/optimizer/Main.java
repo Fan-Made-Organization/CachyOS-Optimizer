@@ -10,6 +10,7 @@ import com.x504.optimizer.core.SystemCore;
 import com.x504.optimizer.monitor.SystemMonitor;
 import com.x504.optimizer.install.OptimizationToolsInstaller;
 import com.x504.optimizer.optimize.OptimizationCenter;
+import com.x504.optimizer.steam.SteamLaunchOptionsBuilder;
 import com.x504.optimizer.compatibility.CompatibilityAnalyzer;
 import com.x504.optimizer.hardware.HardwareDetector;
 import com.x504.optimizer.modules.*;
@@ -36,6 +37,7 @@ public final class Main {
         if (args.length > 0 && args[0].equals("--compare-benchmarks")) { compareBenchmarks(args); return; }
         if (args.length > 0 && args[0].equals("--install-tools")) { runInstallTools(); return; }
         if (args.length > 0 && args[0].equals("--optimizer")) { runOptimizationCenter(); return; }
+        if (args.length > 0 && args[0].equals("--steam-options")) { runSteamOptions(); return; }
         if (args.length > 0 && args[0].equals("--help")) {
             printHelp();
             return;
@@ -202,6 +204,7 @@ public final class Main {
             System.out.println("4) Gaming: instalar herramientas");
             System.out.println("5) Almacenamiento: activar TRIM programado");
             System.out.println("6) Kernel: información y compatibilidad");
+            System.out.println("7) Steam: creador de parámetros de lanzamiento");
             System.out.println("0) Volver");
             System.out.print("Selecciona una categoría: ");
             if (!scanner.hasNextLine()) return;
@@ -227,6 +230,7 @@ public final class Main {
                         System.out.println("No se sustituye ni elimina el kernel activo automáticamente.");
                         System.out.println("Primero se verifica compatibilidad de GPU, initramfs, módulos y entradas de arranque.");
                     }
+                    case "7" -> runSteamOptions(scanner);
                     case "0" -> { return; }
                     default -> System.out.println("Opción no válida.");
                 }
@@ -242,6 +246,60 @@ public final class Main {
         }
     }
 
+    private static void runSteamOptions() {
+        try (var scanner = new java.util.Scanner(System.in)) { runSteamOptions(scanner); }
+    }
+
+    private static void runSteamOptions(java.util.Scanner scanner) {
+        SteamLaunchOptionsBuilder builder = new SteamLaunchOptionsBuilder();
+        System.out.println("\n=== CREADOR DE PARÁMETROS DE STEAM ===");
+        System.out.println("Genera opciones para pegar en Steam > Propiedades > General > Parámetros de lanzamiento.");
+        System.out.println("1) Básico");
+        System.out.println("2) GameMode");
+        System.out.println("3) MangoHud");
+        System.out.println("4) GameMode + MangoHud");
+        System.out.println("5) Gamescope (pantalla completa)");
+        System.out.println("6) Registro de Proton (diagnóstico)");
+        System.out.println("7) FSR de Proton (si el juego/versión de Proton lo admite)");
+        System.out.println("8) Personalizado: combinar funciones");
+        System.out.print("Elige una plantilla: ");
+        if (!scanner.hasNextLine()) return;
+        String choice = scanner.nextLine().strip();
+        SteamLaunchOptionsBuilder.Options options = switch (choice) {
+            case "1" -> new SteamLaunchOptionsBuilder.Options(false,false,false,false,false);
+            case "2" -> new SteamLaunchOptionsBuilder.Options(true,false,false,false,false);
+            case "3" -> new SteamLaunchOptionsBuilder.Options(false,true,false,false,false);
+            case "4" -> new SteamLaunchOptionsBuilder.Options(true,true,false,false,false);
+            case "5" -> new SteamLaunchOptionsBuilder.Options(false,false,true,false,false);
+            case "6" -> new SteamLaunchOptionsBuilder.Options(false,false,false,true,false);
+            case "7" -> new SteamLaunchOptionsBuilder.Options(false,false,false,false,true);
+            case "8" -> {
+                System.out.print("¿Activar GameMode? [s/N]: "); boolean gm = scanner.hasNextLine() && scanner.nextLine().strip().equalsIgnoreCase("s");
+                System.out.print("¿Activar MangoHud? [s/N]: "); boolean hud = scanner.hasNextLine() && scanner.nextLine().strip().equalsIgnoreCase("s");
+                System.out.print("¿Usar Gamescope en pantalla completa? [s/N]: "); boolean gs = scanner.hasNextLine() && scanner.nextLine().strip().equalsIgnoreCase("s");
+                System.out.print("¿Activar registro de Proton? [s/N]: "); boolean log = scanner.hasNextLine() && scanner.nextLine().strip().equalsIgnoreCase("s");
+                System.out.print("¿Activar FSR de Proton? [s/N]: "); boolean fsr = scanner.hasNextLine() && scanner.nextLine().strip().equalsIgnoreCase("s");
+                yield new SteamLaunchOptionsBuilder.Options(gm,hud,gs,log,fsr);
+            }
+            default -> null;
+        };
+        if (options == null) { System.out.println("Plantilla no válida."); return; }
+        String launchOptions = builder.build(options);
+        System.out.println("\nCopia esta línea en Steam:");
+        System.out.println("\n" + launchOptions + "\n");
+        System.out.println("Nota: GameMode, MangoHud y Gamescope deben estar instalados; FSR depende de Proton y del juego.");
+        System.out.print("¿Guardar también en un archivo local? [s/N]: ");
+        if (scanner.hasNextLine() && scanner.nextLine().strip().equalsIgnoreCase("s")) {
+            Path directory = Path.of(System.getProperty("user.home"), ".local", "share", "cachyos-optimizer");
+            Path destination = directory.resolve("steam-launch-options-" + java.time.LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss")) + ".txt");
+            try {
+                java.nio.file.Files.createDirectories(directory);
+                java.nio.file.Files.writeString(destination, launchOptions + System.lineSeparator(), java.nio.file.StandardOpenOption.CREATE_NEW, java.nio.file.StandardOpenOption.WRITE);
+                System.out.println("Guardado en: " + destination);
+                writeAuditEvent("steam_launch_options_created", "Se generó una plantilla local de parámetros Steam");
+            } catch (IOException ex) { System.err.println("No se pudo guardar: " + ex.getMessage()); }
+        }
+    }
     private static void runCpuOptimization(OptimizationCenter center, java.util.Scanner scanner)
             throws java.io.IOException, InterruptedException {
         System.out.println("\nPerfil actual: " + center.currentPowerProfile());
@@ -358,6 +416,7 @@ public final class Main {
                 System.out.println("║  5) Benchmark completo                   ║");
                 System.out.println("║  6) Instalar herramientas de optimización ║");
                 System.out.println("║  7) Centro de optimización               ║");
+                System.out.println("║  8) Creador de parámetros de Steam       ║");
                 System.out.println("║  0) Salir                                ║");
                 System.out.println("╚══════════════════════════════════════════╝");
                 System.out.print("Selecciona una opción: ");
@@ -371,8 +430,9 @@ public final class Main {
                     case "5" -> runBenchmarkSuite(new String[]{"--benchmark-suite"});
                     case "6" -> runInstallTools(scanner);
                     case "7" -> runOptimizationCenter(scanner);
+                    case "8" -> runSteamOptions(scanner);
                     case "0" -> { System.out.println("Hasta luego."); return; }
-                    default -> System.out.println("Opción no válida. Elige 1, 2, 3, 4, 5, 6, 7 o 0.");
+                    default -> System.out.println("Opción no válida. Elige una opción del 0 al 8.");
                 }
             }
         }
@@ -447,6 +507,7 @@ public final class Main {
                   --compare-benchmarks A B  Compara dos CSV (antes/después).
                   --install-tools          Instala herramientas recomendadas en Arch/CachyOS.
                   --optimizer              Abre el centro de optimización guiada.
+                  --steam-options          Crea parámetros de lanzamiento para Steam.
                   --backup DIR ARCHIVO... 
                                Respalda archivos elegidos en un directorio nuevo.
                   --restore COPIA DESTINO
