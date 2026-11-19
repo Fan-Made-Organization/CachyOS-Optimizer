@@ -51,6 +51,7 @@ public final class LinuxOptimizerGui {
     private javax.swing.Timer liveTimer;
     private AdvancedDiagnostics.Report lastReport;
     private String portableDetails;
+    private PlatformHardwareInspector.Report hardwareReport;
 
     private LinuxOptimizerGui() {
         build();
@@ -382,6 +383,7 @@ public final class LinuxOptimizerGui {
                     gpu.setText(hw.graphicsAdapters().isEmpty() ? "No detectada" : hw.graphicsAdapters().get(0));
                     status.setText("Actualizado • " + java.time.LocalTime.now().withNano(0));
                     renderDetails();
+                    refreshLinuxHardwareInventory();
                 } catch (InterruptedException ex) {
                     Thread.currentThread().interrupt();
                     status.setText("Actualización interrumpida");
@@ -392,6 +394,21 @@ public final class LinuxOptimizerGui {
         }.execute();
     }
 
+    private void refreshLinuxHardwareInventory() {
+        new SwingWorker<PlatformHardwareInspector.Report, Void>() {
+            @Override protected PlatformHardwareInspector.Report doInBackground() {
+                return new PlatformHardwareInspector().inspect();
+            }
+            @Override protected void done() {
+                try {
+                    hardwareReport = get();
+                    renderDetails();
+                } catch (Exception ex) {
+                    status.setText("Inventario adicional no disponible");
+                }
+            }
+        }.execute();
+    }
     private static boolean isLinuxHost() {
         return System.getProperty("os.name", "").toLowerCase(java.util.Locale.ROOT).contains("linux");
     }
@@ -458,6 +475,19 @@ public final class LinuxOptimizerGui {
                     "RED", lastReport.network(), "SERVICIOS", lastReport.services(),
                     "KERNEL", lastReport.kernel(), "GAMING", lastReport.gaming());
         };
+        if (hardwareReport != null && (activePage.equals("Gráficos") || activePage.equals("Almacenamiento") || activePage.equals("Resumen"))) {
+            lines = new java.util.ArrayList<>(lines);
+            if (activePage.equals("Gráficos") || activePage.equals("Resumen")) {
+                lines.add("━━ TELEMETRÍA GRÁFICA ADICIONAL ━━━━━━━━━━━━━━━━━");
+                lines.addAll(hardwareReport.graphics());
+                lines.add("");
+            }
+            if (activePage.equals("Almacenamiento") || activePage.equals("Resumen")) {
+                lines.add("━━ INVENTARIO DE DISCOS ADICIONAL ━━━━━━━━━━━━━━━");
+                lines.addAll(hardwareReport.storage());
+                lines.add("");
+            }
+        }
         details.setText(String.join("\n", lines));
         details.setCaretPosition(0);
     }
