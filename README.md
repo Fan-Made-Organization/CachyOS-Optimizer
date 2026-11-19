@@ -2,7 +2,7 @@
 
 <p align="center">
   <strong>Diagnóstico, análisis de compatibilidad y preparación para optimizar Linux con seguridad.</strong><br>
-  Diseñado con prioridad en CachyOS y Arch Linux.
+  Diseñado para Linux: soporte ampliado para Arch/CachyOS, Debian/Ubuntu, Fedora y openSUSE.
 </p>
 
 <p align="center">
@@ -15,7 +15,7 @@
 
 ## ¿Qué es CachyOS Optimizer?
 
-CachyOS Optimizer es un proyecto libre y en desarrollo para reunir en una sola herramienta información del sistema, hardware, compatibilidad y componentes relacionados con el uso diario y los videojuegos en Linux.
+CachyOS Optimizer es un proyecto libre y en desarrollo para reunir en una sola herramienta información del sistema, hardware, compatibilidad, kernels y componentes relacionados con el uso diario y los videojuegos en distintas distribuciones Linux.
 
 Su objetivo es ayudar a entender el equipo antes de cambiar configuraciones: detectar el entorno, mostrar información útil, señalar herramientas que no estén disponibles y preparar recomendaciones que puedan evaluarse de forma segura.
 
@@ -53,7 +53,7 @@ Su objetivo es ayudar a entender el equipo antes de cambiar configuraciones: det
 | KDE Plasma | Información del entorno KDE cuando está presente. |
 | Steam | Detección de Steam y elementos relacionados que puedan inspeccionarse. |
 | Proton | Información disponible sobre Proton y compatibilidad de juegos. |
-| Diagnóstico general | Agrupa las comprobaciones generales del sistema. |
+| Diagnóstico general | Agrupa las comprobaciones generales del sistema. |\n| Kernel y arranque | Kernel activo, variantes identificables, árboles de módulos, headers, módulos cargados, UEFI y rutas comunes de GRUB/systemd-boot. |\n| Compatibilidad de distribución Linux | Familia de distribución, versión e identificación del gestor de paquetes. |
 | Hardware Intelligence | Capacidades anunciadas de CPU, topología básica y recuento PCI. |
 | Driver Inspector | Asociaciones de dispositivos PCI con controladores del kernel y módulos cargados. |
 | System Health Monitor | Memoria, carga promedio, espacio raíz y disponibilidad de sensores. |
@@ -138,7 +138,7 @@ El menú ofrece **Limpiador seguro de caché** y el comando `--cleaner`. Primero
 
 ### 11. Instalador de herramientas de optimización
 
-El menú incluye **Instalar herramientas de optimización** y el comando `--install-tools`. En CachyOS/Arch instala un conjunto aprobado de utilidades:
+El menú incluye **Instalar herramientas de optimización** y el comando `--install-tools`. En Arch/CachyOS, Debian/Ubuntu, Fedora y openSUSE instala un conjunto de utilidades aprobado para cada familia:
 
 - Diagnóstico y hardware: `inxi`, `lshw`, `dmidecode`, `smartmontools`, `lm_sensors`.
 - Gráficos y aceleración: `vulkan-tools`, `mesa-utils`, `libva-utils`, `vdpauinfo`, `nvtop`.
@@ -146,7 +146,7 @@ El menú incluye **Instalar herramientas de optimización** y el comando `--inst
 - Gaming y monitorización: `gamemode`, `lib32-gamemode`, `mangohud`, `lib32-mangohud`, `gamescope`, `goverlay`, `vkbasalt`, `lib32-vkbasalt`, `protontricks`.
 - Monitorización y diagnóstico adicional: `btop`, `fastfetch`, `stress-ng`, `intel-gpu-tools` y `radeontop` (las utilidades específicas de GPU muestran datos según el hardware compatible).
 
-En la primera ejecución, el lanzador solicita elegir idioma (Español, English o Português Brasil) y guarda la preferencia en `~/.config/cachyos-optimizer/language`. La preferencia se conserva para los siguientes inicios. El código visible de la aplicación todavía está principalmente en español; la selección ya prepara el idioma del proceso y del lanzador, pero la traducción completa de todos los menús está pendiente.\n\nAntes de empezar la instalación de herramientas, muestra la lista completa y pide confirmación. Después ejecuta `sudo pacman -S --needed` sin `--noconfirm`, por lo que Pacman también presenta su resumen y solicita aprobación. Los paquetes que ya estén instalados se conservan.
+En la primera ejecución, el lanzador solicita elegir idioma (Español, English o Português Brasil) y guarda la preferencia en `~/.config/cachyos-optimizer/language`. La preferencia se conserva para los siguientes inicios. El código visible de la aplicación todavía está principalmente en español; la selección ya prepara el idioma del proceso y del lanzador, pero la traducción completa de todos los menús está pendiente.\n\nAntes de empezar la instalación de herramientas, muestra la lista y pide confirmación. Después usa el gestor de paquetes detectado (Pacman, APT, DNF/YUM o Zypper) sin opciones de confirmación automática, por lo que el gestor presenta su resumen y solicita aprobación.
 
 **Alcance importante:** esta opción instala herramientas de usuario; no instala controladores a ciegas ni activa servicios automáticamente. `power-profiles-daemon` y `thermald` pueden requerir habilitación manual según el equipo. No se activa TLP junto a otros gestores de energía para evitar conflictos. Los cambios de perfil/gobernador se realizan desde el centro con confirmación. Esos cambios dependen del hardware y requieren módulos específicos, comprobaciones y reversión. Si Pacman no encuentra un paquete o una dependencia, la transacción puede cancelarse sin completar.
 
@@ -156,7 +156,34 @@ Ejecutar directamente:
 bash scripts/launch.sh --install-tools
 ```
 
-### 12. Instalador de controladores gráficos
+### 12. Compatibilidad ampliada de distribuciones y kernels Linux
+
+El proyecto ya no limita sus diagnósticos a CachyOS/Arch. Detecta la distribución mediante `/etc/os-release` y clasifica familias:
+
+| Familia | Distribuciones de referencia | Gestor reconocido |
+|---|---|---|
+| Arch | CachyOS, Arch, Manjaro, EndeavourOS y derivadas identificadas | pacman |
+| Debian | Debian, Ubuntu, Linux Mint, Pop!_OS y derivadas identificadas | apt / apt-get |
+| Fedora / RHEL | Fedora, RHEL, CentOS Stream, Rocky y AlmaLinux cuando declaran esa familia | dnf / yum |
+| SUSE | openSUSE Leap y Tumbleweed, y derivadas identificadas | zypper |
+
+La clasificación usa `ID` y `ID_LIKE`; no significa que cada derivada tenga exactamente los mismos repositorios o nombres de paquetes. Distribuciones no reconocidas siguen pudiendo ejecutar los diagnósticos Linux de solo lectura, pero no reciben una instalación automática de paquetes.
+
+El instalador de herramientas usa listas pequeñas y específicas por familia. Muestra los paquetes antes de empezar y deja que APT, DNF/YUM, Pacman o Zypper muestren su transacción y soliciten aprobación. No usa opciones de confirmación automática. No instala controladores, kernels, servicios ni gestores de energía.
+
+**Soporte de kernels:** inspecciona la versión activa, kernels con árboles de módulos instalados, presencia de headers/build, módulos cargados, parámetros de arranque, estado de lockdown, UEFI y rutas comunes de GRUB/systemd-boot. Reconoce etiquetas habituales como LTS, Zen, Hardened, CachyOS, XanMod y Liquorix cuando aparecen en la versión. La identificación por nombre es orientativa.
+
+**Límite deliberado:** la administración de kernels es de solo lectura en esta versión. No instala ni elimina kernels, no regenera initramfs, no modifica GRUB/systemd-boot y no cambia parámetros de arranque. Antes de implementar operaciones de ese nivel se necesita detectar con precisión el gestor de arranque, los kernels de respaldo, el esquema de paquetes y un procedimiento de recuperación específico por distribución.
+
+Ejecuta el informe con:
+
+```bash
+bash scripts/launch.sh --linux-support
+```
+
+También aparece como opción 10 en el menú principal y sus datos se incluyen en el diagnóstico modular.
+
+### 13. Instalador de controladores gráficos
 
 El centro de optimización incorpora una sección separada para paquetes gráficos de Arch/CachyOS. Permite elegir un conjunto por fabricante: Intel (Mesa/OpenGL, ANV Vulkan e Intel Media), AMD (Mesa/OpenGL, RADV Vulkan y VA-API), NVIDIA (nvidia-open y bibliotecas de usuario), o compatibilidad DirectX para Wine/Proton (DXVK/VKD3D). También ofrece los componentes comunes Mesa y Vulkan loader. La lista se muestra antes de ejecutar Pacman y requiere confirmación; no se mezclan paquetes de Intel/AMD/NVIDIA ni se desinstala el controlador actual.
 
@@ -164,7 +191,7 @@ El centro de optimización incorpora una sección separada para paquetes gráfic
 
 Linux no instala un “driver DirectX” nativo: DXVK y VKD3D traducen Direct3D a Vulkan para Wine/Proton. Proton normalmente incluye versiones propias, así que instalar capas globales no es obligatorio. FSR tampoco es un controlador; depende del juego, Proton o Gamescope. La instalación de paquetes no garantiza que una aplicación o juego utilice una función concreta. Después de instalar, reinicia la sesión si corresponde y ejecuta `--diagnostics` para comprobar OpenGL/Vulkan.
 
-### 13. Centro de optimización guiada
+### 14. Centro de optimización guiada
 
 Abre el centro desde el menú principal (opción 7) o ejecuta `bash scripts/launch.sh --optimizer`. Reúne seis áreas:
 
@@ -179,13 +206,13 @@ Las operaciones CPU y TRIM solicitan confirmación. El perfil de energía se pue
 
 **Importante:** zram, perfiles de energía, gobernadores y TRIM requieren confirmación; zram solo puede revertirse automáticamente si la configuración sigue coincidiendo con la que creó la app. La gestión de controladores GPU y la sustitución/eliminación de kernels siguen siendo informativas: requieren selección manual y recuperación específica para cada equipo.
 
-### 14. Creador de parámetros de Steam
+### 15. Creador de parámetros de Steam
 
 Desde el menú principal (opción 8), el centro de optimización (opción 7) o con `bash scripts/launch.sh --steam-options`, abre un asistente para generar una línea lista para pegar en **Steam → Propiedades → General → Parámetros de lanzamiento**. Incluye plantillas para `%command%`, GameMode, MangoHud, Gamescope, registro de Proton, FSR de Proton y WineD3D (`PROTON_USE_WINED3D=1`), combinaciones personalizadas, resolución y frecuencia objetivo de Gamescope, y perfiles de juego (competitivo, equilibrado, diagnóstico y escalado). Puede guardar la línea en `~/.local/share/cachyos-optimizer/` sin sobrescribir archivos existentes.
 
 Las opciones son plantillas: no instalan herramientas ni garantizan compatibilidad con todos los juegos. GameMode, MangoHud y Gamescope deben estar instalados; FSR depende de la versión de Proton y del juego. WineD3D fuerza la traducción Direct3D a OpenGL en lugar de DXVK/Vulkan. Puede servir como alternativa cuando Vulkan o DXVK presenta problemas, pero no es una optimización universal y suele ofrecer menos rendimiento que DXVK; actívalo solo si el juego lo necesita. La resolución y frecuencia son objetivos para Gamescope, no promesas de FPS ni cambios automáticos de los ajustes gráficos internos del juego. El registro de Proton es para diagnóstico y puede generar archivos de log.
 
-### 15. Límites de seguridad
+### 16. Límites de seguridad
 - El diagnóstico normal es de solo lectura; las acciones disponibles se muestran por separado y requieren confirmación explícita.
 - Los comandos administrativos usan una lista cerrada de operaciones y no interpolan parámetros libres de shell.
 - Los cambios de CPU, zram y TRIM tienen mecanismos de reversión documentados; GPU y kernel permanecen en modo de inspección.
