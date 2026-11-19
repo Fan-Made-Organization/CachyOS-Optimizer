@@ -137,6 +137,12 @@ You can also use Maven installed on your system:
 mvn clean verify
 mvn package
 java -jar target/cachyos-optimizer-0.1.0-SNAPSHOT.jar
+
+# Back up only files you explicitly select
+java -jar target/cachyos-optimizer-0.1.0-SNAPSHOT.jar --backup "$HOME/x504-backups" "$HOME/.config/example.conf"
+
+# Restore verified copies into a separate directory without overwriting
+java -jar target/cachyos-optimizer-0.1.0-SNAPSHOT.jar --restore "$HOME/x504-backups/backup-..." "$HOME/x504-restored"
 ```
 
 Available helper scripts:
