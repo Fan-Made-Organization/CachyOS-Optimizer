@@ -2,6 +2,8 @@
 
 ## Desarrollo actual
 
+- Renombrado el producto y el artefacto Maven a Linux Optimizer; actualizado el lanzador, el CLI y las instrucciones de clonación. Se conservan rutas locales heredadas donde son necesarias para no romper datos y acciones reversibles de instalaciones anteriores.
+
 - Ampliada la detección de distribuciones Linux a familias Arch, Debian, Fedora/RHEL y SUSE.
 - Añadido instalador interactivo de herramientas de diagnóstico con comandos específicos para Pacman, APT, DNF/YUM y Zypper; sin confirmación automática.
 - Añadido diagnóstico de kernel/arranque: variantes, árboles de módulos, headers, módulos cargados, UEFI, lockdown y detección orientativa de GRUB/systemd-boot.
