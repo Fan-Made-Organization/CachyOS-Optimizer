@@ -11,10 +11,15 @@ public final class SteamLaunchOptionsBuilder {
         }
     }
     public record AdvancedOptions(boolean gameMode, boolean mangoHud, boolean gamescope, boolean protonLog,
-                                  boolean fsr, int width, int height, int refreshRate, int fsrStrength, boolean wined3d) {
+                                  boolean fsr, int width, int height, int refreshRate, int fsrStrength, boolean wined3d,
+                                  boolean frameLimitEnabled, int frameLimit) {
+        public AdvancedOptions(boolean gameMode, boolean mangoHud, boolean gamescope, boolean protonLog,
+                               boolean fsr, int width, int height, int refreshRate, int fsrStrength, boolean wined3d) {
+            this(gameMode, mangoHud, gamescope, protonLog, fsr, width, height, refreshRate, fsrStrength, wined3d, false, 60);
+        }
         public AdvancedOptions(boolean gameMode, boolean mangoHud, boolean gamescope, boolean protonLog,
                                boolean fsr, int width, int height, int refreshRate, int fsrStrength) {
-            this(gameMode, mangoHud, gamescope, protonLog, fsr, width, height, refreshRate, fsrStrength, false);
+            this(gameMode, mangoHud, gamescope, protonLog, fsr, width, height, refreshRate, fsrStrength, false, false, 60);
         }
     }
 
@@ -30,6 +35,7 @@ public final class SteamLaunchOptionsBuilder {
         List<String> parts = new ArrayList<>();
         if (options.protonLog()) parts.add("PROTON_LOG=1");
         if (options.wined3d()) parts.add("PROTON_USE_WINED3D=1");
+        if (options.frameLimitEnabled()) parts.add("DXVK_FRAME_RATE=" + options.frameLimit());
         if (options.fsr()) {
             parts.add("WINE_FULLSCREEN_FSR=1");
             parts.add("WINE_FULLSCREEN_FSR_STRENGTH=" + options.fsrStrength());
@@ -52,6 +58,8 @@ public final class SteamLaunchOptionsBuilder {
             throw new IllegalArgumentException("Frecuencia fuera del rango permitido (30-360 Hz).");
         if (o.fsrStrength() < 0 || o.fsrStrength() > 5)
             throw new IllegalArgumentException("La intensidad FSR debe estar entre 0 y 5.");
+        if (o.frameLimitEnabled() && (o.frameLimit() < 1 || o.frameLimit() > 360))
+            throw new IllegalArgumentException("El límite de FPS debe estar entre 1 y 360.");
     }
 
     public List<String> presets() {
