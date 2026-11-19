@@ -2,7 +2,7 @@
 
 <p align="center">
   <strong>Diagnóstico Linux, análise de compatibilidade e uma base de otimização com foco em segurança.</strong><br>
-  Desenvolvido prioritariamente para CachyOS e Arch Linux.
+  Desenvolvido para Linux, com suporte ampliado a Arch/CachyOS, Debian/Ubuntu, Fedora e openSUSE.
 </p>
 
 <p align="center">
@@ -100,7 +100,7 @@ O código Java compilado pelo Maven fica em `src/main/java`. Os arquivos em `src
 
 ## Compatibilidade e foco
 
-- **Alvos principais:** CachyOS e Arch Linux.
+- **Detecção de distribuição:** famílias Arch/CachyOS, Debian/Ubuntu, Fedora/RHEL e openSUSE/SUSE.\n- **Instalação de pacotes:** somente ferramentas de diagnóstico específicas por família; o gerenciador de pacotes mantém a confirmação interativa.\n- **Suporte a kernel:** inventário somente leitura do kernel ativo, árvores de módulos, headers, variantes comuns e ambiente de inicialização. Não instala/remove kernels nem altera o bootloader.
 - **Ambiente:** Linux.
 - **Linguagem:** Java 21.
 - **Desktop:** o KDE Plasma é identificado quando está disponível.
@@ -162,7 +162,7 @@ Se algum comando falhar, consulte [Instalação](docs/INSTALLATION.md), [Depend�
 4. Preparar uma forma de reversão sempre que a alteração permitir.
 5. Registrar o que foi sugerido e o que foi executado.
 
-O aplicativo não deve ser executado como root para diagnósticos normais. Comandos privilegiados silenciosos e concatenação de entradas do usuário em comandos de shell não são aceitáveis. Leia a [política de segurança](docs/SECURITY.md).
+A inspeção de kernel é somente leitura. Instalação/remoção de kernels, regeneração de initramfs e alterações do bootloader não são automatizadas.\n\nO aplicativo não deve ser executado como root para diagnósticos normais. Comandos privilegiados silenciosos e concatenação de entradas do usuário em comandos de shell não são aceitáveis. Leia a [política de segurança](docs/SECURITY.md).
 
 ## Documentação
 
