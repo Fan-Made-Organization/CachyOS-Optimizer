@@ -25,7 +25,7 @@ public final class GitHubUpdater {
     public Result checkAndStage() throws IOException, InterruptedException {
         HttpRequest request = HttpRequest.newBuilder(URI.create(API)).timeout(Duration.ofSeconds(20))
                 .header("Accept", "application/vnd.github+json").header("User-Agent", "Linux-Optimizer").GET().build();
-        HttpResponse<String> response = CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
+        String tag = capture(response.body(), "\"tag_name\"\\s*:\\s*\"([^\"]+)\"");
         if (response.statusCode() == 404) return new Result(false, "No hay una versión publicada todavía.");
         if (response.statusCode() != 200) throw new IOException("GitHub respondió HTTP " + response.statusCode());
         String tag = capture(response.body(), "\\"tag_name\\"\\s*:\\s*\\"([^\\"]+)\\"");
@@ -66,7 +66,7 @@ public final class GitHubUpdater {
     private static String currentVersion() {
         String version = GitHubUpdater.class.getPackage().getImplementationVersion();
         return version == null ? "0.1.0-SNAPSHOT" : version;
-    }
+        Pattern p = Pattern.compile("\"name\"\\s*:\\s*\""+Pattern.quote(name)+"\"[\\s\\S]*?\"browser_download_url\"\\s*:\\s*\"([^\"]+)\"");
     private static byte[] download(String url) throws IOException, InterruptedException {
         HttpRequest req = HttpRequest.newBuilder(URI.create(url)).timeout(Duration.ofSeconds(60))
                 .header("User-Agent", "Linux-Optimizer").GET().build();
