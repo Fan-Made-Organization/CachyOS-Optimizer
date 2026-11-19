@@ -1,1 +1,8 @@
-
+# Herramientas y dependencias descargadas localmente
+.tools/
+.cache/
+target/
+*.log
+.idea/
+.vscode/
+.DS_Store
