@@ -145,24 +145,28 @@ public final class Main {
         } catch (IOException | RuntimeException ex) { System.err.println("No se pudo comparar: " + ex.getMessage()); }
     }
     private static void runInstallTools() {
+        try (var scanner = new java.util.Scanner(System.in)) { runInstallTools(scanner); }
+    }
+
+    private static void runInstallTools(java.util.Scanner scanner) {
         OptimizationToolsInstaller installer = new OptimizationToolsInstaller();
         if (!installer.isArchBased()) {
             System.err.println("Instalación cancelada: esta función está limitada a Arch Linux y CachyOS.");
             return;
         }
-        try (var scanner = new java.util.Scanner(System.in)) {
-            System.out.println("\\n=== Instalador de herramientas de optimización ===");
-            System.out.println("Se instalarán herramientas de diagnóstico, gráficos y gaming:");
-            installer.packages(true).forEach(pkg -> System.out.println("  • " + pkg));
-            System.out.println("\\nNo se instalarán controladores propietarios ni se cambiarán kernel, servicios,");
-            System.out.println("gobernadores, parámetros de arranque o configuraciones del sistema.");
-            System.out.println("Pacman mostrará su resumen y pedirá confirmación antes de instalar.");
-            System.out.print("\\n¿Continuar? [s/N]: ");
-            if (!scanner.hasNextLine() || !scanner.nextLine().strip().equalsIgnoreCase("s")) {
-                System.out.println("Instalación cancelada por el usuario.");
-                return;
-            }
-            System.out.println("\\nIniciando instalador. Introduce tu contraseña de sudo si se solicita.");
+        System.out.println("\n=== Instalador de herramientas de optimización ===");
+        System.out.println("Se instalarán herramientas de diagnóstico, gráficos y gaming:");
+        installer.packages(true).forEach(pkg -> System.out.println("  • " + pkg));
+        System.out.println("\nNo se instalarán controladores propietarios ni se cambiarán kernel, servicios,");
+        System.out.println("gobernadores, parámetros de arranque o configuraciones del sistema.");
+        System.out.println("Pacman mostrará su resumen y pedirá confirmación antes de instalar.");
+        System.out.print("\n¿Continuar? [s/N]: ");
+        if (!scanner.hasNextLine() || !scanner.nextLine().strip().equalsIgnoreCase("s")) {
+            System.out.println("Instalación cancelada por el usuario.");
+            return;
+        }
+        try {
+            System.out.println("\nIniciando instalador. Introduce tu contraseña de sudo si se solicita.");
             int exit = installer.install(true);
             if (exit == 0) {
                 System.out.println("Herramientas instaladas o ya presentes.");
@@ -256,7 +260,7 @@ public final class Main {
                     case "3" -> printHelp();
                     case "4" -> runMonitor(new String[]{"--monitor", "15"});
                     case "5" -> runBenchmarkSuite(new String[]{"--benchmark-suite"});
-                    case "6" -> runInstallTools();
+                    case "6" -> runInstallTools(scanner);
                     case "0" -> { System.out.println("Hasta luego."); return; }
                     default -> System.out.println("Opción no válida. Elige 1, 2, 3, 4, 5, 6 o 0.");
                 }
