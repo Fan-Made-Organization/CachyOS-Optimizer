@@ -11,7 +11,7 @@ public final class OptimizationToolsInstaller {
     private static final List<String> DIAGNOSTIC = List.of(
             "inxi", "lshw", "dmidecode", "smartmontools", "lm_sensors",
             "vulkan-tools", "mesa-utils", "libva-utils", "vdpauinfo", "nvtop",
-            "power-profiles-daemon", "zram-generator");
+            "power-profiles-daemon", "zram-generator", "cpupower");
     private static final List<String> GAMING = List.of(
             "gamemode", "mangohud", "gamescope", "goverlay");
 
