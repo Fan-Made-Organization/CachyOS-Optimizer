@@ -129,8 +129,7 @@ public final class BackupManager {
                 if (!checksums.matches(temporary, entry.sha256())) {
                     throw new IOException("La copia restaurada no superó la verificación SHA-256.");
                 }
-                try { Files.move(temporary, target, StandardCopyOption.ATOMIC_MOVE); }
-                catch (AtomicMoveNotSupportedException ignored) { Files.move(temporary, target); }
+                Files.move(temporary, target);
                 restored.add(target);
             } finally {
                 Files.deleteIfExists(temporary);
