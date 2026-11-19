@@ -9,7 +9,9 @@ Los módulos de diagnóstico implementan `DiagnosticModule` y producen un `Modul
 - Energía, temperatura y red.
 - Audio (PipeWire/PulseAudio).
 - Gaming, KDE Plasma, Steam y Proton.
-- Diagnóstico general.\n- Kernel y arranque (versión activa, árboles de módulos, headers, módulos cargados, UEFI y rutas comunes del bootloader).\n- Compatibilidad de distribución Linux (familia y gestor de paquetes).
+- Diagnóstico general.
+- Kernel y arranque (versión activa, árboles de módulos, headers, módulos cargados, UEFI y rutas comunes del bootloader).
+- Compatibilidad de distribución Linux (familia y gestor de paquetes).
 
 ## Flujo
 
