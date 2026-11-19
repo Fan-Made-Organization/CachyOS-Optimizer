@@ -58,7 +58,7 @@ Su objetivo es ayudar a entender el equipo antes de cambiar configuraciones: det
 | Compatibilidad de distribución Linux | Familia de distribución, versión e identificación del gestor de paquetes. |
 | Hardware Intelligence | Capacidades anunciadas de CPU, topología básica y recuento PCI. |
 | Driver Inspector | Asociaciones de dispositivos PCI con controladores del kernel y módulos cargados. |
-| System Health Monitor | Memoria, carga promedio, espacio raíz y disponibilidad de sensores. |
+|  |
 | Power Intelligence | Gobernador, controlador de frecuencia, unidades de gestión energética y batería. |
 | Package Intelligence | Detección de Pacman y ayudantes AUR; señala comprobaciones de paquetes pendientes. |
 
@@ -106,8 +106,6 @@ El instalador crea el acceso “Linux Optimizer” en el menú de aplicaciones, 
 bash scripts/uninstall-app.sh
 ```
 
-El panel de rendimiento recoge CPU y RAM cada segundo, grafica los últimos 60 segundos y muestra la temperatura máxima que el kernel expone. El uso de GPU solo aparece cuando el controlador publica una métrica compatible (por ejemplo, `gpu_busy_percent` en algunos controladores AMD); en otros equipos se indicará “No expuesta”. Las lecturas de temperatura dependen de los sensores disponibles y no sustituyen una herramienta específica del fabricante.
-
 
 ### 7. Informes exportables
 - Exportación del diagnóstico modular a JSON o HTML.
@@ -128,9 +126,8 @@ bash scripts/launch.sh --diagnostics --report-html "$HOME/cachyos-report.html"
 - `BenchmarkEngine`: microbenchmark CPU opcional, limitado y sin cambios de configuración.
 - No se respaldan ni restauran archivos del sistema automáticamente; la restauración no escribe sobre las rutas originales.
 
-### 9. Monitorización y benchmarks ampliados
+### 9. Pruebas de rendimiento opcionales
 
-- `--monitor [segundos]`: monitor CPU/RAM/carga en vivo; duración de 1 a 300 segundos.
 - `--benchmark-memory [MiB]`: prueba sintética acotada de memoria (8-64 MiB).
 - `--benchmark-storage [MiB]`: lectura/escritura temporal de 8-32 MiB; el archivo de prueba se elimina al terminar.
 - `--benchmark-suite [MiB]`: ejecuta CPU, RAM y almacenamiento, y guarda una fila CSV en `~/.local/state/cachyos-optimizer/benchmarks.csv`.
@@ -166,7 +163,6 @@ El menú incluye **Instalar herramientas de optimización** y el comando `--inst
 | Gráficos y vídeo | `vulkan-tools`, utilidades Mesa, VA-API, `vdpauinfo`, `nvtop` según distribución |
 | Almacenamiento | `nvme-cli`, `hdparm`, `iotop` |
 | Red | `iperf3`, `ethtool`, herramientas DNS y `traceroute` |
-| Monitorización | `btop`, `fastfetch`, `htop`, `glances`, `sysstat` según distribución |
 | Gaming | `gamemode`, `mangohud`, `gamescope`, `goverlay`, `vkbasalt`, `protontricks` y paquetes multilib cuando corresponda |
 | Audio y multimedia | `alsa-utils`, `pavucontrol`, `ffmpeg`/`ffmpeg-free`, `v4l-utils` |
 | Desarrollo y depuración | `strace`, `gdb`, `valgrind` |
