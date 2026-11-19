@@ -165,7 +165,13 @@ Las operaciones CPU y TRIM solicitan confirmación. El perfil de energía se pue
 
 **Importante:** RAM, GPU y kernel incluyen inspección y preparación, no cambios automáticos. La configuración de zram y la instalación/cambio de controladores o kernels requieren una implementación específica para cada equipo, revisión de compatibilidad y un plan de recuperación.
 
-### 12. Límites de seguridad
+### 12. Creador de parámetros de Steam
+
+Desde el menú principal (opción 8), el centro de optimización (opción 7) o con `bash scripts/launch.sh --steam-options`, abre un asistente para generar una línea lista para pegar en **Steam → Propiedades → General → Parámetros de lanzamiento**. Incluye plantillas para `%command%`, GameMode, MangoHud, Gamescope, registro de Proton y FSR de Proton, además de una combinación personalizada. Puede guardar la línea en `~/.local/share/cachyos-optimizer/` sin sobrescribir archivos existentes.
+
+Las opciones son plantillas: no instalan herramientas ni garantizan compatibilidad con todos los juegos. GameMode, MangoHud y Gamescope deben estar instalados; FSR depende de la versión de Proton y del juego. El registro de Proton es para diagnóstico y puede generar archivos de log.
+
+### 13. Límites de seguridad
 - Las acciones se validan y preparan, pero el motor no ejecuta modificaciones del sistema.
 - Las operaciones críticas se bloquean.
 - Los cambios requieren aprobación explícita y las operaciones administrativas requieren respaldo.
@@ -184,6 +190,7 @@ Las operaciones CPU y TRIM solicitan confirmación. El perfil de energía se pue
 | Backup de archivos seleccionados y restauración verificada a otra carpeta | Implementado |
 | Instalación guiada de herramientas de diagnóstico y gaming en Arch/CachyOS | Implementada; confirmación previa y Pacman interactivo |
 | Centro guiado CPU/RAM/GPU/Gaming/almacenamiento/kernel | Implementación inicial; CPU y TRIM tienen acciones reversibles; RAM/GPU/kernel son inspección guiada |
+| Creador de parámetros de Steam | Implementado; plantillas y combinador personalizado, guardado local sin sobrescritura |
 | Configuración automática de zram, controladores y kernel | **Pendiente; no se aplica** |
 | Restauración sobre rutas originales y rollback del sistema | **Pendiente** |
 | Registro local de auditoría | Implementado con rotación básica |
