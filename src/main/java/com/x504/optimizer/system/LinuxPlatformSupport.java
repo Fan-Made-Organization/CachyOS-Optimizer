@@ -134,7 +134,21 @@ public final class LinuxPlatformSupport {
             catch(IOException ignored) { }
             if(!values.isEmpty()) return values;
         }
+        if (values.isEmpty()) readLegacyReleaseMarkers(values);
         return values;
+    }
+
+    /** Respaldo para instalaciones minimalistas que no exponen os-release. */
+    private static void readLegacyReleaseMarkers(Map<String,String> values) {
+        if (Files.exists(Path.of("/etc/cachyos-release"))) { values.put("ID", "cachyos"); values.put("ID_LIKE", "arch"); values.put("PRETTY_NAME", "CachyOS"); return; }
+        if (Files.exists(Path.of("/etc/arch-release"))) { values.put("ID", "arch"); values.put("PRETTY_NAME", "Arch Linux"); return; }
+        if (Files.exists(Path.of("/etc/alpine-release"))) { values.put("ID", "alpine"); values.put("PRETTY_NAME", "Alpine Linux"); try { values.put("VERSION_ID", Files.readString(Path.of("/etc/alpine-release")).strip()); } catch (IOException ignored) { } return; }
+        if (Files.exists(Path.of("/etc/debian_version"))) { values.put("ID", "debian"); values.put("PRETTY_NAME", "Debian (identificado por marcador)"); try { values.put("VERSION_ID", Files.readString(Path.of("/etc/debian_version")).strip()); } catch (IOException ignored) { } return; }
+        if (Files.exists(Path.of("/etc/fedora-release")) || Files.exists(Path.of("/etc/redhat-release"))) { values.put("ID", "fedora"); values.put("PRETTY_NAME", "Fedora/RHEL (identificado por marcador)"); return; }
+        if (Files.exists(Path.of("/etc/SuSE-release"))) { values.put("ID", "opensuse"); values.put("ID_LIKE", "suse"); values.put("PRETTY_NAME", "SUSE (identificado por marcador)"); return; }
+        if (Files.exists(Path.of("/etc/gentoo-release"))) { values.put("ID", "gentoo"); values.put("PRETTY_NAME", "Gentoo"); return; }
+        if (Files.exists(Path.of("/etc/void-release"))) { values.put("ID", "void"); values.put("PRETTY_NAME", "Void Linux"); return; }
+        if (Files.exists(Path.of("/etc/NIXOS"))) { values.put("ID", "nixos"); values.put("PRETTY_NAME", "NixOS"); }
     }
     private static boolean available(String name) { String path=System.getenv("PATH"); if(path==null)return false; for(String d:path.split(java.io.File.pathSeparator)) try { if(Files.isExecutable(Path.of(d,name))) return true; } catch(RuntimeException ignored){} return false; }
     private static String firstAvailable(String... names) { for(String n:names) if(available(n)) return n; return "No detectado"; }
