@@ -5,6 +5,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
+import java.nio.file.StandardCopyOption;
 import java.time.Instant;
 import java.util.Objects;
 
@@ -23,6 +24,16 @@ public final class AuditLogger {
         String safeDetails = sanitize(details, "sin detalles");
         Path parent = logFile.getParent();
         if (parent != null) Files.createDirectories(parent);
+        if (Files.isSymbolicLink(logFile)) {
+            throw new IOException("El archivo de auditoría no puede ser un enlace simbólico.");
+        }
+        if (Files.exists(logFile) && Files.size(logFile) >= MAX_LOG_BYTES) {
+            Path rotated = logFile.resolveSibling(logFile.getFileName() + ".1");
+            if (Files.isSymbolicLink(rotated)) {
+                throw new IOException("El archivo rotado no puede ser un enlace simbólico.");
+            }
+            Files.move(logFile, rotated, StandardCopyOption.REPLACE_EXISTING);
+        }
         String line = Instant.now() + "\t" + safeEvent + "\t" + safeDetails + System.lineSeparator();
         Files.writeString(logFile, line, StandardCharsets.UTF_8,
                 StandardOpenOption.CREATE, StandardOpenOption.WRITE, StandardOpenOption.APPEND);
