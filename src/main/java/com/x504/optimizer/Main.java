@@ -515,10 +515,13 @@ public final class Main {
     }
     private static void runCpuOptimization(OptimizationCenter center, java.util.Scanner scanner)
             throws java.io.IOException, InterruptedException {
+        var powerAdvice = new com.x504.optimizer.optimize.PowerDeviceAdvisor().inspect();
+        System.out.println("\nTipo de equipo detectado: " + powerAdvice.type());
+        System.out.println("Perfil sugerido: " + powerAdvice.recommendedProfile() + " — " + powerAdvice.explanation());
         try {
-            System.out.println("\nPerfil de energía actual: " + center.currentPowerProfile());
+            System.out.println("Perfil de energía actual: " + center.currentPowerProfile());
         } catch (java.io.IOException ex) {
-            System.out.println("\nPerfil de energía no disponible: " + ex.getMessage());
+            System.out.println("Perfil de energía no disponible: " + ex.getMessage());
         }
         System.out.println("1) Equilibrado (recomendado para uso diario)");
         System.out.println("2) Rendimiento (más consumo y temperatura potencial)");
