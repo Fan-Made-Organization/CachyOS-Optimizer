@@ -21,6 +21,8 @@ public final class Main {
     private Main() {}
 
     public static void main(String[] args) {
+        if (args.length == 0 || args[0].equals("--menu")) { runTerminalMenu(); return; }
+        if (args.length > 0 && args[0].equals("--diagnostics")) { runDiagnostics(args); return; }
         if (args.length > 0 && args[0].equals("--help")) {
             printHelp();
             return;
@@ -34,6 +36,9 @@ public final class Main {
             return;
         }
 
+    }
+
+    private static void runDiagnostics(String[] args) {
         SystemInfo info = new LinuxSystemDetector().detect();
         var hardware = new HardwareDetector().detect();
         var compatibility = new CompatibilityAnalyzer().analyze(info);
@@ -96,6 +101,32 @@ public final class Main {
         System.out.println("Usa --benchmark para la prueba CPU, --backup/--restore para copias verificadas o --help.");
     }
 
+    private static void runTerminalMenu() {
+        try (var scanner = new java.util.Scanner(System.in)) {
+            while (true) {
+                System.out.println();
+                System.out.println("╔══════════════════════════════════════════╗");
+                System.out.println("║       X504-CACHYOS-OPTIMIZER             ║");
+                System.out.println("║             TERMINAL                    ║");
+                System.out.println("╠══════════════════════════════════════════╣");
+                System.out.println("║  1) Analizar y diagnosticar el sistema   ║");
+                System.out.println("║  2) Diagnóstico + benchmark CPU          ║");
+                System.out.println("║  3) Mostrar ayuda y comandos             ║");
+                System.out.println("║  0) Salir                                ║");
+                System.out.println("╚══════════════════════════════════════════╝");
+                System.out.print("Selecciona una opción: ");
+                if (!scanner.hasNextLine()) return;
+                String choice = scanner.nextLine().strip();
+                switch (choice) {
+                    case "1" -> runDiagnostics(new String[]{"--diagnostics"});
+                    case "2" -> runDiagnostics(new String[]{"--benchmark"});
+                    case "3" -> printHelp();
+                    case "0" -> { System.out.println("Hasta luego."); return; }
+                    default -> System.out.println("Opción no válida. Elige 1, 2, 3 o 0.");
+                }
+            }
+        }
+    }
     private static void runBackup(String[] args) {
         if (args.length < 3) {
             System.err.println("Uso: --backup <directorio-respaldo> <archivo1> [archivo2 ...]");
@@ -153,6 +184,8 @@ public final class Main {
                 Uso: java -jar cachyos-optimizer.jar [opciones]
 
                 Opciones:
+                  --menu        Abre el menú interactivo de terminal.
+                  --diagnostics Ejecuta el análisis completo directamente.
                   --help       Muestra esta ayuda.
                   --benchmark  Ejecuta un microbenchmark breve de CPU.
                                No mide FPS ni rendimiento de GPU/juegos.
