@@ -8,6 +8,7 @@ import com.x504.optimizer.benchmark.BenchmarkSuite;
 import com.x504.optimizer.benchmark.BenchmarkHistory;
 import com.x504.optimizer.core.SystemCore;
 import com.x504.optimizer.monitor.SystemMonitor;
+import com.x504.optimizer.install.OptimizationToolsInstaller;
 import com.x504.optimizer.compatibility.CompatibilityAnalyzer;
 import com.x504.optimizer.hardware.HardwareDetector;
 import com.x504.optimizer.modules.*;
@@ -32,6 +33,7 @@ public final class Main {
         if (args.length > 0 && (args[0].equals("--benchmark-memory") || args[0].equals("--benchmark-storage"))) { runExtendedBenchmark(args); return; }
         if (args.length > 0 && args[0].equals("--benchmark-suite")) { runBenchmarkSuite(args); return; }
         if (args.length > 0 && args[0].equals("--compare-benchmarks")) { compareBenchmarks(args); return; }
+        if (args.length > 0 && args[0].equals("--install-tools")) { runInstallTools(); return; }
         if (args.length > 0 && args[0].equals("--help")) {
             printHelp();
             return;
@@ -142,6 +144,43 @@ public final class Main {
             System.out.println("Compara el mismo equipo y condiciones similares.");
         } catch (IOException | RuntimeException ex) { System.err.println("No se pudo comparar: " + ex.getMessage()); }
     }
+    private static void runInstallTools() {
+        OptimizationToolsInstaller installer = new OptimizationToolsInstaller();
+        if (!installer.isArchBased()) {
+            System.err.println("Instalación cancelada: esta función está limitada a Arch Linux y CachyOS.");
+            return;
+        }
+        try (var scanner = new java.util.Scanner(System.in)) {
+            System.out.println("\\n=== Instalador de herramientas de optimización ===");
+            System.out.println("Se instalarán herramientas de diagnóstico, gráficos y gaming:");
+            installer.packages(true).forEach(pkg -> System.out.println("  • " + pkg));
+            System.out.println("\\nNo se instalarán controladores propietarios ni se cambiarán kernel, servicios,");
+            System.out.println("gobernadores, parámetros de arranque o configuraciones del sistema.");
+            System.out.println("Pacman mostrará su resumen y pedirá confirmación antes de instalar.");
+            System.out.print("\\n¿Continuar? [s/N]: ");
+            if (!scanner.hasNextLine() || !scanner.nextLine().strip().equalsIgnoreCase("s")) {
+                System.out.println("Instalación cancelada por el usuario.");
+                return;
+            }
+            System.out.println("\\nIniciando instalador. Introduce tu contraseña de sudo si se solicita.");
+            int exit = installer.install(true);
+            if (exit == 0) {
+                System.out.println("Herramientas instaladas o ya presentes.");
+                writeAuditEvent("optimization_tools_installed", "Paquete completo de herramientas de diagnóstico y gaming");
+            } else {
+                System.err.println("Pacman terminó con código " + exit + ". Revisa el mensaje anterior.");
+                writeAuditEvent("optimization_tools_install_failed", "Código de salida " + exit);
+            }
+        } catch (java.io.IOException ex) {
+            System.err.println("No se pudo iniciar Pacman: " + ex.getMessage());
+        } catch (InterruptedException ex) {
+            Thread.currentThread().interrupt();
+            System.err.println("Instalación interrumpida.");
+        } catch (IllegalStateException ex) {
+            System.err.println("No se pudo instalar: " + ex.getMessage());
+        }
+    }
+
     private static void runMonitor(String[] args) {
         int seconds = 15;
         if (args.length > 1) {
@@ -204,7 +243,8 @@ public final class Main {
                 System.out.println("║  2) Diagnóstico + benchmark CPU          ║");
                 System.out.println("║  3) Mostrar ayuda y comandos             ║");
                 System.out.println("║  4) Monitor CPU/RAM (15 segundos)        ║");
-                System.out.println("║  5) Benchmark completo                    ║");
+                System.out.println("║  5) Benchmark completo                   ║");
+                System.out.println("║  6) Instalar herramientas de optimización ║");
                 System.out.println("║  0) Salir                                ║");
                 System.out.println("╚══════════════════════════════════════════╝");
                 System.out.print("Selecciona una opción: ");
@@ -216,8 +256,9 @@ public final class Main {
                     case "3" -> printHelp();
                     case "4" -> runMonitor(new String[]{"--monitor", "15"});
                     case "5" -> runBenchmarkSuite(new String[]{"--benchmark-suite"});
+                    case "6" -> runInstallTools();
                     case "0" -> { System.out.println("Hasta luego."); return; }
-                    default -> System.out.println("Opción no válida. Elige 1, 2, 3, 4, 5 o 0.");
+                    default -> System.out.println("Opción no válida. Elige 1, 2, 3, 4, 5, 6 o 0.");
                 }
             }
         }
@@ -289,14 +330,14 @@ public final class Main {
                   --benchmark-storage [MiB] Prueba temporal de disco (8-32 MiB).
                   --monitor [segundos]      Monitor CPU/RAM (1-300 s).
                   --benchmark-suite [MiB]   CPU + RAM + disco; guarda historial.
-                  --compare-benchmarks A B  Compara dos CSV (antes/después).
+                  --compare-benchmarks A B  Compara dos CSV (antes/después).\n                  --install-tools          Instala herramientas recomendadas en Arch/CachyOS.
                   --backup DIR ARCHIVO... 
                                Respalda archivos elegidos en un directorio nuevo.
                   --restore COPIA DESTINO
                                Verifica SHA-256 y restaura copias en DESTINO,
                                sin sobrescribir archivos existentes.
 
-                El análisis normal es de solo lectura. No aplica ajustes al sistema.
+                El análisis normal es de solo lectura. --install-tools instala solo herramientas aprobadas; no cambia ajustes del sistema.
                 La restauración nunca escribe directamente en las rutas originales.
                 """);
     }
