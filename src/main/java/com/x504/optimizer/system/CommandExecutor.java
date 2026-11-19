@@ -8,11 +8,11 @@ import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
-/** Ejecutor limitado a consultas conocidas; nunca invoca un intérprete de comandos. */
+/** Ejecutor limitado a herramientas de consulta; nunca invoca un intérprete de comandos. */
 public final class CommandExecutor {
     private static final Set<String> ALLOWED = Set.of(
             "uname", "lscpu", "lsblk", "lspci", "lsusb", "free", "df",
-            "glxinfo", "vulkaninfo", "inxi", "systemctl"
+            "glxinfo", "vulkaninfo", "inxi"
     );
 
     public CommandResult executeReadOnly(List<String> arguments, Duration timeout)
