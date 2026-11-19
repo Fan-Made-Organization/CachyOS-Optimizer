@@ -2,22 +2,24 @@
 set -Eeuo pipefail
 
 ROOT="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
-JAR="$ROOT/target/cachyos-optimizer-0.1.0-SNAPSHOT.jar"
+JAR="$ROOT/target/linux-optimizer-0.1.0-SNAPSHOT.jar"
 LOCAL_JAVA="$ROOT/.tools/temurin-jdk-21/bin/java"
 LOCAL_MAVEN="$ROOT/.tools/apache-maven-3.9.9/bin/mvn"
-CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/cachyos-optimizer"
+CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/linux-optimizer"
 LANGUAGE_FILE="$CONFIG_DIR/language"
 
-say() { printf '[CachyOS Optimizer] %s\n' "$*"; }
+say() { printf '[Linux Optimizer] %s\n' "$*"; }
 
 choose_language() {
   local selected=""
   if [[ -r "$LANGUAGE_FILE" ]]; then
     selected="$(<"$LANGUAGE_FILE")"
+  elif [[ -r "${XDG_CONFIG_HOME:-$HOME/.config}/cachyos-optimizer/language" ]]; then
+    selected="$(<"${XDG_CONFIG_HOME:-$HOME/.config}/cachyos-optimizer/language")"
   fi
   if [[ ! "$selected" =~ ^(es|en|pt_BR)$ ]]; then
     printf '\n==============================================\n'
-    printf '       CachyOS Optimizer - Idioma / Language\n'
+    printf '       Linux Optimizer - Idioma / Language\n'
     printf '==============================================\n'
     printf '1) Español\n2) English\n3) Português (Brasil)\n'
     while true; do
@@ -34,7 +36,8 @@ choose_language() {
     printf '%s\n' "$selected" > "$LANGUAGE_FILE"
     chmod 600 "$LANGUAGE_FILE"
   fi
-  export CACHYOS_OPTIMIZER_LANGUAGE="$selected"
+  export LINUX_OPTIMIZER_LANGUAGE="$selected"
+  export CACHYOS_OPTIMIZER_LANGUAGE="$selected" # Compatibilidad con versiones anteriores
   case "$selected" in
     es) say "Idioma seleccionado: Español." ;;
     en) say "Selected language: English." ;;
@@ -72,7 +75,7 @@ if ! command -v mvn >/dev/null 2>&1 && [[ ! -x "$LOCAL_MAVEN" ]]; then
 fi
 
 if [[ ! -f "$JAR" ]] || find "$ROOT/src/main" "$ROOT/pom.xml" -type f -newer "$JAR" -print -quit | grep -q .; then
-  say "Compilando o actualizando CachyOS Optimizer..."
+  say "Compilando o actualizando Linux Optimizer..."
   bash "$ROOT/scripts/package.sh"
 fi
 
@@ -90,8 +93,9 @@ fi
 }
 
 # En el primer inicio ofrece el paquete de utilidades; nunca instala en silencio.
-FIRST_RUN_FILE="${XDG_STATE_HOME:-$HOME/.local/state}/cachyos-optimizer/first-run-tools-check"
-if [[ ! -e "$FIRST_RUN_FILE" ]] && { grep -qiE '^(ID|ID_LIKE)=.*(arch|cachyos|manjaro|debian|ubuntu|linuxmint|fedora|rhel|centos|rocky|almalinux|opensuse|suse)' /etc/os-release 2>/dev/null; }; then
+FIRST_RUN_FILE="${XDG_STATE_HOME:-$HOME/.local/state}/linux-optimizer/first-run-tools-check"
+LEGACY_FIRST_RUN_FILE="${XDG_STATE_HOME:-$HOME/.local/state}/cachyos-optimizer/first-run-tools-check"
+if [[ ! -e "$FIRST_RUN_FILE" && ! -e "$LEGACY_FIRST_RUN_FILE" ]] && { grep -qiE '^(ID|ID_LIKE)=.*(arch|cachyos|manjaro|debian|ubuntu|linuxmint|fedora|rhel|centos|rocky|almalinux|opensuse|suse)' /etc/os-release 2>/dev/null; }; then
   printf '\n'
   say "Primera ejecución: ¿quieres abrir el instalador de herramientas recomendadas?"
   say "Puedes aceptar o saltarlo; tu gestor de paquetes solicitará su propia confirmación antes de instalar."
