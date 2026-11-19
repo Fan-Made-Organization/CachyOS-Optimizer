@@ -42,7 +42,7 @@ public final class OptimizationCenter {
         Files.createDirectories(parent);
         if (Files.isSymbolicLink(parent) || Files.isSymbolicLink(stateFile))
             throw new IOException("Se rechazó una ruta de estado que contiene un enlace simbólico.");
-        Files.writeString(stateFile, current + System.lineSeparator());
+        if (!canRestorePowerProfile()) Files.writeString(stateFile, current + System.lineSeparator());
         CommandResult applied = run(List.of("powerprofilesctl", "set", profile), 20);
         if (applied.exitCode() != 0) {
             Files.deleteIfExists(stateFile);
