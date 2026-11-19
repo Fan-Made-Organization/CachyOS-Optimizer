@@ -1,28 +1,59 @@
 package com.x504.optimizer.monitor;
 
+import com.sun.management.OperatingSystemMXBean;
 import java.io.IOException;
+import java.lang.management.ManagementFactory;
 import java.nio.file.*;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
-/** Captura ligera de métricas Linux en vivo mediante /proc y sysfs; solo lectura. */
+/**
+ * Métricas portables de CPU y memoria mediante Java MXBeans.
+ * Temperatura y uso GPU se consultan en Linux cuando sysfs los expone.
+ */
 public final class LiveMetrics {
     private CpuTicks previousCpu;
+    private static final OperatingSystemMXBean OS =
+            ManagementFactory.getOperatingSystemMXBean() instanceof OperatingSystemMXBean bean ? bean : null;
 
     public Sample sample() {
-        CpuTicks now = readCpu();
-        double cpu = previousCpu == null || now == null ? 0 : now.percentSince(previousCpu);
-        previousCpu = now;
-        long total = value("MemTotal"), available = value("MemAvailable");
-        double memory = total <= 0 || available < 0 ? 0 : clamp((total - available) * 100.0 / total);
-        double temperature = readMaxTemperature();
-        double gpu = readGpuUsage();
-        return new Sample(LocalTime.now().withNano(0), cpu, memory, temperature, gpu,
-                Runtime.getRuntime().availableProcessors());
+        double cpu = readPortableCpu();
+        double memory = readPortableMemory();
+        double temperature = isLinux() ? readMaxTemperature() : -1;
+        double gpu = isLinux() ? readGpuUsage() : -1;
+        if (isLinux()) {
+            CpuTicks now = readLinuxCpu();
+            if (now != null) {
+                if (previousCpu != null) cpu = now.percentSince(previousCpu);
+                previousCpu = now;
+            }
+        }
+        return new Sample(LocalTime.now().withNano(0), clamp(cpu), clamp(memory),
+                temperature, gpu, Runtime.getRuntime().availableProcessors());
     }
 
-    private static CpuTicks readCpu() {
+    private static double readPortableCpu() {
+        if (OS != null) {
+            double load = OS.getCpuLoad();
+            if (Double.isFinite(load) && load >= 0) return clamp(load * 100.0);
+        }
+        return 0;
+    }
+
+    private static double readPortableMemory() {
+        if (OS != null && OS.getTotalMemorySize() > 0) {
+            return clamp((OS.getTotalMemorySize() - OS.getFreeMemorySize()) * 100.0 / OS.getTotalMemorySize());
+        }
+        long max = Runtime.getRuntime().maxMemory();
+        return max <= 0 ? 0 : clamp((max - Runtime.getRuntime().freeMemory()) * 100.0 / max);
+    }
+
+    private static boolean isLinux() {
+        return System.getProperty("os.name", "").toLowerCase(java.util.Locale.ROOT).contains("linux");
+    }
+
+    private static CpuTicks readLinuxCpu() {
         try {
             String[] p = Files.readAllLines(Path.of("/proc/stat")).getFirst().trim().split("\\s+");
             long idle = Long.parseLong(p[4]) + (p.length > 5 ? Long.parseLong(p[5]) : 0);
@@ -30,14 +61,6 @@ public final class LiveMetrics {
             for (int i=1;i<p.length;i++) total += Long.parseLong(p[i]);
             return new CpuTicks(total, idle);
         } catch (Exception ex) { return null; }
-    }
-
-    private static long value(String key) {
-        try {
-            for (String line : Files.readAllLines(Path.of("/proc/meminfo")))
-                if (line.startsWith(key + ":")) return Long.parseLong(line.replaceAll("[^0-9]", ""));
-        } catch (Exception ignored) { }
-        return -1;
     }
 
     private static double readMaxTemperature() {
@@ -77,7 +100,7 @@ public final class LiveMetrics {
                     try { return clamp(Double.parseDouble(Files.readString(amd).trim())); }
                     catch (Exception ignored) { }
                 }
-                Path intel = device.resolve("gt/gt0/"); 
+                Path intel = device.resolve("gt/gt0/");
                 for (String file : List.of("busy", "busy_percent")) {
                     Path metric = intel.resolve(file);
                     if (Files.isReadable(metric)) {
@@ -92,7 +115,10 @@ public final class LiveMetrics {
         return -1;
     }
 
-    private static double clamp(double value) { return Math.max(0, Math.min(100, value)); }
+    private static double clamp(double value) {
+        if (!Double.isFinite(value)) return 0;
+        return Math.max(0, Math.min(100, value));
+    }
     private record CpuTicks(long total, long idle) {
         double percentSince(CpuTicks old) {
             long dt=total-old.total, di=idle-old.idle;
