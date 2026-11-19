@@ -6,7 +6,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class CompatibilityAnalyzerTest {
     @Test
-    void calculatesScoreOnlyFromKnownComponents() {
+    void calculatesScoreFromAllChecksAndPartialSupport() {
         SystemInfo info = new SystemInfo("Linux", "CachyOS", "rolling",
                 "6.12.1", "x86_64", "KDE", true, true);
         CompatibilityReport report = new CompatibilityAnalyzer().analyze(info);
@@ -16,11 +16,11 @@ class CompatibilityAnalyzerTest {
     }
 
     @Test
-    void doesNotAwardPointsToUnknownComponents() {
+    void unknownComponentsDoNotInflateCompatibilityScore() {
         SystemInfo info = new SystemInfo("Linux", "Linux", "Desconocida",
                 "Desconocido", "mips", "No detectado", true, false);
         CompatibilityReport report = new CompatibilityAnalyzer().analyze(info);
-        assertEquals(100, report.percentage());
+        assertEquals(25, report.percentage());
         assertEquals(1, report.evaluatedComponents());
         assertEquals(3, report.unknownComponents());
     }
