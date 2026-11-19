@@ -437,6 +437,12 @@ public final class LinuxOptimizerGui {
                 return;
             }
             Map<String, List<String>> categories = support.toolCategories(platform);
+            if (gamingOnly) {
+                categories = categories.entrySet().stream()
+                        .filter(entry -> entry.getKey().equals("Gaming"))
+                        .collect(java.util.stream.Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue,
+                                (left, right) -> left, LinkedHashMap::new));
+            }
             if (categories.isEmpty()) {
                 showMessage("No hay perfiles de paquetes validados para " + platform.name() + ". No se ejecutó ningún comando.");
                 return;
