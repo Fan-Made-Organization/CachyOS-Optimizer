@@ -21,3 +21,7 @@ Los módulos de diagnóstico implementan `DiagnosticModule` y producen un `Modul
 4. El CLI muestra el resultado y registra un resumen local.
 
 Los módulos son de diagnóstico. No modifican controladores, servicios, gobernadores ni parámetros del kernel. La inspección de kernels es compatible con distintas familias Linux y permanece en modo solo lectura.
+
+## Contrato y calidad de los módulos
+
+Un módulo debe ser independiente del gestor de paquetes y del escritorio siempre que sea posible. Debe devolver hallazgos con evidencia observable, indicar cuándo una comprobación no pudo ejecutarse y evitar que la ausencia de una herramienta opcional invalide todo el informe. Las consultas deben tener tiempos de espera y no modificar el sistema. Documenta fuentes, permisos, distribuciones probadas y falsos positivos; añade pruebas con archivos temporales o proveedores simulados.
