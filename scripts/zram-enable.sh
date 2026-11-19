@@ -6,7 +6,17 @@ if [[ ! -x /usr/lib/systemd/system-generators/zram-generator ]]; then echo 'Inst
 config='/etc/systemd/zram-generator.conf'
 state='/var/lib/cachyos-optimizer'
 marker="$state/zram-managed"
-if [[ -e "$marker" ]]; then echo 'CachyOS Optimizer ya administra esta configuración zram.'; exit 0; fi
+expected=$(printf '[zram0]\\nzram-size = min(ram / 2, 4096)\\ncompression-algorithm = zstd\\nswap-priority = 100')
+if [[ -e "$marker" ]]; then
+  if [[ -f "$config" ]] && [[ "$(cat "$config")" == "$expected" ]]; then
+    systemctl daemon-reload
+    systemctl start dev-zram0.swap
+    echo 'Configuración zram administrada encontrada y activada.'
+    exit 0
+  fi
+  echo 'El marcador existe, pero la configuración cambió. No se modificará.' >&2
+  exit 3
+fi
 if [[ -e "$config" ]]; then echo 'Ya existe zram-generator.conf. No se sobrescribirá una configuración existente.' >&2; exit 2; fi
 mkdir -p "$state"
 tmp=$(mktemp)
