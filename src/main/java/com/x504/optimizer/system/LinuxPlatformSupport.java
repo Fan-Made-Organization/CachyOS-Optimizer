@@ -72,30 +72,30 @@ public final class LinuxPlatformSupport {
             }
             case DEBIAN -> {
                 result.put("Diagnóstico y hardware", List.of("inxi","lshw","dmidecode","smartmontools","lm-sensors","pciutils","usbutils"));
-                result.put("Gráficos y vídeo", List.of("vulkan-tools","mesa-utils","vainfo",));
-                result.put("Almacenamiento", List.of("nvme-cli","hdparm",));
+                result.put("Gráficos y vídeo", List.of("vulkan-tools","mesa-utils","vainfo"));
+                result.put("Almacenamiento", List.of("nvme-cli","hdparm"));
                 result.put("Red", List.of("iperf3","ethtool","dnsutils","traceroute"));
                 result.put("Gaming", List.of("gamemode","mangohud","gamescope","protontricks"));
                 result.put("Audio y multimedia", List.of("alsa-utils","pavucontrol","ffmpeg","v4l-utils"));
                 result.put("Desarrollo y depuración", List.of("strace","gdb","valgrind"));
-                result.put("Energía y sensores", List.of(,"acpi","upower"));
+                result.put("Energía y sensores", List.of("acpi","upower"));
             }
             case FEDORA -> {
                 result.put("Diagnóstico y hardware", List.of("inxi","lshw","dmidecode","smartmontools","lm_sensors","pciutils","usbutils"));
-                result.put("Gráficos y vídeo", List.of("vulkan-tools","mesa-demos","libva-utils",));
-                result.put("Almacenamiento", List.of("nvme-cli","hdparm",));
+                result.put("Gráficos y vídeo", List.of("vulkan-tools","mesa-demos","libva-utils"));
+                result.put("Almacenamiento", List.of("nvme-cli","hdparm"));
                 result.put("Red", List.of("iperf3","ethtool","bind-utils","traceroute"));
                 result.put("Gaming", List.of("gamemode","mangohud","gamescope","protontricks"));
             }
             case SUSE -> {
                 result.put("Diagnóstico y hardware", List.of("inxi","lshw","dmidecode","smartmontools","sensors","pciutils","usbutils"));
-                result.put("Gráficos y vídeo", List.of("vulkan-tools","Mesa-demo-x","libva-utils",));
-                result.put("Almacenamiento", List.of("nvme-cli","hdparm",));
+                result.put("Gráficos y vídeo", List.of("vulkan-tools","Mesa-demo-x","libva-utils"));
+                result.put("Almacenamiento", List.of("nvme-cli","hdparm"));
                 result.put("Red", List.of("iperf3","ethtool","bind-utils","traceroute"));
                 result.put("Gaming", List.of("gamemode","mangohud","gamescope"));
                 result.put("Audio y multimedia", List.of("alsa-utils","pavucontrol","ffmpeg","v4l-utils"));
                 result.put("Desarrollo y depuración", List.of("strace","gdb","valgrind"));
-                result.put("Energía y sensores", List.of(,"acpi","upower"));
+                result.put("Energía y sensores", List.of("acpi","upower"));
             }
             case ALPINE -> {
                 result.put("Diagnóstico y hardware", List.of("inxi","smartmontools","lm-sensors","pciutils","usbutils"));
