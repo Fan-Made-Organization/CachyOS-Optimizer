@@ -2,6 +2,10 @@
 set -Eeuo pipefail
 
 ROOT="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
+if [[ "$(uname -s)" != "Linux" ]]; then
+  printf '[Linux Optimizer] Este proyecto solo es compatible con Linux. Windows y macOS no están soportados.\n' >&2
+  exit 1
+fi
 JAR="$ROOT/target/linux-optimizer-0.1.0-SNAPSHOT.jar"
 PENDING_UPDATE="${XDG_DATA_HOME:-$HOME/.local/share}/linux-optimizer/pending-update.jar"
 LOCAL_JAVA="$ROOT/.tools/temurin-jdk-21/bin/java"
