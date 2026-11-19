@@ -3,6 +3,7 @@ package com.x504.optimizer.ui;
 import com.x504.optimizer.hardware.HardwareDetector;
 import com.x504.optimizer.system.AdvancedDiagnostics;
 import com.x504.optimizer.system.LinuxSystemDetector;
+import com.x504.optimizer.system.PlatformHardwareInspector;
 import com.x504.optimizer.monitor.LiveMetrics;
 import com.x504.optimizer.update.GitHubUpdater;
 
