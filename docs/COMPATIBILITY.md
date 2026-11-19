@@ -22,7 +22,9 @@ El gestor de paquetes se detecta por familia (Pacman, APT, DNF/YUM o Zypper). La
 ## Kernels
 Se inspeccionan versiones instaladas en `/usr/lib/modules` o `/lib/modules`, la versión activa, headers/build, módulos cargados, parámetros de arranque, UEFI, lockdown y rutas comunes de GRUB/systemd-boot. Se reconocen etiquetas habituales LTS, Zen, Hardened, CachyOS, XanMod y Liquorix si aparecen en la versión. Es una clasificación orientativa, no una verificación del paquete exacto.
 
-La gestión de kernels permanece en modo solo lectura: no se instala/elimina ningún kernel, no se regenera initramfs y no se modifica GRUB/systemd-boot. Debe conservarse un kernel de respaldo arrancable.
+El gestor guiado ofrece paquetes oficiales de kernel y headers/devel para Arch (estándar/LTS/Zen), Debian, Fedora y SUSE. Muestra el comando antes de ejecutarlo y requiere escribir INSTALAR; distribuciones desconocidas no reciben planes de instalación. La comprobación de respaldo busca otro árbol de módulos o múltiples imágenes de kernel en rutas comunes y es heurística, por lo que el usuario debe verificar manualmente que existe una entrada anterior arrancable. Si no se detecta un posible respaldo, la instalación se bloquea.
+
+No elimina kernels, no cambia GRUB/systemd-boot, no regenera initramfs manualmente y no modifica parámetros de arranque. Después de la instalación, se debe revisar la salida del gestor de paquetes y comprobar initramfs/entradas de arranque antes de reiniciar. La guía integrada explica cómo seleccionar el kernel anterior para recuperación. Los nombres de paquetes y repositorios pueden variar entre derivadas.
 
 ## Límites
 La detección inicial no certifica todos los controladores ni módulos. La compatibilidad de CPU, GPU, Vulkan, OpenGL, kernel y herramientas de juego debe evaluarse por separado antes de activar cada función.
