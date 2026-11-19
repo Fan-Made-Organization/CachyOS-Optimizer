@@ -60,7 +60,20 @@ A module's presence does not mean every driver, device, or tool is installed. Ea
 ### 5. Profile catalog
 The project includes an initial catalog of profiles and descriptions for different usage scenarios. At this stage, profiles are **informational references**. Selecting one does not change CPU governors, drivers, services, or system parameters.
 
-### 6. Safety and backup foundations
+### 6. System analysis dashboard
+
+The CLI displays an ASCII dashboard with distribution, inferred base, kernel, desktop, architecture, CPU, GPU, RAM, and compatibility assessment. Unknown values remain explicitly unknown; the status is not marked excellent when checks are unknown.
+
+The values in the sample below are illustrative. The application prints data actually detected on the host.
+
+### 7. Backup, audit, and benchmark foundations
+- `BackupManager` creates backups of explicitly selected files, writes a manifest, and verifies SHA-256.
+- Restore targets a user-selected directory, verifies integrity, and refuses to overwrite existing files.
+- `AuditLogger` stores a local diagnostic summary in the user's state directory.
+- `BenchmarkEngine` provides an optional bounded CPU microbenchmark without changing system configuration.
+- System files are not backed up or restored automatically; restore never writes to original system paths.
+
+### 8. Safety and backup foundations
 - Risk-level classification for future actions.
 - Initial validation of actions before they can be considered executable.
 - Foundation classes for backup manifests and checksum verification.
