@@ -1,1 +1,9 @@
-
+{
+  "version": 1,
+  "profiles": [
+    {"id": "balanced", "name": "Equilibrado", "enabled": false, "description": "Perfil de referencia; aún no aplica cambios."},
+    {"id": "performance", "name": "Rendimiento", "enabled": false, "description": "Pendiente de evaluación de hardware y temperatura."},
+    {"id": "battery_saver", "name": "Ahorro de energía", "enabled": false, "description": "Pendiente de implementar y probar."},
+    {"id": "gaming", "name": "Gaming", "enabled": false, "description": "Pendiente de detectar juegos y herramientas compatibles."}
+  ]
+}
