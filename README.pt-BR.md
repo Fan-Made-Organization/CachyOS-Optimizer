@@ -1,4 +1,4 @@
-# X504 CachyOS Optimizer
+# CachyOS Optimizer
 
 <p align="center">
   <strong>Diagnóstico Linux, análise de compatibilidade e uma base de otimização com foco em segurança.</strong><br>
@@ -13,7 +13,7 @@
 
 > **Estado atual: desenvolvimento inicial (0.1.0-SNAPSHOT).** O código executável disponível concentra-se em inspeção e diagnóstico somente leitura. O projeto possui bases para perfis, validação de segurança e backups, mas ainda não aplica ajustes de desempenho automaticamente. Consulte [o estado real do projeto](#estado-real-do-projeto).
 
-## O que é o X504 CachyOS Optimizer?
+## O que é o CachyOS Optimizer?
 
 X504 é um projeto de software livre em desenvolvimento que pretende reunir em uma única ferramenta informações do sistema, hardware, compatibilidade e componentes relacionados ao uso diário e a jogos no Linux.
 
@@ -200,4 +200,4 @@ Este projeto é licenciado sob a **GNU General Public License v3.0 (GPL-3.0-only
 
 ---
 
-**X504 CachyOS Optimizer** — primeiro entenda o sistema; depois otimize com responsabilidade.
+**CachyOS Optimizer** — primeiro entenda o sistema; depois otimize com responsabilidade.
