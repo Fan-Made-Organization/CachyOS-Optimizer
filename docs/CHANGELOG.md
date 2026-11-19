@@ -23,3 +23,13 @@
 ## Criterios de registro
 
 Las entradas deben describir cambios verificables, indicar limitaciones relevantes y separar funciones implementadas de trabajo planificado. No se debe anunciar una optimización como disponible cuando solo existe detección o recomendación. Los cambios de nombre del proyecto no migran por sí solos los datos de configuración locales ni amplían automáticamente la compatibilidad.
+
+
+## Cambios recientes — diagnóstico y compatibilidad ampliados
+
+- Se agregó un catálogo de componentes gráficos por familia Linux para Intel, AMD, NVIDIA y perfiles comunes, con instalación mediante el gestor detectado y confirmación explícita.
+- Los perfiles NVIDIA propietarios se mantienen deshabilitados en Fedora, SUSE y Alpine cuando la instalación puede depender de repositorios externos o módulos específicos no validados. Los perfiles no disponibles no ejecutan comandos.
+- Se añadió asesor energético que distingue laptop por presencia de batería y escritorio cuando sysfs está disponible, recomendando un perfil sin aplicarlo automáticamente.
+- Se añadió `--advanced-diagnostics` y la opción 11 del menú para revisar dispositivos de bloque, unidades systemd fallidas, módulos del kernel y herramientas de gaming.
+- Se ampliaron pruebas automatizadas para el catálogo gráfico multidistribución y las recomendaciones energéticas.
+- Estas funciones son diagnósticos y planes guiados; no cambian sistemas de archivos, parámetros NVMe, servicios, kernels ni controladores sin una acción explícita y validada.
