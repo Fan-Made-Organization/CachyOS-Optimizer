@@ -86,6 +86,7 @@ public final class Main {
             System.out.printf("Tiempo mediano: %.2f ms | Operaciones/segundo: %,d%n",
                     result.medianNanos() / 1_000_000.0, result.operationsPerSecond());
             System.out.println(result.note());
+            writeAuditEvent("cpu_benchmark_completed", result.runs() + " repeticiones; " + result.operationsPerSecond() + " operaciones/segundo");
         }
 
         writeAuditEvent("diagnostic_completed",
