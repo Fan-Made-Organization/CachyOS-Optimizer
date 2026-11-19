@@ -36,7 +36,10 @@ class SteamLaunchOptionsBuilderTest {
                 new SteamLaunchOptionsBuilder.AdvancedOptions(false,false,false,false,true,1920,1080,60,99)));
     }
 
-    @Test void addsWineD3DEnvironmentFlagWhenRequested() {\n        assertEquals("PROTON_USE_WINED3D=1 %command%",\n                builder.build(new SteamLaunchOptionsBuilder.Options(false,false,false,false,false,true)));\n        assertEquals("PROTON_USE_WINED3D=1 gamemoderun %command%",\n                builder.build(new SteamLaunchOptionsBuilder.Options(true,false,false,false,false,true)));\n    }\n\n    @Test void providesGameUsageProfiles() {
+    @Test void addsWineD3DEnvironmentFlagWhenRequested() {
+        assertEquals("PROTON_USE_WINED3D=1 %command%",\n                builder.build(new SteamLaunchOptionsBuilder.Options(false,false,false,false,false,true)));
+        assertEquals("PROTON_USE_WINED3D=1 gamemoderun %command%",\n                builder.build(new SteamLaunchOptionsBuilder.Options(true,false,false,false,false,true)));\n    }
+\n    @Test void providesGameUsageProfiles() {
         assertEquals(4, builder.gameProfiles().size());
     }
 
