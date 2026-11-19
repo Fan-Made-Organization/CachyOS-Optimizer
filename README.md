@@ -11,7 +11,7 @@
   <a href="README.pt-BR.md">🇧🇷 Português</a>
 </p>
 
-> **Estado actual: versión temprana (0.1.0-SNAPSHOT).** El código ejecutable disponible se centra en inspección y diagnóstico de solo lectura. El proyecto incluye bases para perfiles, validación de seguridad y respaldos, pero todavía no aplica automáticamente ajustes de rendimiento. Consulta [qué está implementado y qué está planeado](#estado-real-del-proyecto).
+> **Estado actual: versión temprana (0.1.0-SNAPSHOT).** Incluye diagnósticos y algunas acciones optativas y reversibles para CPU, zram y TRIM, además de un creador de parámetros de Steam. No aplica cambios a escondidas ni promete ganancias fijas de rendimiento. Consulta [el estado real del proyecto](#estado-real-del-proyecto).
 
 ## ¿Qué es CachyOS Optimizer?
 
@@ -138,11 +138,12 @@ El menú incluye **Instalar herramientas de optimización** y el comando `--inst
 
 - Diagnóstico y hardware: `inxi`, `lshw`, `dmidecode`, `smartmontools`, `lm_sensors`.
 - Gráficos y aceleración: `vulkan-tools`, `mesa-utils`, `libva-utils`, `vdpauinfo`, `nvtop`.
+- CPU y memoria: `power-profiles-daemon`, `cpupower`, `zram-generator`.
 - Gaming y monitorización: `gamemode`, `mangohud`, `gamescope`, `goverlay`.
 
 Antes de empezar, muestra la lista completa y pide confirmación. Después ejecuta `sudo pacman -S --needed` sin `--noconfirm`, por lo que Pacman también presenta su resumen y solicita aprobación. Los paquetes que ya estén instalados se conservan.
 
-**Alcance importante:** esta opción instala herramientas de usuario; no instala controladores a ciegas ni cambia kernel, servicios, parámetros de arranque, gobernadores CPU o ajustes de energía. Esos cambios dependen del hardware y requieren módulos específicos, comprobaciones y reversión. Si Pacman no encuentra un paquete o una dependencia, la transacción puede cancelarse sin completar.
+**Alcance importante:** esta opción instala herramientas de usuario; no instala controladores a ciegas ni cambia kernel, servicios o parámetros de arranque. Los cambios de perfil/gobernador se realizan desde el centro con confirmación. Esos cambios dependen del hardware y requieren módulos específicos, comprobaciones y reversión. Si Pacman no encuentra un paquete o una dependencia, la transacción puede cancelarse sin completar.
 
 Ejecutar directamente:
 
@@ -154,22 +155,22 @@ bash scripts/launch.sh --install-tools
 
 Abre el centro desde el menú principal (opción 7) o ejecuta `bash scripts/launch.sh --optimizer`. Reúne seis áreas:
 
-- **CPU:** consulta y cambia entre `balanced`, `performance` y `power-saver` mediante `power-profiles-daemon`. Guarda el perfil anterior en `~/.local/state/cachyos-optimizer/previous-power-profile` y permite restaurarlo.
-- **RAM:** comprueba si existe zram. El instalador incluye `zram-generator`, pero no escribe una configuración de memoria ni fuerza la limpieza de cachés.
-- **GPU:** mantiene el controlador existente y dirige al diagnóstico de Vulkan/OpenGL; no instala controladores sin identificar hardware y compatibilidad.
+- **CPU:** consulta y cambia entre `balanced`, `performance` y `power-saver` mediante `power-profiles-daemon`. También permite consultar y cambiar gobernadores CPU realmente disponibles (`performance`, `powersave`, `schedutil`, etc.) mediante `cpupower`. Guarda el valor anterior y permite restaurarlo. El controlador de frecuencia o el servicio de energía puede limitar qué opciones están disponibles.
+- **RAM:** detecta zram y permite crear/activar una configuración administrada con `zram-generator` (zstd; tamaño objetivo hasta la mitad de la RAM, máximo 4 GiB). Solo actúa si no existe ya `/etc/systemd/zram-generator.conf`; guarda un marcador para reconocer su propia configuración y ofrece retirarla desde el mismo menú. No toca una configuración zram ajena ni purga cachés.
+- **GPU:** enumera tarjetas DRM, fabricante PCI y controlador asociado; muestra orientación general para Intel/AMD/NVIDIA. No instala ni reemplaza controladores automáticamente.
 - **Gaming:** instala el conjunto de herramientas opcionales (GameMode, MangoHud, Gamescope, GOverlay y utilidades de diagnóstico).
 - **Almacenamiento:** si detecta un dispositivo no rotacional, permite habilitar `fstrim.timer` con `sudo systemctl enable --now fstrim.timer`. Se puede revertir desde el mismo menú o con `sudo systemctl disable --now fstrim.timer`. El menú también muestra el estado y permite volver a habilitarlo.
-- **Kernel:** muestra la versión activa y evita sustituir o eliminar kernels automáticamente.
+- **Kernel:** muestra la versión activa y los directorios de módulos/kernels instalados. No elimina ni sustituye kernels.
 
 Las operaciones CPU y TRIM solicitan confirmación. El perfil de energía se puede restaurar desde el mismo centro; TRIM se revierte deshabilitando el temporizador. No se prometen ganancias fijas de rendimiento.
 
-**Importante:** RAM, GPU y kernel incluyen inspección y preparación, no cambios automáticos. La configuración de zram y la instalación/cambio de controladores o kernels requieren una implementación específica para cada equipo, revisión de compatibilidad y un plan de recuperación.
+**Importante:** zram, perfiles de energía, gobernadores y TRIM requieren confirmación; zram solo puede revertirse automáticamente si la configuración sigue coincidiendo con la que creó la app. La gestión de controladores GPU y la sustitución/eliminación de kernels siguen siendo informativas: requieren selección manual y recuperación específica para cada equipo.
 
 ### 12. Creador de parámetros de Steam
 
-Desde el menú principal (opción 8), el centro de optimización (opción 7) o con `bash scripts/launch.sh --steam-options`, abre un asistente para generar una línea lista para pegar en **Steam → Propiedades → General → Parámetros de lanzamiento**. Incluye plantillas para `%command%`, GameMode, MangoHud, Gamescope, registro de Proton y FSR de Proton, además de una combinación personalizada. Puede guardar la línea en `~/.local/share/cachyos-optimizer/` sin sobrescribir archivos existentes.
+Desde el menú principal (opción 8), el centro de optimización (opción 7) o con `bash scripts/launch.sh --steam-options`, abre un asistente para generar una línea lista para pegar en **Steam → Propiedades → General → Parámetros de lanzamiento**. Incluye plantillas para `%command%`, GameMode, MangoHud, Gamescope, registro de Proton y FSR de Proton, combinaciones personalizadas, resolución y frecuencia objetivo de Gamescope, y perfiles de juego (competitivo, equilibrado, diagnóstico y escalado). Puede guardar la línea en `~/.local/share/cachyos-optimizer/` sin sobrescribir archivos existentes.
 
-Las opciones son plantillas: no instalan herramientas ni garantizan compatibilidad con todos los juegos. GameMode, MangoHud y Gamescope deben estar instalados; FSR depende de la versión de Proton y del juego. El registro de Proton es para diagnóstico y puede generar archivos de log.
+Las opciones son plantillas: no instalan herramientas ni garantizan compatibilidad con todos los juegos. GameMode, MangoHud y Gamescope deben estar instalados; FSR depende de la versión de Proton y del juego. La resolución y frecuencia son objetivos para Gamescope, no promesas de FPS ni cambios automáticos de los ajustes gráficos internos del juego. El registro de Proton es para diagnóstico y puede generar archivos de log.
 
 ### 13. Límites de seguridad
 - Las acciones se validan y preparan, pero el motor no ejecuta modificaciones del sistema.
@@ -189,8 +190,8 @@ Las opciones son plantillas: no instalan herramientas ni garantizan compatibilid
 | Validación y preparación de acciones | Implementada; las modificaciones reales siguen deshabilitadas |
 | Backup de archivos seleccionados y restauración verificada a otra carpeta | Implementado |
 | Instalación guiada de herramientas de diagnóstico y gaming en Arch/CachyOS | Implementada; confirmación previa y Pacman interactivo |
-| Centro guiado CPU/RAM/GPU/Gaming/almacenamiento/kernel | Implementación inicial; CPU y TRIM tienen acciones reversibles; RAM/GPU/kernel son inspección guiada |
-| Creador de parámetros de Steam | Implementado; plantillas y combinador personalizado, guardado local sin sobrescritura |
+| Centro guiado CPU/RAM/GPU/Gaming/almacenamiento/kernel | Implementado parcialmente; perfiles de energía, gobernadores CPU, zram administrado y TRIM son acciones optativas; GPU/kernel son inspección guiada |
+| Creador de parámetros de Steam | Implementado; plantillas, perfiles de juego, Gamescope con resolución/Hz y guardado local sin sobrescritura |
 | Configuración automática de zram, controladores y kernel | **Pendiente; no se aplica** |
 | Restauración sobre rutas originales y rollback del sistema | **Pendiente** |
 | Registro local de auditoría | Implementado con rotación básica |
