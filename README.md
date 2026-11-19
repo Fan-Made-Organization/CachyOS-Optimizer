@@ -156,7 +156,7 @@ Ejecutar directamente:
 bash scripts/launch.sh --install-tools
 ```
 
-### 11. Instalador de controladores gráficos
+### 12. Instalador de controladores gráficos
 
 El centro de optimización incorpora una sección separada para paquetes gráficos de Arch/CachyOS. Permite elegir un conjunto por fabricante: Intel (Mesa/OpenGL, ANV Vulkan e Intel Media), AMD (Mesa/OpenGL, RADV Vulkan y VA-API), NVIDIA (nvidia-open y bibliotecas de usuario), o compatibilidad DirectX para Wine/Proton (DXVK/VKD3D). También ofrece los componentes comunes Mesa y Vulkan loader. La lista se muestra antes de ejecutar Pacman y requiere confirmación; no se mezclan paquetes de Intel/AMD/NVIDIA ni se desinstala el controlador actual.
 
@@ -164,7 +164,7 @@ El centro de optimización incorpora una sección separada para paquetes gráfic
 
 Linux no instala un “driver DirectX” nativo: DXVK y VKD3D traducen Direct3D a Vulkan para Wine/Proton. Proton normalmente incluye versiones propias, así que instalar capas globales no es obligatorio. FSR tampoco es un controlador; depende del juego, Proton o Gamescope. La instalación de paquetes no garantiza que una aplicación o juego utilice una función concreta. Después de instalar, reinicia la sesión si corresponde y ejecuta `--diagnostics` para comprobar OpenGL/Vulkan.
 
-### 12. Centro de optimización guiada
+### 13. Centro de optimización guiada
 
 Abre el centro desde el menú principal (opción 7) o ejecuta `bash scripts/launch.sh --optimizer`. Reúne seis áreas:
 
@@ -179,13 +179,13 @@ Las operaciones CPU y TRIM solicitan confirmación. El perfil de energía se pue
 
 **Importante:** zram, perfiles de energía, gobernadores y TRIM requieren confirmación; zram solo puede revertirse automáticamente si la configuración sigue coincidiendo con la que creó la app. La gestión de controladores GPU y la sustitución/eliminación de kernels siguen siendo informativas: requieren selección manual y recuperación específica para cada equipo.
 
-### 13. Creador de parámetros de Steam
+### 14. Creador de parámetros de Steam
 
 Desde el menú principal (opción 8), el centro de optimización (opción 7) o con `bash scripts/launch.sh --steam-options`, abre un asistente para generar una línea lista para pegar en **Steam → Propiedades → General → Parámetros de lanzamiento**. Incluye plantillas para `%command%`, GameMode, MangoHud, Gamescope, registro de Proton, FSR de Proton y WineD3D (`PROTON_USE_WINED3D=1`), combinaciones personalizadas, resolución y frecuencia objetivo de Gamescope, y perfiles de juego (competitivo, equilibrado, diagnóstico y escalado). Puede guardar la línea en `~/.local/share/cachyos-optimizer/` sin sobrescribir archivos existentes.
 
 Las opciones son plantillas: no instalan herramientas ni garantizan compatibilidad con todos los juegos. GameMode, MangoHud y Gamescope deben estar instalados; FSR depende de la versión de Proton y del juego. WineD3D fuerza la traducción Direct3D a OpenGL en lugar de DXVK/Vulkan. Puede servir como alternativa cuando Vulkan o DXVK presenta problemas, pero no es una optimización universal y suele ofrecer menos rendimiento que DXVK; actívalo solo si el juego lo necesita. La resolución y frecuencia son objetivos para Gamescope, no promesas de FPS ni cambios automáticos de los ajustes gráficos internos del juego. El registro de Proton es para diagnóstico y puede generar archivos de log.
 
-### 13. Límites de seguridad
+### 15. Límites de seguridad
 - El diagnóstico normal es de solo lectura; las acciones disponibles se muestran por separado y requieren confirmación explícita.
 - Los comandos administrativos usan una lista cerrada de operaciones y no interpolan parámetros libres de shell.
 - Los cambios de CPU, zram y TRIM tienen mecanismos de reversión documentados; GPU y kernel permanecen en modo de inspección.
