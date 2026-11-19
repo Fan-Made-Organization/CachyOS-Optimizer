@@ -173,9 +173,9 @@ Desde el menú principal (opción 8), el centro de optimización (opción 7) o c
 Las opciones son plantillas: no instalan herramientas ni garantizan compatibilidad con todos los juegos. GameMode, MangoHud y Gamescope deben estar instalados; FSR depende de la versión de Proton y del juego. La resolución y frecuencia son objetivos para Gamescope, no promesas de FPS ni cambios automáticos de los ajustes gráficos internos del juego. El registro de Proton es para diagnóstico y puede generar archivos de log.
 
 ### 13. Límites de seguridad
-- Las acciones se validan y preparan, pero el motor no ejecuta modificaciones del sistema.
-- Las operaciones críticas se bloquean.
-- Los cambios requieren aprobación explícita y las operaciones administrativas requieren respaldo.
+- El diagnóstico normal es de solo lectura; las acciones disponibles se muestran por separado y requieren confirmación explícita.
+- Los comandos administrativos usan una lista cerrada de operaciones y no interpolan parámetros libres de shell.
+- Los cambios de CPU, zram y TRIM tienen mecanismos de reversión documentados; GPU y kernel permanecen en modo de inspección.
 - El respaldo restaura copias verificadas en otra carpeta; no altera automáticamente los archivos originales.
 
 ## Estado real del proyecto
