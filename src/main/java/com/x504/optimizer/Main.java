@@ -809,7 +809,7 @@ public final class Main {
                   --monitor [segundos]      Monitor CPU/RAM (1-300 s).
                   --benchmark-suite [MiB]   CPU + RAM + disco; guarda historial.
                   --compare-benchmarks A B  Compara dos CSV (antes/después).
-                  --install-tools          Instala herramientas de diagnóstico en distros compatibles (Arch, Debian, Fedora, openSUSE).\n                  --linux-support         Muestra compatibilidad de distro y kernel.
+                  --install-tools          Instala herramientas por categoría en familias compatibles (Arch, Debian, Fedora, SUSE, Alpine).\n                  --linux-support         Muestra compatibilidad de distro y kernel.
                   --optimizer              Abre el centro de optimización guiada.
                   --steam-options          Crea parámetros de lanzamiento para Steam.\n                  --cleaner               Vista previa y limpieza de cachés seguras del usuario.
                   --backup DIR ARCHIVO... 
