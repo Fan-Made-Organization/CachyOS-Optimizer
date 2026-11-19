@@ -177,6 +177,9 @@ public final class LinuxOptimizerGui {
     }
 
     private void showPage(String page) {
+        int oldIndex = List.of("Resumen", "CPU y memoria", "Gráficos", "Almacenamiento", "Red", "Sistema", "Gaming").indexOf(activePage);
+        int newIndex = List.of("Resumen", "CPU y memoria", "Gráficos", "Almacenamiento", "Red", "Sistema", "Gaming").indexOf(page);
+        int travelDirection = newIndex >= oldIndex ? 1 : -1;
         activePage = page;
         navigation.forEach((name, button) -> {
             boolean selected = name.equals(page);
@@ -257,13 +260,12 @@ public final class LinuxOptimizerGui {
         pageScroll.getVerticalScrollBar().setUnitIncrement(20);
         content.add(pageScroll, BorderLayout.CENTER);
         content.revalidate();
-        content.startFade();
+        content.startTransition(travelDirection);
         renderDetails();
     }
 
     private JPanel metricCard(String label, JLabel value) {
-        JPanel card = new JPanel(new BorderLayout(0, 12));
-        card.setBackground(PANEL);
+        JPanel card = new GlassPanel(new BorderLayout(0, 12));
         card.setBorder(new EmptyBorder(18, 18, 18, 18));
         JLabel heading = new JLabel(label);
         heading.setForeground(MUTED);
@@ -276,8 +278,7 @@ public final class LinuxOptimizerGui {
     }
 
     private JPanel section(String title, String subtitle) {
-        JPanel p = new JPanel(new BorderLayout(0, 7));
-        p.setBackground(PANEL_ALT);
+        JPanel p = new GlassPanel(new BorderLayout(0, 7));
         p.setBorder(new EmptyBorder(18, 19, 18, 19));
         JLabel h = new JLabel(title);
         h.setForeground(TEXT);
@@ -355,7 +356,11 @@ public final class LinuxOptimizerGui {
     }
 
     private void refresh() {
-        status.setText("Analizando el sistema…");
+        if (!isLinuxHost()) {
+            refreshPortableHost();
+            return;
+        }
+        status.setText("Analizando el sistema Linux…");
         new SwingWorker<AdvancedDiagnostics.Report, Void>() {
             protected AdvancedDiagnostics.Report doInBackground() {
                 return new AdvancedDiagnostics().inspect();
@@ -379,6 +384,33 @@ public final class LinuxOptimizerGui {
                 }
             }
         }.execute();
+    }
+
+    private static boolean isLinuxHost() {
+        return System.getProperty("os.name", "").toLowerCase(java.util.Locale.ROOT).contains("linux");
+    }
+
+    /** Resumen portable para Windows y macOS; los módulos de bajo nivel siguen siendo Linux-only. */
+    private void refreshPortableHost() {
+        String os = System.getProperty("os.name", "Sistema desconocido");
+        String version = System.getProperty("os.version", "");
+        String arch = System.getProperty("os.arch", "");
+        String javaVersion = System.getProperty("java.version", "");
+        var bean = java.lang.management.ManagementFactory.getOperatingSystemMXBean();
+        long total = bean instanceof com.sun.management.OperatingSystemMXBean mx ? mx.getTotalMemorySize() : -1;
+        cpu.setText(Runtime.getRuntime().availableProcessors() + " procesadores lógicos");
+        ram.setText(total > 0 ? String.format("%.1f GiB", total / 1073741824.0) : "No disponible");
+        gpu.setText("Consulta no disponible en este módulo");
+        distro.setText(os + " " + version + "  •  " + arch);
+        details.setText("LINUX OPTIMIZER · MODO MULTIPLATAFORMA\n\n"
+                + "Sistema operativo: " + os + "\nVersión: " + version
+                + "\nArquitectura: " + arch + "\nJava: " + javaVersion
+                + "\nProcesadores lógicos: " + Runtime.getRuntime().availableProcessors()
+                + "\nMemoria física total: " + (total > 0 ? String.format("%.2f GiB", total / 1073741824.0) : "No expuesta por la JVM")
+                + "\n\nLa interfaz, las gráficas de CPU/RAM y el actualizador funcionan en este sistema."
+                + "\nLos inspectores de controladores, kernel, servicios, almacenamiento Linux y herramientas gaming específicas requieren Linux."
+                + "\nNo se ejecutan comandos Linux ni se modifican ajustes del sistema en Windows/macOS.");
+        status.setText("Modo multiplataforma • " + java.time.LocalTime.now().withNano(0));
     }
 
     private void renderDetails() {
@@ -409,25 +441,52 @@ public final class LinuxOptimizerGui {
         return result;
     }
 
+    /** Transición vertical direccional: la página entra desde arriba o abajo según la pestaña elegida. */
     private static final class AnimatedPanel extends JPanel {
-        private float alpha = 1f;
-        private javax.swing.Timer fadeTimer;
+        private float progress = 1f;
+        private int direction = 1;
+        private javax.swing.Timer transitionTimer;
         AnimatedPanel() { super(new BorderLayout(0, 18)); setOpaque(false); }
-        void startFade() {
-            if (fadeTimer != null) fadeTimer.stop();
-            alpha = 0f;
-            fadeTimer = new javax.swing.Timer(16, event -> {
-                alpha = Math.min(1f, alpha + 0.12f);
+        void startTransition(int direction) {
+            if (transitionTimer != null) transitionTimer.stop();
+            this.direction = direction;
+            progress = 0f;
+            long started = System.nanoTime();
+            transitionTimer = new javax.swing.Timer(16, event -> {
+                double elapsed = (System.nanoTime() - started) / 1_000_000.0;
+                float t = (float) Math.min(1.0, elapsed / 260.0);
+                progress = 1f - (float) Math.pow(1f - t, 3);
                 repaint();
-                if (alpha >= 1f) fadeTimer.stop();
+                if (t >= 1f) transitionTimer.stop();
             });
-            fadeTimer.start();
+            transitionTimer.start();
         }
         @Override protected void paintChildren(Graphics graphics) {
             Graphics2D g = (Graphics2D) graphics.create();
-            g.setComposite(AlphaComposite.SrcOver.derive(alpha));
+            int offsetY = Math.round((1f - progress) * 34f * direction);
+            g.translate(0, offsetY);
+            g.setComposite(AlphaComposite.SrcOver.derive(Math.max(0.05f, progress)));
             super.paintChildren(g);
             g.dispose();
+        }
+    }
+
+    /** Superficie glass oscura con gradiente, borde translúcido y sombra suave. */
+    private static final class GlassPanel extends JPanel {
+        GlassPanel(LayoutManager layout) { super(layout); setOpaque(false); }
+        @Override protected void paintComponent(Graphics graphics) {
+            Graphics2D g = (Graphics2D) graphics.create();
+            g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            int w = getWidth(), h = getHeight();
+            g.setColor(new Color(0, 0, 0, 48));
+            g.fillRoundRect(2, 5, w - 4, h - 5, 22, 22);
+            g.setPaint(new GradientPaint(0, 0, new Color(42, 49, 70, 242),
+                    w, h, new Color(22, 28, 43, 246)));
+            g.fillRoundRect(0, 0, w - 4, h - 7, 22, 22);
+            g.setColor(new Color(174, 158, 255, 38));
+            g.drawRoundRect(0, 0, w - 5, h - 8, 22, 22);
+            g.dispose();
+            super.paintComponent(graphics);
         }
     }
 
