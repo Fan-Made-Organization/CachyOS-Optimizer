@@ -35,8 +35,8 @@ if ! command -v mvn >/dev/null 2>&1 && [[ ! -x "$LOCAL_MAVEN" ]]; then
   bash "$ROOT/scripts/bootstrap.sh"
 fi
 
-if [[ ! -f "$JAR" ]]; then
-  say "Primera ejecución: compilando y empaquetando X504 CachyOS Optimizer..."
+if [[ ! -f "$JAR" ]] || find "$ROOT/src/main" "$ROOT/pom.xml" -type f -newer "$JAR" -print -quit | grep -q .; then
+  say "Compilando o actualizando X504 CachyOS Optimizer..."
   bash "$ROOT/scripts/package.sh"
 fi
 
