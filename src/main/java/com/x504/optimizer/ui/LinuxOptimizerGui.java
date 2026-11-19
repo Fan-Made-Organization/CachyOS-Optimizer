@@ -699,7 +699,8 @@ public final class LinuxOptimizerGui {
         JCheckBox protonLog = steamCheck("Registro de Proton", "Activa un registro útil para diagnosticar compatibilidad.");
         JCheckBox fsr = steamCheck("FSR de Proton", "Activa el escalado FSR cuando el juego lo admite.");
         JCheckBox wineD3d = steamCheck("WineD3D (OpenGL)", "Alternativa de compatibilidad; puede rendir menos que DXVK/Vulkan.");
-        for (JCheckBox box : List.of(gameMode, mangoHud, gamescope, protonLog, fsr, wineD3d)) {
+        JCheckBox frameLimitEnabled = steamCheck("Límite de FPS para DXVK", "Limita los FPS para reducir consumo y calor; solo afecta juegos que usan DXVK.");
+        for (JCheckBox box : List.of(gameMode, mangoHud, gamescope, protonLog, fsr, wineD3d, frameLimitEnabled)) {
             root.add(box);
             root.add(Box.createVerticalStrut(7));
         }
@@ -710,10 +711,12 @@ public final class LinuxOptimizerGui {
         JSpinner height = new JSpinner(new SpinnerNumberModel(1080, 480, 4320, 10));
         JSpinner refreshRate = new JSpinner(new SpinnerNumberModel(60, 30, 360, 1));
         JSpinner fsrStrength = new JSpinner(new SpinnerNumberModel(2, 0, 5, 1));
+        JSpinner frameLimit = new JSpinner(new SpinnerNumberModel(60, 1, 360, 1));
         advanced.add(steamField("Ancho Gamescope", width));
         advanced.add(steamField("Alto Gamescope", height));
         advanced.add(steamField("Frecuencia (Hz)", refreshRate));
         advanced.add(steamField("Intensidad FSR (0–5)", fsrStrength));
+        advanced.add(steamField("Límite DXVK (FPS)", frameLimit));
         JLabel advancedHint = new JLabel("La resolución solo se usa si activas Gamescope.");
         advancedHint.setForeground(MUTED);
         advancedHint.setFont(new Font("SansSerif", Font.PLAIN, 11));
@@ -732,7 +735,7 @@ public final class LinuxOptimizerGui {
                         protonLog.isSelected(), fsr.isSelected(),
                         (Integer) width.getValue(), (Integer) height.getValue(),
                         (Integer) refreshRate.getValue(), (Integer) fsrStrength.getValue(),
-                        wineD3d.isSelected());
+                        wineD3d.isSelected(), frameLimitEnabled.isSelected(), (Integer) frameLimit.getValue());
                 String result = new SteamLaunchOptionsBuilder().build(options);
                 dialog.dispose();
                 showSteamOutput(result);
@@ -743,8 +746,8 @@ public final class LinuxOptimizerGui {
         root.add(Box.createVerticalStrut(17));
         root.add(buttons);
         dialog.setContentPane(root);
-        dialog.setSize(690, 650);
-        dialog.setMinimumSize(new Dimension(620, 600));
+        dialog.setSize(690, 720);
+        dialog.setMinimumSize(new Dimension(620, 660));
         dialog.setLocationRelativeTo(frame);
         dialog.setVisible(true);
     }
