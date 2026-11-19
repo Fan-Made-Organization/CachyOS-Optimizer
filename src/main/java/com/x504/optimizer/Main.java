@@ -255,10 +255,10 @@ public final class Main {
             System.out.println("Este instalador automático está limitado a Arch Linux y CachyOS.");
             return;
         }
-        System.out.println("\\n=== INSTALADOR DE CONTROLADORES GRÁFICOS ===");
+        System.out.println("\n=== INSTALADOR DE CONTROLADORES GRÁFICOS ===");
         System.out.println("GPU detectadas:");
         installer.detectGpuVendors().forEach(line -> System.out.println("  • " + line));
-        System.out.println("\\n1) Intel: Mesa/OpenGL + ANV Vulkan + Intel media");
+        System.out.println("\n1) Intel: Mesa/OpenGL + ANV Vulkan + Intel media");
         System.out.println("2) AMD: Mesa/OpenGL + RADV Vulkan + VA-API");
         System.out.println("3) NVIDIA: controlador NVIDIA open kernel module + Vulkan");
         System.out.println("4) Compatibilidad DirectX para Wine/Proton: DXVK + VKD3D");
@@ -276,7 +276,7 @@ public final class Main {
             default -> List.of();
         };
         if (packages.isEmpty()) { System.out.println("Instalación cancelada."); return; }
-        System.out.println("\\nPaquetes que se solicitarán a Pacman:");
+        System.out.println("\nPaquetes que se solicitarán a Pacman:");
         packages.forEach(pkg -> System.out.println("  • " + pkg));
         if (choice.equals("3")) {
             System.out.println("ADVERTENCIA NVIDIA: nvidia-open depende de compatibilidad con tu GPU y kernel. Verifica que tu modelo soporte el módulo abierto y conserva un kernel arrancable de respaldo.");
@@ -284,7 +284,7 @@ public final class Main {
         System.out.println("DirectX no tiene un controlador nativo instalable en Linux: DXVK/VKD3D traducen Direct3D a Vulkan. Proton ya incluye sus propias versiones y puede no necesitar estos paquetes globales.");
         System.out.println("FSR no es un driver: se habilita mediante Proton/juego o Gamescope cuando el juego y la GPU lo permiten.");
         System.out.println("No se instalarán paquetes de fabricantes distintos ni se eliminarán controladores existentes.");
-        System.out.print("\\n¿Continuar? Pacman mostrará su transacción y pedirá confirmación. [s/N]: ");
+        System.out.print("\n¿Continuar? Pacman mostrará su transacción y pedirá confirmación. [s/N]: ");
         if (!scanner.hasNextLine() || !scanner.nextLine().strip().equalsIgnoreCase("s")) {
             System.out.println("Instalación cancelada."); return;
         }
@@ -309,7 +309,8 @@ public final class Main {
         System.out.println("1) Básico   2) GameMode   3) MangoHud   4) GameMode + MangoHud");
         System.out.println("5) Gamescope   6) Registro Proton   7) FSR Proton");
         System.out.println("8) Combinación personalizada   9) Gamescope con resolución/FPS");
-        System.out.println("10) Perfiles de juego predefinidos");\n        System.out.println("11) WineD3D (usar OpenGL en lugar de DXVK/Vulkan)");
+        System.out.println("10) Perfiles de juego predefinidos");
+        System.out.println("11) WineD3D (usar OpenGL en lugar de DXVK/Vulkan)");
         System.out.print("Elige: ");
         if (!scanner.hasNextLine()) return;
         String choice = scanner.nextLine().strip();
@@ -322,7 +323,8 @@ public final class Main {
             case "4" -> options = new SteamLaunchOptionsBuilder.Options(true,true,false,false,false);
             case "5" -> options = new SteamLaunchOptionsBuilder.Options(false,false,true,false,false);
             case "6" -> options = new SteamLaunchOptionsBuilder.Options(false,false,false,true,false);
-            case "7" -> options = new SteamLaunchOptionsBuilder.Options(false,false,false,false,true);\n            case "11" -> options = new SteamLaunchOptionsBuilder.Options(false,false,false,false,false,true);
+            case "7" -> options = new SteamLaunchOptionsBuilder.Options(false,false,false,false,true);
+            case "11" -> options = new SteamLaunchOptionsBuilder.Options(false,false,false,false,false,true);
             case "8" -> {
                 boolean gm = askYesNo(scanner, "¿Activar GameMode?");
                 boolean hud = askYesNo(scanner, "¿Activar MangoHud?");
@@ -362,7 +364,9 @@ public final class Main {
             System.out.println("\nCopia esta línea en Steam → Propiedades → General → Parámetros de lanzamiento:");
             System.out.println("\n" + launchOptions + "\n");
             System.out.println("GameMode, MangoHud y Gamescope deben estar instalados si se seleccionaron.");
-            System.out.println("FSR depende de Proton/juego; resolución y Hz son objetivos de Gamescope, no garantizan FPS.");\n            if ((advanced != null && advanced.wined3d()) || (options != null && options.wined3d())) {\n                System.out.println("WineD3D fuerza la traducción Direct3D→OpenGL. Úsalo como alternativa de compatibilidad si Vulkan/DXVK falla; normalmente puede rendir menos que DXVK.");\n            }
+            System.out.println("FSR depende de Proton/juego; resolución y Hz son objetivos de Gamescope, no garantizan FPS.");
+            if ((advanced != null && advanced.wined3d()) || (options != null && options.wined3d())) {\n                System.out.println("WineD3D fuerza la traducción Direct3D→OpenGL. Úsalo como alternativa de compatibilidad si Vulkan/DXVK falla; normalmente puede rendir menos que DXVK.");
+            }
             if (askYesNo(scanner, "¿Guardar la línea en un archivo local?")) {
                 Path directory = Path.of(System.getProperty("user.home"), ".local", "share", "cachyos-optimizer");
                 Path destination = directory.resolve("steam-launch-options-" + java.time.LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss")) + ".txt");
