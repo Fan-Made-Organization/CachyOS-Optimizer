@@ -17,6 +17,13 @@ class KernelManagerTest {
         assertEquals(List.of("sudo", "pacman", "-S", "--needed", "linux", "linux-headers"), manager.installCommand(support, arch, options.get(0)));
     }
 
+    @Test void usesCachyOsAndUbuntuSpecificKernelMetapackages() {
+        var cachy = new LinuxPlatformSupport.Platform("cachyos", "CachyOS", "", "arch", LinuxPlatformSupport.Family.ARCH, "pacman");
+        var ubuntu = new LinuxPlatformSupport.Platform("ubuntu", "Ubuntu", "", "debian", LinuxPlatformSupport.Family.DEBIAN, "apt-get");
+        assertEquals(List.of("linux-cachyos", "linux-cachyos-headers"), manager.options(cachy).get(0).packages());
+        assertEquals(List.of("linux-generic", "linux-headers-generic"), manager.options(ubuntu).get(0).packages());
+    }
+
     @Test void offersOfficialKernelPackagesForDebianFedoraAndSuse() {
         assertEquals(List.of("linux-image-amd64", "linux-headers-amd64"), manager.options(platform(LinuxPlatformSupport.Family.DEBIAN, "apt-get")).get(0).packages());
         assertEquals(List.of("kernel", "kernel-devel"), manager.options(platform(LinuxPlatformSupport.Family.FEDORA, "dnf")).get(0).packages());
