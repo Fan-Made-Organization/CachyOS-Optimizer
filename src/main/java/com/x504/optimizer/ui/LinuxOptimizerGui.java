@@ -69,9 +69,9 @@ public final class LinuxOptimizerGui {
         frame.getContentPane().setBackground(BG);
         frame.setLayout(new BorderLayout());
         frame.add(sidebar(), BorderLayout.WEST);
-        JPanel shell = new JPanel(new BorderLayout(0, 18));
+        JPanel shell = new JPanel(new BorderLayout(0, 14));
         shell.setBackground(BG);
-        shell.setBorder(new EmptyBorder(28, 30, 24, 30));
+        shell.setBorder(new EmptyBorder(22, 24, 18, 24));
         shell.add(header(), BorderLayout.NORTH);
         content.setOpaque(false);
         shell.add(content, BorderLayout.CENTER);
@@ -126,23 +126,29 @@ public final class LinuxOptimizerGui {
     }
 
     private JPanel header() {
-        JPanel p = new JPanel(new BorderLayout());
+        JPanel p = new JPanel();
         p.setOpaque(false);
+        p.setLayout(new BoxLayout(p, BoxLayout.Y_AXIS));
         JPanel titles = new JPanel();
         titles.setOpaque(false);
+        titles.setAlignmentX(Component.CENTER_ALIGNMENT);
         titles.setLayout(new BoxLayout(titles, BoxLayout.Y_AXIS));
-        JLabel eyebrow = new JLabel("LINUX / SYSTEM INTELLIGENCE");
+        JLabel eyebrow = new JLabel("OPTIMIZACIÓN DEL SISTEMA");
         eyebrow.setForeground(ACCENT);
         eyebrow.setFont(new Font("SansSerif", Font.BOLD, 10));
-        JLabel title = new JLabel("Panel de control");
+        JLabel title = new JLabel("Linux Optimizer");
+        title.setAlignmentX(Component.CENTER_ALIGNMENT);
+        eyebrow.setAlignmentX(Component.CENTER_ALIGNMENT);
+        distro.setAlignmentX(Component.CENTER_ALIGNMENT);
         title.setForeground(TEXT);
         title.setFont(new Font("SansSerif", Font.BOLD, 27));
         distro.setForeground(MUTED);
         distro.setFont(new Font("SansSerif", Font.PLAIN, 12));
         titles.add(eyebrow); titles.add(Box.createVerticalStrut(5)); titles.add(title);
         titles.add(Box.createVerticalStrut(5)); titles.add(distro);
-        JPanel actions = new JPanel(new FlowLayout(FlowLayout.RIGHT, 9, 0));
+        JPanel actions = new JPanel(new FlowLayout(FlowLayout.CENTER, 9, 0));
         actions.setOpaque(false);
+        actions.setAlignmentX(Component.CENTER_ALIGNMENT);
         updateButton = new JButton("⇧  Buscar actualizaciones");
         styleButton(updateButton);
         updateButton.setBackground(PANEL_ALT);
@@ -152,8 +158,9 @@ public final class LinuxOptimizerGui {
         refresh.addActionListener(e -> refresh());
         actions.add(updateButton);
         actions.add(refresh);
-        p.add(titles, BorderLayout.WEST);
-        p.add(actions, BorderLayout.EAST);
+        p.add(titles);
+        p.add(Box.createVerticalStrut(12));
+        p.add(actions);
         return p;
     }
 
@@ -162,7 +169,7 @@ public final class LinuxOptimizerGui {
         p.setOpaque(false);
         status.setForeground(MUTED);
         status.setFont(new Font("SansSerif", Font.PLAIN, 11));
-        JLabel version = new JLabel("LINUX OPTIMIZER  •  PREVIEW");
+        JLabel version = new JLabel("LINUX OPTIMIZER");
         version.setForeground(new Color(103, 115, 139));
         version.setFont(new Font("SansSerif", Font.BOLD, 10));
         p.add(status, BorderLayout.WEST);
@@ -171,8 +178,9 @@ public final class LinuxOptimizerGui {
     }
 
     private void showPage(String page) {
-        int oldIndex = List.of("Resumen", "CPU y memoria", "Gráficos", "Almacenamiento", "Red", "Sistema", "Gaming").indexOf(activePage);
-        int newIndex = List.of("Resumen", "CPU y memoria", "Gráficos", "Almacenamiento", "Red", "Sistema", "Gaming").indexOf(page);
+        List<String> pages = List.of("Resumen", "CPU y memoria", "Gráficos", "Almacenamiento", "Sistema", "Gaming");
+        int oldIndex = pages.indexOf(activePage);
+        int newIndex = pages.indexOf(page);
         int travelDirection = newIndex >= oldIndex ? 1 : -1;
         activePage = page;
         navigation.forEach((name, button) -> {
@@ -183,7 +191,7 @@ public final class LinuxOptimizerGui {
             button.setFont(new Font("SansSerif", selected ? Font.BOLD : Font.PLAIN, 13));
         });
         content.removeAll();
-        JPanel body = new JPanel();
+        JPanel body = new ResponsivePanel();
         body.setOpaque(false);
         body.setLayout(new BoxLayout(body, BoxLayout.Y_AXIS));
         if (page.equals("Resumen")) {
@@ -214,8 +222,8 @@ public final class LinuxOptimizerGui {
         scroll.getViewport().setBackground(PANEL);
         scroll.getVerticalScrollBar().setUnitIncrement(18);
         details.setWrapStyleWord(true);
-        scroll.setPreferredSize(new Dimension(700, 230));
-        scroll.setMaximumSize(new Dimension(960, 250));
+        scroll.setPreferredSize(new Dimension(600, 230));
+        scroll.setMaximumSize(new Dimension(Integer.MAX_VALUE, 250));
         scroll.setAlignmentX(Component.CENTER_ALIGNMENT);
         body.add(Box.createVerticalStrut(14));
         body.add(scroll);
@@ -228,6 +236,7 @@ public final class LinuxOptimizerGui {
         pageScroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
         pageScroll.getViewport().setOpaque(false);
         pageScroll.getVerticalScrollBar().setUnitIncrement(20);
+        pageScroll.setWheelScrollingEnabled(true);
         content.add(pageScroll, BorderLayout.CENTER);
         content.revalidate();
         content.startTransition(travelDirection);
@@ -319,8 +328,8 @@ public final class LinuxOptimizerGui {
         text.add(subtitle);
         card.add(text, BorderLayout.NORTH);
         card.add(buttonRow, BorderLayout.SOUTH);
-        card.setMaximumSize(new Dimension(960, 230));
-        card.setPreferredSize(new Dimension(760, Math.max(150, 112 + ((buttons.length + 1) / 2) * 51)));
+        card.setMaximumSize(new Dimension(Integer.MAX_VALUE, 230));
+        card.setPreferredSize(new Dimension(600, Math.max(150, 112 + ((buttons.length + 1) / 2) * 51)));
         card.setAlignmentX(Component.CENTER_ALIGNMENT);
         return card;
     }
@@ -816,6 +825,16 @@ public final class LinuxOptimizerGui {
             super.paintChildren(g);
             g.dispose();
         }
+    }
+
+    /** Panel desplazable que siempre se adapta al ancho visible, sin scroll horizontal. */
+    private static final class ResponsivePanel extends JPanel implements Scrollable {
+        ResponsivePanel() { super(); }
+        @Override public Dimension getPreferredScrollableViewportSize() { return getPreferredSize(); }
+        @Override public int getScrollableUnitIncrement(Rectangle visibleRect, int orientation, int direction) { return 24; }
+        @Override public int getScrollableBlockIncrement(Rectangle visibleRect, int orientation, int direction) { return Math.max(48, (orientation == SwingConstants.VERTICAL ? visibleRect.height : visibleRect.width) - 48); }
+        @Override public boolean getScrollableTracksViewportWidth() { return true; }
+        @Override public boolean getScrollableTracksViewportHeight() { return false; }
     }
 
     /** Superficie glass oscura con gradiente, borde translúcido y sombra suave. */
