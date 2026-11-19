@@ -31,6 +31,7 @@ public final class LinuxOptimizerGui {
     private static final Color TEXT = new Color(235, 239, 249);
     private static final Color MUTED = new Color(151, 162, 184);
     private final JFrame frame = new JFrame("Linux Optimizer");
+    private JPanel headerPanel;
     private final AnimatedPanel content = new AnimatedPanel();
     private final JLabel status = new JLabel("Preparado");
     private final JLabel distro = new JLabel("Detectando sistema…");
@@ -72,12 +73,13 @@ public final class LinuxOptimizerGui {
         JPanel shell = new JPanel(new BorderLayout(0, 14));
         shell.setBackground(BG);
         shell.setBorder(new EmptyBorder(22, 24, 18, 24));
-        shell.add(header(), BorderLayout.NORTH);
+        headerPanel = header();
+        shell.add(headerPanel, BorderLayout.NORTH);
         content.setOpaque(false);
         shell.add(content, BorderLayout.CENTER);
         shell.add(footer(), BorderLayout.SOUTH);
         frame.add(shell, BorderLayout.CENTER);
-        showPage("Resumen");
+        showPage("Información general");
     }
 
     private JPanel sidebar() {
@@ -96,7 +98,7 @@ public final class LinuxOptimizerGui {
         caption.setFont(new Font("SansSerif", Font.BOLD, 10));
         caption.setBorder(new EmptyBorder(0, 8, 12, 0));
         side.add(caption);
-        for (String page : List.of("Resumen", "CPU y memoria", "Gráficos", "Almacenamiento", "Sistema", "Gaming")) {
+        for (String page : List.of("Información general", "Resumen", "CPU y memoria", "Gráficos", "Almacenamiento", "Sistema", "Gaming")) {
             JToggleButton button = new JToggleButton(page);
             button.setUI(new javax.swing.plaf.basic.BasicButtonUI());
             button.setHorizontalAlignment(SwingConstants.LEFT);
@@ -178,7 +180,9 @@ public final class LinuxOptimizerGui {
     }
 
     private void showPage(String page) {
-        List<String> pages = List.of("Resumen", "CPU y memoria", "Gráficos", "Almacenamiento", "Sistema", "Gaming");
+        List<String> pages = List.of("Información general", "Resumen", "CPU y memoria", "Gráficos", "Almacenamiento", "Sistema", "Gaming");
+        headerPanel.setVisible(page.equals("Información general"));
+        headerPanel.getParent().revalidate();
         int oldIndex = pages.indexOf(activePage);
         int newIndex = pages.indexOf(page);
         int travelDirection = newIndex >= oldIndex ? 1 : -1;
@@ -194,7 +198,7 @@ public final class LinuxOptimizerGui {
         JPanel body = new ResponsivePanel();
         body.setOpaque(false);
         body.setLayout(new BoxLayout(body, BoxLayout.Y_AXIS));
-        if (page.equals("Resumen")) {
+        if (page.equals("Resumen") || page.equals("Información general")) {
             JPanel cards = new JPanel(new GridLayout(1, 3, 14, 0));
             cards.setOpaque(false);
             cards.add(metricCard("PROCESADOR", cpu));
@@ -257,6 +261,7 @@ public final class LinuxOptimizerGui {
             return panel;
         }
         switch (page) {
+            case "Información general" -> { return null; }
             case "Resumen" -> {
                 panel.add(actionCard("Centro de optimización",
                         "Accede a las acciones disponibles para tu distribución. Cada cambio requiere confirmación.",
@@ -759,9 +764,9 @@ public final class LinuxOptimizerGui {
                     "RED", lastReport.network(), "SERVICIOS", lastReport.services(),
                     "KERNEL", lastReport.kernel(), "GAMING", lastReport.gaming());
         };
-        if (hardwareReport != null && (activePage.equals("Gráficos") || activePage.equals("Almacenamiento") || activePage.equals("Resumen"))) {
+        if (hardwareReport != null && (activePage.equals("Gráficos") || activePage.equals("Almacenamiento") || activePage.equals("Resumen") || activePage.equals("Información general") || activePage.equals("Información general"))) {
             lines = new java.util.ArrayList<>(lines);
-            if (activePage.equals("Gráficos") || activePage.equals("Resumen")) {
+            if (activePage.equals("Gráficos") || activePage.equals("Resumen") || activePage.equals("Información general")) {
                 lines.add("━━ INFORMACIÓN DEL ADAPTADOR GRÁFICO ━━━━━━━━━━━");
                 lines.addAll(hardwareReport.graphics());
                 lines.add("");
