@@ -54,6 +54,11 @@ Su objetivo es ayudar a entender el equipo antes de cambiar configuraciones: det
 | Steam | Detección de Steam y elementos relacionados que puedan inspeccionarse. |
 | Proton | Información disponible sobre Proton y compatibilidad de juegos. |
 | Diagnóstico general | Agrupa las comprobaciones generales del sistema. |
+| Hardware Intelligence | Capacidades anunciadas de CPU, topología básica y recuento PCI. |
+| Driver Inspector | Asociaciones de dispositivos PCI con controladores del kernel y módulos cargados. |
+| System Health Monitor | Memoria, carga promedio, espacio raíz y disponibilidad de sensores. |
+| Power Intelligence | Gobernador, controlador de frecuencia, unidades de gestión energética y batería. |
+| Package Intelligence | Detección de Pacman y ayudantes AUR; señala comprobaciones de paquetes pendientes. |
 
 La presencia de un módulo no significa que todos los controladores, dispositivos o herramientas estén instalados. Cada módulo depende de lo que el sistema permita detectar.
 
@@ -85,7 +90,19 @@ El CLI presenta un panel ASCII con distribución, base inferida, kernel, escrito
 
 Los valores anteriores son ilustrativos; el programa muestra los datos reales detectados en cada equipo.
 
-### 7. Respaldos, auditoría y benchmarks
+### 7. Informes exportables
+- Exportación del diagnóstico modular a JSON o HTML.
+- Los informes incluyen fecha de generación, hallazgos y advertencias de cada módulo.
+- El exportador no sobrescribe archivos existentes.
+
+Ejemplo (ejecuta primero el diagnóstico y añade una o ambas opciones):
+
+```bash
+bash scripts/launch.sh --diagnostics --report-json "$HOME/cachyos-report.json"
+bash scripts/launch.sh --diagnostics --report-html "$HOME/cachyos-report.html"
+```
+
+### 8. Respaldos, auditoría y benchmarks
 - `BackupManager`: crea respaldos de archivos seleccionados, genera un manifiesto y verifica SHA-256.
 - Restauración a una carpeta elegida, con verificación de integridad y sin sobrescribir archivos existentes.
 - `AuditLogger`: registra localmente el resumen de diagnósticos en el directorio de estado del usuario.
@@ -104,7 +121,7 @@ Los valores anteriores son ilustrativos; el programa muestra los datos reales de
 |---|---|
 | Detección e información básica de Linux | Implementación inicial |
 | Inspección de hardware | Implementación inicial |
-| Diagnósticos modulares | Implementación inicial |
+| Diagnósticos modulares (incluye hardware, controladores, salud, energía y paquetes) | Implementación inicial; algunas comprobaciones son indicativas |
 | Análisis de compatibilidad | Implementación inicial |
 | Catálogo de perfiles | Disponible como catálogo informativo |
 | Validación y preparación de acciones | Implementada; las modificaciones reales siguen deshabilitadas |
@@ -114,6 +131,7 @@ Los valores anteriores son ilustrativos; el programa muestra los datos reales de
 | Registro local de auditoría | Implementado con rotación básica |
 | Interfaz gráfica | No prevista; el proyecto prioriza una interfaz de terminal. |
 | Microbenchmark CPU local | Implementado como prueba opcional; no mide FPS ni GPU |
+| Exportación de informes JSON/HTML | Implementación inicial |
 
 El código Java que Maven compila se encuentra en `src/main/java`. Los archivos bajo `src/main/resources/java` son recursos heredados y no forman parte del conjunto de clases compiladas por la configuración Maven actual.
 
