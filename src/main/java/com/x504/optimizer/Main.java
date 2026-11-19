@@ -526,14 +526,17 @@ public final class Main {
     }
 
     private static void runCleaner() {
-        try (var scanner = new java.util.Scanner(System.in)) {
-            System.out.println("\\n=== LIMPIADOR CONSERVADOR ===");
+        try (var scanner = new java.util.Scanner(System.in)) { runCleaner(scanner); }
+    }
+    private static void runCleaner(java.util.Scanner scanner) {
+        try {
+            System.out.println("\n=== LIMPIADOR CONSERVADOR ===");
             System.out.println("Solo revisa miniaturas y caché de fuentes del usuario con más de 30 días.");
             System.out.println("No toca cachés de shaders, navegadores, paquetes, juegos ni archivos personales.");
             var cleaner = new SystemCleaner();
             var entries = cleaner.preview();
             if (entries.isEmpty()) { System.out.println("No hay archivos antiguos permitidos para limpiar."); return; }
-            for (var entry : entries) System.out.printf("- %s: %d archivos, %.2f MiB\\n", entry.category(), entry.files(), entry.bytes() / 1048576.0);
+            for (var entry : entries) System.out.printf("- %s: %d archivos, %.2f MiB%n", entry.category(), entry.files(), entry.bytes() / 1048576.0);
             System.out.print("Escribe el nombre exacto de una categoría para limpiarla (Enter cancela): ");
             if (!scanner.hasNextLine()) return;
             String category = scanner.nextLine().strip();
@@ -547,7 +550,6 @@ public final class Main {
             }
         } catch (java.io.IOException | RuntimeException ex) { System.err.println("No se pudo completar la limpieza: " + ex.getMessage()); }
     }
-
     private static void runMonitor(String[] args) {
         int seconds = 15;
         if (args.length > 1) {
@@ -629,7 +631,7 @@ public final class Main {
                     case "6" -> runInstallTools(scanner);
                     case "7" -> runOptimizationCenter(scanner);
                     case "8" -> runSteamOptions(scanner);
-                    case "9" -> runCleaner();
+                    case "9" -> runCleaner(scanner);
                     case "0" -> { System.out.println("Hasta luego."); return; }
                     default -> System.out.println("Opción no válida. Elige una opción del 0 al 8.");
                 }
