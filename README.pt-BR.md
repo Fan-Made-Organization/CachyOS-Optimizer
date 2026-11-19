@@ -88,10 +88,10 @@ Os valores de exemplo são ilustrativos. O aplicativo exibe os dados realmente d
 | Diagnósticos modulares | Implementação inicial |
 | Análise de compatibilidade | Implementação inicial |
 | Catálogo de perfis | Disponível como catálogo informativo |
-| Validação e preparação de ações | Implementadas; modificações reais do sistema continuam desativadas |
+| Validação e preparação de ações | Implementadas; as alterações reais no sistema permanecem desativadas |
 | Backup de arquivos selecionados e restauração verificada em outra pasta | Implementado |
 | Aplicação automática de otimizações | **Desativada; nenhuma alteração é executada** |
-| Restauração nos caminhos originais do sistema e rollback completo | **Planejados** |
+| Restauração nos caminhos originais do sistema e reversão completa | **Planejadas** |
 | Registro local de auditoria | Implementado com rotação básica |
 | Interface gráfica | **Planejada** |
 | Microbenchmark local de CPU | Implementado como teste opcional; não mede FPS nem GPU |
