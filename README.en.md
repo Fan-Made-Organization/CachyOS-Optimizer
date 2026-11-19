@@ -90,12 +90,12 @@ These are development foundations, not a complete backup, restore, or automatic 
 | Modular diagnostics | Initial implementation |
 | Compatibility analysis | Initial implementation |
 | Profile catalog | Available as an informational catalog |
-| Safety validation | Foundation implemented; needs expansion |
-| Backup manifests and checksums | Foundation implemented; not a complete backup/restore workflow |
-| Automatic optimization application | **Not implemented yet** |
-| Full restore and rollback | **Planned** |
-| Graphical user interface | **Planned** |
-| Integrated benchmarks and comparisons | **Planned** |
+| Action validation and planning | Implemented; actual system modifications remain disabled |
+| Selected-file backup and verified restore to another directory | Implemented |
+| Automatic optimization application | **Disabled; no changes are executed** |
+| Restore to original system paths and full system rollback | **Planned** |
+| Local audit log | Implemented with basic rotation |
+| Local CPU microbenchmark | Implemented as an optional test; does not measure FPS or GPU |
 
 The Java source compiled by Maven is located in `src/main/java`. Files under `src/main/resources/java` are legacy resources and are not compiled as Java classes by the current Maven configuration.
 
