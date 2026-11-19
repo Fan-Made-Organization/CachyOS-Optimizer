@@ -18,5 +18,9 @@ jobs:
           distribution: temurin
           java-version: '21'
           cache: maven
+      - name: Validar sintaxis de scripts
+        run: for script in scripts/*.sh; do bash -n "$script"; done
+      - name: Comprobar espacios y formato del diff
+        run: git diff --check
       - name: Compilar y ejecutar pruebas
         run: mvn --batch-mode --no-transfer-progress clean verify
