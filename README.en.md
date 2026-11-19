@@ -110,11 +110,11 @@ The Java source compiled by Maven is located in `src/main/java`. Files under `sr
 ## Requirements
 
 - Linux for complete diagnostics.
-- **JDK 21** (not just a Java runtime).
-- Internet access during initial setup to download Maven or missing dependencies.
-- Base tools for the setup script: `curl`, `tar`, `sha512sum`, `awk`, and `sed`.
+- Linux x86_64 or ARM64 for automatic JDK setup.
+- Internet access during initial setup.
+- Base tools: `curl`, `tar`, `sha256sum`, `sha512sum`, `awk`, `sed`, `python3`, and `uname`.
 
-The bootstrap script can download Maven 3.9.9 into the local project checkout and verify the archive using SHA-512. Maven downloads Java dependencies into a local cache. **Java 21 must be installed beforehand**; the script does not install the JDK or run administrator commands. Optional diagnostic tools are not installed automatically.
+If Java 21 is missing, bootstrap downloads Temurin JDK 21 and verifies SHA-256; if Maven is missing, it downloads Maven 3.9.9 and verifies SHA-512. Both stay under `.tools/` in the local checkout. Java dependencies are stored in `.cache/`. It does not install software system-wide or run administrator commands. Optional diagnostic tools are not installed automatically.
 
 ## Installation and usage
 
