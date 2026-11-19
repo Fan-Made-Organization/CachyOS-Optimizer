@@ -32,6 +32,8 @@ public final class Main {
             report.findings().forEach(line -> System.out.println("  • " + line));
             report.warnings().forEach(line -> System.out.println("  ! " + line));
         }
+        System.out.println("\n=== Perfiles disponibles ===");
+        new ProfileCatalog().all().forEach(profile -> System.out.println("- " + profile.name() + ": " + profile.description()));
         System.out.println("\nModo actual: diagnóstico de solo lectura.");
         System.out.println("Ningún ajuste del sistema fue modificado.");
     }
