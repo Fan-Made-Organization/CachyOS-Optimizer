@@ -12,6 +12,9 @@ if [[ ! -f "$JAR" ]] || find "$ROOT/src/main" "$ROOT/pom.xml" -type f -newer "$J
 fi
 mkdir -p "$APP_DIR" "$BIN_DIR" "$ICON_DIR" "$DESKTOP_DIR"
 install -m 0644 "$JAR" "$APP_DIR/linux-optimizer.jar"
+if [[ -x "$ROOT/.tools/temurin-jdk-21/bin/java" && ! -x "$APP_DIR/jre/bin/java" ]]; then
+  cp -a "$ROOT/.tools/temurin-jdk-21" "$APP_DIR/jre"
+fi
 install -m 0644 "$ROOT/assets/linux-optimizer.svg" "$ICON_DIR/linux-optimizer.svg"
 cat > "$BIN_DIR/linux-optimizer" <<'LAUNCHER'
 #!/usr/bin/env bash
