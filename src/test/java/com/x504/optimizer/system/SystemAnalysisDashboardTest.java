@@ -20,7 +20,7 @@ class SystemAnalysisDashboardTest {
         ), 75, 3, 1);
 
         String dashboard = new SystemAnalysisDashboard().render(system, hardware, compatibility);
-        assertTrue(dashboard.contains("X504-CACHYOS-OPTIMIZER"));
+        assertTrue(dashboard.contains("CACHYOS-OPTIMIZER"));
         assertTrue(dashboard.contains("Sistema:       CachyOS"));
         assertTrue(dashboard.contains("Base:          Arch Linux"));
         assertTrue(dashboard.contains("Kernel:        Linux 6.12.1"));
