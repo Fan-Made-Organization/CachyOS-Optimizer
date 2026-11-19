@@ -165,13 +165,13 @@ public final class Main {
             System.err.println("Puedes instalar manualmente herramientas equivalentes desde los repositorios oficiales de tu distribución.");
             return;
         }
-        System.out.println("\\n=== HERRAMIENTAS PARA LINUX ===");
+        System.out.println("\n=== HERRAMIENTAS PARA LINUX ===");
         System.out.println("Distribución: " + platform.name() + " | Familia: " + platform.family() + " | Gestor: " + platform.packageManager());
         System.out.println("Paquetes que se solicitarán:");
         packages.forEach(pkg -> System.out.println("  • " + pkg));
         System.out.println("No se instalarán controladores gráficos, kernels ni servicios automáticamente.");
         System.out.println("El gestor de paquetes mostrará su transacción y pedirá aprobación.");
-        System.out.print("\\n¿Continuar? [s/N]: ");
+        System.out.print("\n¿Continuar? [s/N]: ");
         if (!scanner.hasNextLine() || !scanner.nextLine().strip().equalsIgnoreCase("s")) { System.out.println("Instalación cancelada."); return; }
         try {
             int exit = support.install(platform, packages);
@@ -184,7 +184,7 @@ public final class Main {
 
     private static void runLinuxSupport() {
         var platform = new LinuxPlatformSupport().detect();
-        System.out.println("\\n=== SOPORTE LINUX ===");
+        System.out.println("\n=== SOPORTE LINUX ===");
         System.out.println("Distribución: " + platform.name());
         System.out.println("ID / versión: " + platform.id() + " / " + platform.version());
         System.out.println("Familia: " + platform.family());
@@ -193,7 +193,7 @@ public final class Main {
         var report = new KernelModule().inspect();
         report.findings().forEach(line -> System.out.println(" • " + line));
         report.warnings().forEach(line -> System.out.println(" ! " + line));
-        System.out.println("\\nEl soporte detecta diferencias entre distribuciones; no cambia el kernel ni el cargador de arranque.");
+        System.out.println("\nEl soporte detecta diferencias entre distribuciones; no cambia el kernel ni el cargador de arranque.");
     }
     private static void runGraphicsDriverInstaller(java.util.Scanner scanner) {
         GraphicsDriverInstaller installer = new GraphicsDriverInstaller();
