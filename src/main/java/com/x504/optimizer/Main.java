@@ -784,7 +784,7 @@ public final class Main {
                                Verifica SHA-256 y restaura copias en DESTINO,
                                sin sobrescribir archivos existentes.
 
-                El análisis normal es de solo lectura. --install-tools instala solo herramientas aprobadas; no cambia drivers ni kernels. El soporte de kernel es informativo.
+                El diagnóstico normal es de solo lectura. --install-tools instala herramientas con confirmación. La opción 10 permite instalar paquetes de kernel compatibles con confirmación explícita, sin eliminar kernels ni editar el bootloader.
                 La restauración nunca escribe directamente en las rutas originales.
                 """);
     }
