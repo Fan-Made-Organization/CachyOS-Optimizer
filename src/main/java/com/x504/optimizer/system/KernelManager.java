@@ -5,6 +5,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /** Planificador conservador de kernels. Nunca elimina kernels ni modifica el bootloader. */
 public final class KernelManager {
@@ -56,6 +57,28 @@ public final class KernelManager {
         return support.installCommand(platform, option.packages());
     }
 
+    /** Comando de consulta sin privilegios para comprobar paquetes instalados. */
+    public List<String> packageQueryCommand(LinuxPlatformSupport.Platform platform, String packageName) {
+        if (packageName == null || !packageName.matches("[A-Za-z0-9@._+-]+"))
+            throw new IllegalArgumentException("Nombre de paquete no válido.");
+        return switch (platform.family()) {
+            case ARCH -> List.of("pacman", "-Q", packageName);
+            case DEBIAN -> List.of("dpkg-query", "-W", "-f=${Status}", "--", packageName);
+            case FEDORA -> List.of("rpm", "-q", packageName);
+            case SUSE -> List.of("zypper", "search", "--installed-only", "--match-exact", "--type", "package", packageName);
+            case UNKNOWN -> throw new IllegalStateException("No hay consulta de paquetes para esta distribución.");
+        };
+    }
+
+    /** Devuelve true/false si la consulta terminó; null si no pudo determinarse. */
+    public Boolean isPackageInstalled(LinuxPlatformSupport.Platform platform, String packageName) throws IOException, InterruptedException {
+        Process process = new ProcessBuilder(packageQueryCommand(platform, packageName)).redirectErrorStream(true).start();
+        if (!process.waitFor(10, TimeUnit.SECONDS)) {
+            process.destroyForcibly();
+            return null;
+        }
+        return process.exitValue() == 0;
+    }
     public BootInventory inspectBootInventory() {
         String active = System.getProperty("os.version", "unknown");
         List<String> modules = new ArrayList<>();
