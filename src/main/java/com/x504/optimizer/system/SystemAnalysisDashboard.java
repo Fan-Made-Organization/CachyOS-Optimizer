@@ -21,8 +21,9 @@ public final class SystemAnalysisDashboard {
         String desktop = system.desktop();
         String architecture = system.architecture();
         String state = stateOf(compatibility);
-        String score = compatibility.percentage() + "% (" + compatibility.evaluatedComponents()
-                + " evaluados, " + compatibility.unknownComponents() + " desconocidos)";
+        String score = compatibility.percentage() + "%";
+        String checks = compatibility.evaluatedComponents() + " evaluados / "
+                + compatibility.unknownComponents() + " desconocidos";
         String cpu = hardware.processor();
         String gpu = hardware.graphicsAdapters().isEmpty()
                 ? "No detectada" : String.join(", ", hardware.graphicsAdapters());
@@ -42,6 +43,7 @@ public final class SystemAnalysisDashboard {
         out.append(row("Arquitectura:  " + architecture)).append('\n');
         out.append(mid()).append('\n');
         out.append(row("Compatibilidad: " + score)).append('\n');
+        out.append(row("Comprobaciones: " + checks)).append('\n');
         out.append(row("Estado:        " + state)).append('\n');
         out.append(mid()).append('\n');
         out.append(row("CPU: " + cpu)).append('\n');
