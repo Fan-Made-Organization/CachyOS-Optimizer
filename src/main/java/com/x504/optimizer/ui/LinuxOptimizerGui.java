@@ -11,7 +11,6 @@ import com.x504.optimizer.system.LinuxPlatformSupport;
 import com.x504.optimizer.system.KernelManager;
 import com.x504.optimizer.cleaner.SystemCleaner;
 import com.x504.optimizer.steam.SteamLaunchOptionsBuilder;
-import java.util.ArrayList;
 import java.util.concurrent.Callable;
 
 import javax.swing.*;
@@ -617,17 +616,6 @@ public final class LinuxOptimizerGui {
         p.setMaximumSize(new Dimension(Integer.MAX_VALUE, 100));
         p.setAlignmentX(Component.LEFT_ALIGNMENT);
         return p;
-    }
-
-    private String description(String page) {
-        return switch (page) {
-            case "CPU y memoria" -> "Modelo, frecuencia, gobernador, RAM, swap y presión del kernel.";
-            case "Gráficos" -> "Adaptadores DRM, controladores y herramientas de aceleración detectables.";
-            case "Almacenamiento" -> "Dispositivos de bloque, planificador y sistemas de archivos montados.";
-            case "Red" -> "Interfaces, enlace y ruta IPv4 predeterminada.";
-            case "Gaming" -> "Herramientas disponibles para juegos en Linux.";
-            default -> "Kernel activo, servicios fallidos y detalles del sistema.";
-        };
     }
 
     private void checkUpdates(boolean showDialog) {
