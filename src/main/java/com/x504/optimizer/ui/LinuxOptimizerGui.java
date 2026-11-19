@@ -50,6 +50,7 @@ public final class LinuxOptimizerGui {
     private final ChartPanel gpuChart = new ChartPanel("GPU", gpuHistory);
     private javax.swing.Timer liveTimer;
     private AdvancedDiagnostics.Report lastReport;
+    private String portableDetails;
 
     private LinuxOptimizerGui() {
         build();
@@ -405,20 +406,45 @@ public final class LinuxOptimizerGui {
         long total = bean instanceof com.sun.management.OperatingSystemMXBean mx ? mx.getTotalMemorySize() : -1;
         cpu.setText(Runtime.getRuntime().availableProcessors() + " procesadores lógicos");
         ram.setText(total > 0 ? String.format("%.1f GiB", total / 1073741824.0) : "No disponible");
-        gpu.setText("Consulta no disponible en este módulo");
-        distro.setText(os + " " + version + "  •  " + arch);
-        details.setText("LINUX OPTIMIZER · MODO MULTIPLATAFORMA\n\n"
+        gpu.setText("Consultando adaptadores…");
+        distro.setText(os + "  •  " + version + "  •  " + arch);
+        portableDetails = "LINUX OPTIMIZER · MODO MULTIPLATAFORMA\n\n"
                 + "Sistema operativo: " + os + "\nVersión: " + version
                 + "\nArquitectura: " + arch + "\nJava: " + javaVersion
                 + "\nProcesadores lógicos: " + Runtime.getRuntime().availableProcessors()
                 + "\nMemoria física total: " + (total > 0 ? String.format("%.2f GiB", total / 1073741824.0) : "No expuesta por la JVM")
                 + "\n\nLa interfaz, las gráficas de CPU/RAM y el actualizador funcionan en este sistema."
-                + "\nLos inspectores de controladores, kernel, servicios, almacenamiento Linux y herramientas gaming específicas requieren Linux."
-                + "\nNo se ejecutan comandos Linux ni se modifican ajustes del sistema en Windows/macOS.");
+                + "\nEl inventario de GPU y almacenamiento usa las herramientas nativas disponibles."
+                + "\nLas métricas de temperatura y uso GPU dependen de los sensores/controladores del fabricante."
+                + "\nNo se ejecutan pruebas de estrés ni se modifican dispositivos."; 
         status.setText("Modo multiplataforma • " + java.time.LocalTime.now().withNano(0));
+        renderDetails();
+        new SwingWorker<PlatformHardwareInspector.Report, Void>() {
+            @Override protected PlatformHardwareInspector.Report doInBackground() {
+                return new PlatformHardwareInspector().inspect();
+            }
+            @Override protected void done() {
+                try {
+                    PlatformHardwareInspector.Report report = get();
+                    gpu.setText(report.graphics().isEmpty() ? "No detectada" : report.graphics().get(0));
+                    portableDetails += "\n\n━━ GPU / GRÁFICOS ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
+                            + String.join("\n", report.graphics())
+                            + "\n\n━━ ALMACENAMIENTO ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
+                            + String.join("\n", report.storage());
+                    renderDetails();
+                } catch (Exception ex) {
+                    portableDetails += "\n\nNo se pudo completar el inventario de hardware: " + ex.getMessage();
+                    renderDetails();
+                }
+            }
+        }.execute();
     }
-
     private void renderDetails() {
+        if (!isLinuxHost() && portableDetails != null) {
+            details.setText(portableDetails);
+            details.setCaretPosition(0);
+            return;
+        }
         if (lastReport == null) { details.setText("Esperando el primer análisis…"); return; }
         List<String> lines = switch (activePage) {
             case "CPU y memoria" -> combine("CPU", lastReport.cpu(), "MEMORIA", lastReport.memory());
