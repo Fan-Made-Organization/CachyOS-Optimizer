@@ -106,12 +106,12 @@ Estas piezas son una base de desarrollo; todavía no representan un sistema comp
 | Diagnósticos modulares | Implementación inicial |
 | Análisis de compatibilidad | Implementación inicial |
 | Catálogo de perfiles | Disponible como catálogo informativo |
-| Validación de seguridad | Base implementada; requiere ampliación |
-| Manifiestos y checksums de respaldo | Base implementada; no es un flujo completo de backup/restore |
-| Aplicación automática de optimizaciones | **Todavía no implementada** |
-| Restauración y rollback completos | **Pendiente** |
-| Interfaz gráfica | **Pendiente** |
-| Comparativas y benchmarks integrados | **Pendiente** |
+| Validación y preparación de acciones | Implementada; las modificaciones reales siguen deshabilitadas |
+| Backup de archivos seleccionados y restauración verificada a otra carpeta | Implementado |
+| Aplicación automática de optimizaciones | **Deshabilitada; no se ejecutan cambios** |
+| Restauración sobre rutas originales y rollback del sistema | **Pendiente** |
+| Registro local de auditoría | Implementado con rotación básica |
+| Microbenchmark CPU local | Implementado como prueba opcional; no mide FPS ni GPU |
 
 El código Java que Maven compila se encuentra en `src/main/java`. Los archivos bajo `src/main/resources/java` son recursos heredados y no forman parte del conjunto de clases compiladas por la configuración Maven actual.
 
