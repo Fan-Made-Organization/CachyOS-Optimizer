@@ -6,7 +6,7 @@ JAR="$ROOT/target/cachyos-optimizer-0.1.0-SNAPSHOT.jar"
 LOCAL_JAVA="$ROOT/.tools/temurin-jdk-21/bin/java"
 LOCAL_MAVEN="$ROOT/.tools/apache-maven-3.9.9/bin/mvn"
 
-say() { printf '[CachyOS Optimizer] %s\\n' "$*"; }
+say() { printf '[CachyOS Optimizer] %s\n' "$*"; }
 
 java_is_21() {
   local binary="$1" version
@@ -49,7 +49,7 @@ else
 fi
 
 [[ -n "$JAVA_BIN" && -x "$JAVA_BIN" ]] || {
-  printf '[CachyOS Optimizer] ERROR: no se encontró Java 21. Ejecuta: bash scripts/bootstrap.sh\\n' >&2
+  printf '[CachyOS Optimizer] ERROR: no se encontró Java 21. Ejecuta: bash scripts/bootstrap.sh\n' >&2
   exit 1
 }
 
