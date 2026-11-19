@@ -86,6 +86,13 @@ class LinuxPlatformSupportTest {
         assertTrue(categories.containsKey("Desarrollo y depuración"));
         assertTrue(categories.containsKey("Energía y sensores"));
         assertTrue(categories.get("Gaming").contains("gamescope"));
+        assertTrue(categories.get("Gaming").contains("vkbasalt-cli"));
+        assertFalse(categories.get("Gaming").contains("vkbasalt"));
+
+        var archLinux = new LinuxPlatformSupport.Platform("arch", "Arch Linux", "", "", LinuxPlatformSupport.Family.ARCH, "pacman");
+        var archGaming = support.toolCategories(archLinux).get("Gaming");
+        assertTrue(archGaming.contains("vkbasalt"));
+        assertFalse(archGaming.contains("vkbasalt-cli"));
         assertEquals(support.diagnosticTools(arch).size(), support.diagnosticTools(arch).stream().distinct().count());
     }
 
