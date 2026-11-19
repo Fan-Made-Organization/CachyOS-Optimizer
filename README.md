@@ -140,26 +140,28 @@ El menú ofrece **Limpiador seguro de caché** y el comando `--cleaner`. Primero
 
 ### 11. Instalador de herramientas de optimización
 
-El menú incluye **Instalar herramientas de optimización** y el comando `--install-tools`. En Arch/CachyOS, Debian/Ubuntu, Fedora y openSUSE instala un conjunto de utilidades aprobado para cada familia:
+El menú incluye **Instalar herramientas de optimización** y el comando `--install-tools`. El detector identifica la familia y el gestor de paquetes antes de ofrecer un perfil. En las familias con catálogo validado se puede elegir una categoría individual o instalar el conjunto completo:
 
-- Diagnóstico y hardware: `inxi`, `lshw`, `dmidecode`, `smartmontools`, `lm_sensors`.
-- Gráficos y aceleración: `vulkan-tools`, `mesa-utils`, `libva-utils`, `vdpauinfo`, `nvtop`.
-- Energía y temperatura: `power-profiles-daemon`, `thermald`, `powertop`, `cpupower`, `zram-generator`.
-- Gaming y monitorización: `gamemode`, `lib32-gamemode`, `mangohud`, `lib32-mangohud`, `gamescope`, `goverlay`, `vkbasalt`, `lib32-vkbasalt`, `protontricks`.
-- Monitorización y diagnóstico adicional: `btop`, `fastfetch`, `stress-ng`, `intel-gpu-tools` y `radeontop` (las utilidades específicas de GPU muestran datos según el hardware compatible).
+| Categoría | Utilidad |
+|---|---|
+| Diagnóstico y hardware | `inxi`, `lshw`, `dmidecode`, `smartmontools`, `lm_sensors`/`lm-sensors`, `pciutils`, `usbutils` |
+| Gráficos y vídeo | `vulkan-tools`, utilidades Mesa, VA-API, `vdpauinfo`, `nvtop` según distribución |
+| Almacenamiento | `nvme-cli`, `hdparm`, `iotop` |
+| Red | `iperf3`, `ethtool`, herramientas DNS y `traceroute` |
+| Monitorización | `btop`, `fastfetch`, `htop`, `glances`, `sysstat` según distribución |
+| Gaming | `gamemode`, `mangohud`, `gamescope`, `goverlay`, `vkbasalt`, `protontricks` y paquetes multilib cuando corresponda |
 
-En la primera ejecución, el lanzador solicita elegir idioma (Español, English o Português Brasil) y guarda la preferencia en `~/.config/cachyos-optimizer/language`. La preferencia se conserva para los siguientes inicios. El código visible de la aplicación todavía está principalmente en español; la selección ya prepara el idioma del proceso y del lanzador, pero la traducción completa de todos los menús está pendiente.
+Los nombres de paquetes se adaptan a Arch, Debian/Ubuntu, Fedora y openSUSE; Alpine tiene un catálogo más reducido. Gentoo, Void y NixOS se reconocen, pero todavía no reciben un perfil automático de herramientas: se mantiene el modo de solo lectura hasta validar sus paquetes y particularidades. No se supone que un mismo nombre exista en todos los repositorios.
 
-Antes de empezar la instalación de herramientas, muestra la lista y pide confirmación. Después usa el gestor de paquetes detectado (Pacman, APT, DNF/YUM o Zypper) sin opciones de confirmación automática, por lo que el gestor presenta su resumen y solicita aprobación.
+El instalador muestra distribución, versión, familia, gestor, categoría y lista exacta de paquetes. Para continuar hay que escribir `INSTALAR`; luego el gestor de paquetes muestra su propia transacción y mantiene sus mecanismos de confirmación. No se usan opciones de aceptación automática, no se actualiza todo el sistema, no se eliminan paquetes y no se activan servicios.
 
-**Alcance importante:** esta opción instala herramientas de usuario; no instala controladores a ciegas ni activa servicios automáticamente. `power-profiles-daemon` y `thermald` pueden requerir habilitación manual según el equipo. No se activa TLP junto a otros gestores de energía para evitar conflictos. Los cambios de perfil/gobernador se realizan desde el centro con confirmación. Esos cambios dependen del hardware y requieren módulos específicos, comprobaciones y reversión. Si Pacman no encuentra un paquete o una dependencia, la transacción puede cancelarse sin completar.
+**Alcance importante:** instala utilidades de usuario; no instala controladores gráficos, kernels, firmware ni servicios automáticamente. Las herramientas específicas de GPU solo aportan datos si el hardware es compatible. La disponibilidad puede depender de la versión de la distribución, repositorios habilitados y arquitectura.
 
 Ejecutar directamente:
 
 ```bash
 bash scripts/launch.sh --install-tools
 ```
-
 ### 12. Compatibilidad ampliada de distribuciones y kernels Linux
 
 El proyecto ya no limita sus diagnósticos a CachyOS/Arch. Detecta la distribución mediante `/etc/os-release` y clasifica familias:
