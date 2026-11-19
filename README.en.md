@@ -107,7 +107,7 @@ The Java source compiled by Maven is located in `src/main/java`. Files under `sr
 - **Language:** Java 21.
 - **Desktop:** KDE Plasma is detected when available.
 - **Gaming:** Steam, Proton, and graphics-related tools are inspected when detectable.
-- **Other distributions:** They may provide useful data, but equivalent detection coverage and compatibility are not guaranteed yet.
+- **Other Linux distributions:** Read-only diagnostics may work; automatic package installation is disabled for unknown families.
 
 ## Requirements
 
