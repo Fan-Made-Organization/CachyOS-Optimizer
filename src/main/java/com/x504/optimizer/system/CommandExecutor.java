@@ -17,7 +17,7 @@ import java.util.concurrent.TimeUnit;
 public final class CommandExecutor {
     private static final Set<String> ALLOWED = Set.of(
             "uname", "lscpu", "lsblk", "lspci", "lsusb", "free", "df",
-            "glxinfo", "vulkaninfo", "vainfo", "vdpauinfo", "inxi"
+            "glxinfo", "vulkaninfo", "vainfo", "vdpauinfo", "inxi", "pacman"
     );
     private static final int MAX_OUTPUT_BYTES = 1024 * 1024;
     private static final String TRUNCATED_MARKER = "\n[X504: salida truncada al alcanzar el límite de 1 MiB]\n";
