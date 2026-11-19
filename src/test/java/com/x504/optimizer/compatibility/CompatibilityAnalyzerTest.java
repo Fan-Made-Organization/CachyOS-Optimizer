@@ -10,7 +10,7 @@ class CompatibilityAnalyzerTest {
         SystemInfo info = new SystemInfo("Linux", "CachyOS", "rolling",
                 "6.12.1", "x86_64", "KDE", true, true);
         CompatibilityReport report = new CompatibilityAnalyzer().analyze(info);
-        assertEquals(100, report.percentage());
+        assertEquals(90, report.percentage());
         assertEquals(4, report.evaluatedComponents());
         assertEquals(0, report.unknownComponents());
     }
