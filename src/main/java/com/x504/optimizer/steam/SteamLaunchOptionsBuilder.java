@@ -61,7 +61,8 @@ public final class SteamLaunchOptionsBuilder {
                 "GameMode + MangoHud: gamemoderun mangohud %command%",
                 "Gamescope: gamescope -f -- %command%",
                 "Registro Proton: PROTON_LOG=1 %command%",
-                "FSR de Proton: WINE_FULLSCREEN_FSR=1 WINE_FULLSCREEN_FSR_STRENGTH=2 %command%",\n                "WineD3D (OpenGL): PROTON_USE_WINED3D=1 %command%"
+                "FSR de Proton: WINE_FULLSCREEN_FSR=1 WINE_FULLSCREEN_FSR_STRENGTH=2 %command%",
+                "WineD3D (OpenGL): PROTON_USE_WINED3D=1 %command%"
         );
     }
 
