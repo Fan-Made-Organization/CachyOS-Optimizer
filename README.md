@@ -90,13 +90,11 @@ Los valores anteriores son ilustrativos; el programa muestra los datos reales de
 - `BenchmarkEngine`: microbenchmark CPU opcional, limitado y sin cambios de configuración.
 - No se respaldan ni restauran archivos del sistema automáticamente; la restauración no escribe sobre las rutas originales.
 
-### 8. Bases de seguridad y respaldos
-- Clasificación de niveles de riesgo para acciones futuras.
-- Validación inicial de acciones antes de considerarlas ejecutables.
-- Clases base para manifiestos de respaldo y comprobación de sumas de verificación.
-- Enfoque de cambios explícitos y reversibles.
-
-Estas piezas son una base de desarrollo; todavía no representan un sistema completo de copia, restauración o reversión automática.
+### 8. Límites de seguridad
+- Las acciones se validan y preparan, pero el motor no ejecuta modificaciones del sistema.
+- Las operaciones críticas se bloquean.
+- Los cambios requieren aprobación explícita y las operaciones administrativas requieren respaldo.
+- El respaldo restaura copias verificadas en otra carpeta; no altera automáticamente los archivos originales.
 
 ## Estado real del proyecto
 
