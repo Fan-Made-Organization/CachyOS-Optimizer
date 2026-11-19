@@ -229,9 +229,9 @@ public final class LinuxOptimizerGui {
                     var info = new LinuxSystemDetector().detect();
                     var hw = new HardwareDetector().detect();
                     distro.setText(info.distro() + "  •  " + info.kernel() + "  •  " + info.desktop());
-                    cpu.setText(hw.cpuModel());
-                    ram.setText(hw.totalMemoryKb() > 0 ? String.format("%.1f GiB", hw.totalMemoryKb()/1024.0/1024.0) : "No disponible");
-                    gpu.setText(hw.graphicsAdapters().isEmpty() ? "No detectada" : hw.graphicsAdapters().getFirst());
+                    cpu.setText(hw.processor());
+                    ram.setText(hw.totalMemoryKiB() > 0 ? String.format("%.1f GiB", hw.totalMemoryKb()/1024.0/1024.0) : "No disponible");
+                    gpu.setText(hw.graphicsAdapters().isEmpty() ? "No detectada" : hw.graphicsAdapters().get(0));
                     status.setText("Actualizado • " + java.time.LocalTime.now().withNano(0));
                     renderDetails();
                 } catch (InterruptedException ex) {
@@ -262,11 +262,11 @@ public final class LinuxOptimizerGui {
         details.setCaretPosition(0);
     }
 
-    private List<String> combine(String... sections) {
+    private List<String> combine(Object... sections) {
         java.util.ArrayList<String> result = new java.util.ArrayList<>();
         for (int i=0;i<sections.length;i+=2) {
             result.add("━━ " + sections[i] + " ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
-            result.addAll((List<String>) (List<?>) sections[i+1]);
+            for (Object line : (List<?>) sections[i+1]) result.add(String.valueOf(line));
             result.add("");
         }
         return result;
