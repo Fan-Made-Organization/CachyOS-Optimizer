@@ -138,10 +138,10 @@ mvn clean verify
 mvn package
 java -jar target/cachyos-optimizer-0.1.0-SNAPSHOT.jar
 
-# Faça backup somente dos arquivos selecionados
+# Faça backup somente dos arquivos escolhidos explicitamente
 java -jar target/cachyos-optimizer-0.1.0-SNAPSHOT.jar --backup "$HOME/x504-backups" "$HOME/.config/example.conf"
 
-# Restaure cópias verificadas em outra pasta
+# Restaure cópias verificadas em outra pasta, sem sobrescrever arquivos existentes
 java -jar target/cachyos-optimizer-0.1.0-SNAPSHOT.jar --restore "$HOME/x504-backups/backup-..." "$HOME/x504-restored"
 ```
 
