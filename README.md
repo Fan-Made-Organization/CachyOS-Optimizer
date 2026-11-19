@@ -461,6 +461,8 @@ El centro de optimización incorpora un catálogo gráfico por familia Linux par
 
 El asesor energético distingue laptops mediante la presencia de una batería en sysfs y escritorios cuando la interfaz de alimentación existe sin batería. Recomienda un perfil conservador, pero nunca cambia el perfil por sí solo. La disponibilidad real depende de `power-profiles-daemon`.
 
+El catálogo Arch/CachyOS de **Energía y sensores** también identifica `tlp`, `tuned`, `thermald` y `auto-cpufreq`, además de `power-profiles-daemon`. Son alternativas de administración energética, no componentes que deban habilitarse todos juntos: TLP y auto-cpufreq pueden competir con otros gestores, y `tuned` puede aplicar ajustes que se solapan. Instala y activa solo un gestor principal por vez, revisa sus unidades con `systemctl`, y conserva `thermald` como control térmico complementario cuando sea compatible. En Arch/CachyOS, `auto-cpufreq` puede requerir AUR; no se instala desde el catálogo de repositorios oficiales ni se activa automáticamente. El catálogo es informativo y no habilita servicios.
+
 El comando `--advanced-diagnostics` amplía el diagnóstico con CPU (frecuencias y gobernador expuestos), RAM/swap/PSI, almacenamiento (dispositivos, scheduler y sistemas de archivos montados), interfaces de red/ruta predeterminada, GPU mediante DRM y herramientas gráficas, unidades systemd fallidas, módulos del kernel y herramientas de gaming. Es una revisión de solo lectura: no ejecuta pruebas de velocidad ni estrés, no consulta SMART automáticamente y no cambia servicios, drivers o configuraciones. La frecuencia de CPU es una lectura puntual y la clasificación rotacional no distingue por sí sola SATA SSD de NVMe.
 
 
