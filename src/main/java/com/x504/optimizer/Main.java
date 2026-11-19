@@ -204,7 +204,7 @@ public final class Main {
                 System.out.println("║  2) Diagnóstico + benchmark CPU          ║");
                 System.out.println("║  3) Mostrar ayuda y comandos             ║");
                 System.out.println("║  4) Monitor CPU/RAM (15 segundos)        ║");
-                System.out.println("║  5) Benchmark CPU + RAM + almacenamiento ║");
+                System.out.println("║  5) Benchmark completo                    ║");
                 System.out.println("║  0) Salir                                ║");
                 System.out.println("╚══════════════════════════════════════════╝");
                 System.out.print("Selecciona una opción: ");
