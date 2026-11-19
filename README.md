@@ -62,7 +62,7 @@ El proyecto incluye un catálogo inicial de perfiles y descripciones para distin
 
 ### 6. Interfaz de terminal y panel de análisis del sistema
 
-X504 utiliza una interfaz de terminal interactiva, sin interfaz gráfica. Al ejecutar `bash scripts/launch.sh` se abre un menú para iniciar el diagnóstico, ejecutar el benchmark CPU o consultar la ayuda. También se pueden usar los comandos directamente desde la terminal.
+CachyOS Optimizer utiliza una interfaz de terminal interactiva, sin interfaz gráfica. Al ejecutar `bash scripts/launch.sh` se abre un menú para iniciar el diagnóstico, ejecutar el benchmark CPU o consultar la ayuda. También se pueden usar los comandos directamente desde la terminal.
 
 El CLI presenta un panel ASCII con distribución, base inferida, kernel, escritorio, arquitectura, CPU, GPU, RAM y evaluación de compatibilidad. Los valores desconocidos se muestran como tales; el estado no se declara excelente si existen comprobaciones desconocidas.
 
