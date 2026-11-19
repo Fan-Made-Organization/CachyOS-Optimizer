@@ -38,6 +38,9 @@ public final class CommandExecutor {
             throw new SecurityException("Comando no permitido: " + executable);
         }
 
+        if (executable.equals("pacman") && (arguments.size() != 2 || !Set.of("-Qdtq", "-Qu").contains(arguments.get(1)))) {
+            throw new SecurityException("Solo se permiten consultas de lectura específicas de pacman.");
+        }
         Process process = new ProcessBuilder(List.copyOf(arguments))
                 .redirectErrorStream(false)
                 .start();
