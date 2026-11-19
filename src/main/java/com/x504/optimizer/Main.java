@@ -19,6 +19,7 @@ import com.x504.optimizer.modules.*;
 import com.x504.optimizer.profiles.ProfileCatalog;
 import com.x504.optimizer.reports.ReportExporter;
 import com.x504.optimizer.system.LinuxSystemDetector;
+import com.x504.optimizer.system.LinuxPlatformSupport;
 import com.x504.optimizer.system.SystemAnalysisDashboard;
 import com.x504.optimizer.system.SystemInfo;
 import java.io.IOException;
@@ -41,6 +42,7 @@ public final class Main {
         if (args.length > 0 && args[0].equals("--optimizer")) { runOptimizationCenter(); return; }
         if (args.length > 0 && args[0].equals("--steam-options")) { runSteamOptions(); return; }
         if (args.length > 0 && args[0].equals("--cleaner")) { runCleaner(); return; }
+        if (args.length > 0 && args[0].equals("--linux-support")) { runLinuxSupport(); return; }
         if (args.length > 0 && args[0].equals("--help")) {
             printHelp();
             return;
@@ -70,7 +72,7 @@ public final class Main {
         System.out.println(compatibility.toDisplayString());
 
         ModuleManager manager = new ModuleManager(List.of(
-                new CpuModule(), new MemoryModule(), new GpuModule(), new StorageModule(),
+                new CpuModule(), new MemoryModule(), new GpuModule(), new StorageModule(), new KernelModule(), new LinuxPlatformModule(),
                 new PowerModule(), new NetworkModule(), new AudioModule(), new GamingModule(), new GraphicsStackModule(),
                 new HardwareIntelligenceModule(), new DriverInspectorModule(), new SystemHealthModule(),
                 new PowerIntelligenceModule(), new PackageIntelligenceModule(),
@@ -154,103 +156,45 @@ public final class Main {
     private static void runInstallTools() {
         try (var scanner = new java.util.Scanner(System.in)) { runInstallTools(scanner); }
     }
-
     private static void runInstallTools(java.util.Scanner scanner) {
-        OptimizationToolsInstaller installer = new OptimizationToolsInstaller();
-        if (!installer.isArchBased()) {
-            System.err.println("Instalación cancelada: esta función está limitada a Arch Linux y CachyOS.");
+        LinuxPlatformSupport support = new LinuxPlatformSupport();
+        var platform = support.detect();
+        List<String> packages = support.diagnosticTools(platform);
+        if (packages.isEmpty()) {
+            System.err.println("Instalación automática no habilitada para esta familia. Distribución: " + platform.name() + "; gestor: " + platform.packageManager());
+            System.err.println("Puedes instalar manualmente herramientas equivalentes desde los repositorios oficiales de tu distribución.");
             return;
         }
-        System.out.println("\n=== Instalador de herramientas de optimización ===");
-        System.out.println("Se instalarán herramientas de diagnóstico, gráficos y gaming:");
-        installer.packages(true).forEach(pkg -> System.out.println("  • " + pkg));
-        System.out.println("\nNo se instalarán controladores propietarios ni se cambiarán kernel, servicios,");
-        System.out.println("gobernadores, parámetros de arranque o configuraciones del sistema.");
-        System.out.println("Pacman mostrará su resumen y pedirá confirmación antes de instalar.");
-        System.out.print("\n¿Continuar? [s/N]: ");
-        if (!scanner.hasNextLine() || !scanner.nextLine().strip().equalsIgnoreCase("s")) {
-            System.out.println("Instalación cancelada por el usuario.");
-            return;
-        }
+        System.out.println("\\n=== HERRAMIENTAS PARA LINUX ===");
+        System.out.println("Distribución: " + platform.name() + " | Familia: " + platform.family() + " | Gestor: " + platform.packageManager());
+        System.out.println("Paquetes que se solicitarán:");
+        packages.forEach(pkg -> System.out.println("  • " + pkg));
+        System.out.println("No se instalarán controladores gráficos, kernels ni servicios automáticamente.");
+        System.out.println("El gestor de paquetes mostrará su transacción y pedirá aprobación.");
+        System.out.print("\\n¿Continuar? [s/N]: ");
+        if (!scanner.hasNextLine() || !scanner.nextLine().strip().equalsIgnoreCase("s")) { System.out.println("Instalación cancelada."); return; }
         try {
-            System.out.println("\nIniciando instalador. Introduce tu contraseña de sudo si se solicita.");
-            int exit = installer.install(true);
-            if (exit == 0) {
-                System.out.println("Herramientas instaladas o ya presentes.");
-                writeAuditEvent("optimization_tools_installed", "Paquete completo de herramientas de diagnóstico y gaming");
-            } else {
-                System.err.println("Pacman terminó con código " + exit + ". Revisa el mensaje anterior.");
-                writeAuditEvent("optimization_tools_install_failed", "Código de salida " + exit);
-            }
-        } catch (java.io.IOException ex) {
-            System.err.println("No se pudo iniciar Pacman: " + ex.getMessage());
-        } catch (InterruptedException ex) {
-            Thread.currentThread().interrupt();
-            System.err.println("Instalación interrumpida.");
-        } catch (IllegalStateException ex) {
-            System.err.println("No se pudo instalar: " + ex.getMessage());
-        }
+            int exit = support.install(platform, packages);
+            if (exit == 0) { System.out.println("Herramientas instaladas o ya presentes."); writeAuditEvent("linux_tools_installed", platform.family() + ": " + String.join(",", packages)); }
+            else System.err.println("El gestor de paquetes terminó con código " + exit + ". Revisa sus mensajes.");
+        } catch (IOException ex) { System.err.println("No se pudo iniciar el gestor de paquetes: " + ex.getMessage()); }
+        catch (InterruptedException ex) { Thread.currentThread().interrupt(); System.err.println("Instalación interrumpida."); }
+        catch (IllegalStateException | IllegalArgumentException ex) { System.err.println("No se pudo instalar: " + ex.getMessage()); }
     }
 
-    private static void runOptimizationCenter() {
-        try (var scanner = new java.util.Scanner(System.in)) { runOptimizationCenter(scanner); }
+    private static void runLinuxSupport() {
+        var platform = new LinuxPlatformSupport().detect();
+        System.out.println("\\n=== SOPORTE LINUX ===");
+        System.out.println("Distribución: " + platform.name());
+        System.out.println("ID / versión: " + platform.id() + " / " + platform.version());
+        System.out.println("Familia: " + platform.family());
+        System.out.println("Gestor de paquetes: " + platform.packageManager());
+        System.out.println("Kernel activo: " + System.getProperty("os.version"));
+        var report = new KernelModule().inspect();
+        report.findings().forEach(line -> System.out.println(" • " + line));
+        report.warnings().forEach(line -> System.out.println(" ! " + line));
+        System.out.println("\\nEl soporte detecta diferencias entre distribuciones; no cambia el kernel ni el cargador de arranque.");
     }
-
-    private static void runOptimizationCenter(java.util.Scanner scanner) {
-        OptimizationCenter center = new OptimizationCenter();
-        while (true) {
-            System.out.println("\n=== CENTRO DE OPTIMIZACIÓN ===");
-            center.categoryStatus().forEach(System.out::println);
-            System.out.println("\n1) CPU: perfiles de energía");
-            System.out.println("2) RAM: revisar memoria y zram");
-            System.out.println("3) GPU: revisar controlador y herramientas");
-            System.out.println("8) Instalar controladores gráficos (OpenGL/Vulkan/Intel/AMD/NVIDIA/DirectX)");
-            System.out.println("4) Gaming: instalar herramientas");
-            System.out.println("5) Almacenamiento: administrar TRIM programado");
-            System.out.println("6) Kernel: información y compatibilidad");
-            System.out.println("7) Steam: creador de parámetros de lanzamiento");
-            System.out.println("0) Volver");
-            System.out.print("Selecciona una categoría: ");
-            if (!scanner.hasNextLine()) return;
-            String choice = scanner.nextLine().strip();
-            try {
-                switch (choice) {
-                    case "1" -> runCpuOptimization(center, scanner);
-                    case "2" -> runRamOptimization(center, scanner);
-                    case "3" -> {
-                        System.out.println("\n=== GPU Y CONTROLADORES ===");
-                        center.gpuSummary().forEach(line -> System.out.println("• " + line));
-                        System.out.println("No se instala ni reemplaza ningún controlador automáticamente.");
-                        System.out.println("Intel suele usar i915/xe; AMD usa amdgpu; NVIDIA puede usar nouveau o el controlador propietario.");
-                        System.out.println("La elección depende de la GPU, kernel y sesión gráfica. Revisa también Vulkan/OpenGL en el diagnóstico.");
-                    }
-                    case "4" -> runInstallTools(scanner);
-                    case "8" -> runGraphicsDriverInstaller(scanner);
-                    case "5" -> runStorageOptimization(center, scanner);
-                    case "6" -> {
-                        System.out.println("\nKernel activo: " + System.getProperty("os.version"));
-                        System.out.println("Kernels instalados en /usr/lib/modules:");
-                        var kernels = center.installedKernels();
-                        if (kernels.isEmpty()) System.out.println("  No se encontraron directorios de módulos.");
-                        else kernels.forEach(kernel -> System.out.println("  • " + kernel));
-                        System.out.println("No se elimina ni reemplaza ningún kernel. Conserva siempre un kernel de respaldo arrancable.");
-                    }
-                    case "7" -> runSteamOptions(scanner);
-                    case "0" -> { return; }
-                    default -> System.out.println("Opción no válida.");
-                }
-            } catch (java.io.IOException ex) {
-                System.err.println("No se pudo completar la operación: " + ex.getMessage());
-            } catch (InterruptedException ex) {
-                Thread.currentThread().interrupt();
-                System.err.println("Operación interrumpida.");
-                return;
-            } catch (IllegalArgumentException | IllegalStateException ex) {
-                System.err.println("Operación no disponible: " + ex.getMessage());
-            }
-        }
-    }
-
     private static void runGraphicsDriverInstaller(java.util.Scanner scanner) {
         GraphicsDriverInstaller installer = new GraphicsDriverInstaller();
         if (!new OptimizationToolsInstaller().isArchBased()) {
@@ -618,6 +562,7 @@ public final class Main {
                 System.out.println("║  7) Centro de optimización               ║");
                 System.out.println("║  8) Creador de parámetros de Steam       ║");
                 System.out.println("║  9) Limpiador seguro de caché             ║");
+                System.out.println("║ 10) Compatibilidad Linux y kernels       ║");
                 System.out.println("║  0) Salir                                ║");
                 System.out.println("╚══════════════════════════════════════════╝");
                 System.out.print("Selecciona una opción: ");
@@ -633,6 +578,7 @@ public final class Main {
                     case "7" -> runOptimizationCenter(scanner);
                     case "8" -> runSteamOptions(scanner);
                     case "9" -> runCleaner(scanner);
+                    case "10" -> runLinuxSupport();
                     case "0" -> { System.out.println("Hasta luego."); return; }
                     default -> System.out.println("Opción no válida. Elige una opción del 0 al 8.");
                 }
@@ -707,7 +653,7 @@ public final class Main {
                   --monitor [segundos]      Monitor CPU/RAM (1-300 s).
                   --benchmark-suite [MiB]   CPU + RAM + disco; guarda historial.
                   --compare-benchmarks A B  Compara dos CSV (antes/después).
-                  --install-tools          Instala herramientas recomendadas en Arch/CachyOS.
+                  --install-tools          Instala herramientas de diagnóstico en distros compatibles (Arch, Debian, Fedora, openSUSE).\n                  --linux-support         Muestra compatibilidad de distro y kernel.
                   --optimizer              Abre el centro de optimización guiada.
                   --steam-options          Crea parámetros de lanzamiento para Steam.\n                  --cleaner               Vista previa y limpieza de cachés seguras del usuario.
                   --backup DIR ARCHIVO... 
@@ -716,7 +662,7 @@ public final class Main {
                                Verifica SHA-256 y restaura copias en DESTINO,
                                sin sobrescribir archivos existentes.
 
-                El análisis normal es de solo lectura. --install-tools instala solo herramientas aprobadas; no cambia ajustes del sistema.
+                El análisis normal es de solo lectura. --install-tools instala solo herramientas aprobadas; no cambia drivers ni kernels. El soporte de kernel es informativo.
                 La restauración nunca escribe directamente en las rutas originales.
                 """);
     }
