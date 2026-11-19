@@ -474,6 +474,27 @@ public final class LinuxOptimizerGui {
         }.execute();
     }
 
+    private void chooseSwappiness() {
+        OptimizationCenter center = new OptimizationCenter();
+        JComboBox<Integer> values = new JComboBox<>(new Integer[]{10, 20, 30, 40, 60, 100});
+        values.setSelectedItem(20);
+        values.setFont(new Font("SansSerif", Font.BOLD, 15));
+        values.setPreferredSize(new Dimension(220, 42));
+        int result = JOptionPane.showConfirmDialog(frame, values,
+                "Selecciona el nuevo valor de swappiness", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+        if (result != JOptionPane.OK_OPTION) return;
+        int selected = (Integer) values.getSelectedItem();
+        confirmAction("Ajustar swappiness",
+                "Se cambiará vm.swappiness a " + selected + " de forma temporal. No se guardará en el arranque y podrás restaurar el valor anterior. ¿Continuar?",
+                () -> { center.applySwappiness(selected); return "Swappiness aplicado: " + selected + ". El cambio se mantiene hasta reiniciar o restaurarlo."; });
+    }
+
+    private void restoreSwappiness() {
+        confirmAction("Restaurar swappiness",
+                "¿Restaurar el valor de vm.swappiness guardado antes del último cambio?",
+                () -> { new OptimizationCenter().restoreSwappiness(); return "Valor anterior de swappiness restaurado."; });
+    }
+
     private void applyPowerProfile(String profile) {
         confirmAction("Aplicar perfil de energía",
                 "Se aplicará '" + profile + "'. Se guardará el perfil anterior para poder revertirlo. ¿Continuar?",
