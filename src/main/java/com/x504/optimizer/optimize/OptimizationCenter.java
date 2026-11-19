@@ -68,6 +68,9 @@ public final class OptimizationCenter {
         if (!Files.isDirectory(block)) return false;
         try (var devices = Files.list(block)) {
             return devices.anyMatch(device -> {
+                String name = device.getFileName().toString();
+                if (name.startsWith("loop") || name.startsWith("ram") || name.startsWith("zram")
+                        || name.startsWith("dm-") || name.startsWith("md")) return false;
                 Path rotational = device.resolve("queue/rotational");
                 try { return Files.isRegularFile(rotational) && Files.readString(rotational).strip().equals("0"); }
                 catch (IOException ex) { return false; }
