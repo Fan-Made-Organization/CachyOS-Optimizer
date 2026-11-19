@@ -67,9 +67,9 @@ La presencia de un módulo no significa que todos los controladores, dispositivo
 ### 5. Perfiles de optimización
 El catálogo incluye seis enfoques: Equilibrado, Rendimiento, Ahorro de energía, Gaming, Diagnóstico y Mantenimiento. Son guías de comprobaciones y siguientes pasos; no aplican cambios en lote ni prometen FPS. Las acciones disponibles se realizan por separado desde el centro de optimización, con confirmación y reversión cuando corresponde.
 
-### 6. Interfaz de terminal y panel de análisis del sistema
+### 6. Interfaz gráfica y panel de análisis del sistema
 
-Linux Optimizer utiliza una interfaz de terminal interactiva, sin interfaz gráfica. Al ejecutar `bash scripts/launch.sh` se abre un menú para iniciar el diagnóstico, ejecutar el benchmark CPU o consultar la ayuda. También se pueden usar los comandos directamente desde la terminal.
+Linux Optimizer incluye una interfaz gráfica Swing de escritorio, con tema oscuro, navegación lateral, tarjetas de hardware, paneles por categoría y actualización en segundo plano. Se ejecuta con `bash scripts/launch.sh --gui`. La interfaz no bloquea la ventana mientras recopila diagnósticos y mantiene las consultas en modo de solo lectura. También se conserva el menú de terminal: `bash scripts/launch.sh` o `bash scripts/launch.sh --menu`.
 
 El CLI presenta un panel ASCII con distribución, base inferida, kernel, escritorio, arquitectura, CPU, GPU, RAM y evaluación de compatibilidad. Los valores desconocidos se muestran como tales; el estado no se declara excelente si existen comprobaciones desconocidas.
 
@@ -91,6 +91,12 @@ El CLI presenta un panel ASCII con distribución, base inferida, kernel, escrito
 ```
 
 Los valores anteriores son ilustrativos; el programa muestra los datos reales detectados en cada equipo.
+
+Para abrir la aplicación gráfica:
+```bash
+bash scripts/launch.sh --gui
+```
+
 
 ### 7. Informes exportables
 - Exportación del diagnóstico modular a JSON o HTML.
@@ -120,6 +126,7 @@ bash scripts/launch.sh --diagnostics --report-html "$HOME/cachyos-report.html"
 - `--compare-benchmarks antes.csv despues.csv`: compara las últimas filas de dos historiales CSV.
 - `SystemCore`: captura común e inmutable de los informes modulares.
 - Inventario PCI/USB y revisión indicativa de dispositivos sin enlace de controlador.
+- Diagnóstico avanzado de VRAM cuando el controlador la expone, velocidad de enlace anunciada de red, y disponibilidad de `smartctl`/`nvme` sin ejecutar autopruebas ni modificar discos.
 
 Ejemplos:
 ```bash
