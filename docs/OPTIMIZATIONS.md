@@ -36,3 +36,18 @@ No se permiten ajustes universales a ciegas para CPU, GPU, Mesa, controladores, 
 7. **Verificar:** repetir comprobaciones y no afirmar mejoras que no se hayan medido.
 
 Un perfil es una colección de recomendaciones, no una orden para aplicar todos los ajustes. El resultado depende del hardware, la carga, el kernel y los servicios activos.
+
+
+## Perfiles energéticos por tipo de equipo
+
+El asesor `PowerDeviceAdvisor` busca dispositivos de tipo `Battery` en `/sys/class/power_supply`. Si encuentra uno clasifica el equipo como laptop; si la interfaz existe sin batería, como escritorio; en caso contrario conserva el tipo desconocido. Sugiere `balanced` como punto de partida y explica cuándo considerar ahorro o rendimiento. No cambia automáticamente perfiles ni gobernadores. La aplicación de perfiles sigue dependiendo de `power-profiles-daemon` y requiere aprobación explícita.
+
+## Almacenamiento y diagnóstico avanzado
+
+El inventario avanzado consulta `/sys/block`, muestra indicador rotacional y scheduler, y excluye dispositivos virtuales comunes. El valor rotacional cero significa dispositivo no rotacional; no prueba por sí solo que sea NVMe. TRIM programado sigue siendo una acción separada y solo se propone cuando se detecta almacenamiento no rotacional. No se cambia scheduler, sistema de archivos, opciones de montaje, firmware ni parámetros NVMe automáticamente.
+
+## Gráficos y gaming entre distribuciones
+
+El catálogo gráfico ofrece paquetes específicos para Arch, Debian, Fedora, SUSE y Alpine donde se ha definido un perfil. Los perfiles NVIDIA propietarios se restringen cuando requieren repositorios externos o combinaciones que el programa no puede validar con seguridad. Gentoo, Void y NixOS permanecen sin instalación automática de drivers. DXVK/VKD3D/Wine/Proton se tratan como capas de compatibilidad, no como drivers nativos DirectX. No se instalan repositorios externos, no se eliminan drivers y no se garantiza rendimiento/FPS.
+
+El diagnóstico avanzado consulta unidades fallidas de systemd, módulos cargados (con atención a controladores gráficos y virtualización), indicador kernel-tainted y herramientas comunes de Steam/Wine/Gamescope. Son pistas para investigación, no una reparación automática ni una declaración concluyente de conflicto.
