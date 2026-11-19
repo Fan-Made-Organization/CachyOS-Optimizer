@@ -60,7 +60,20 @@ A existência de um módulo não significa que todos os drivers, dispositivos ou
 ### 5. Catálogo de perfis
 O projeto inclui um catálogo inicial de perfis e descrições para diferentes formas de uso. Nesta etapa, os perfis são **referências informativas**: selecioná-los não altera governadores de CPU, drivers, serviços ou parâmetros do sistema.
 
-### 6. Bases de segurança e backup
+### 6. Painel de análise do sistema
+
+O CLI apresenta um painel ASCII com distribuição, base inferida, kernel, ambiente gráfico, arquitetura, CPU, GPU, RAM e avaliação de compatibilidade. Valores desconhecidos continuam identificados como desconhecidos; o estado não é marcado como excelente quando existem verificações desconhecidas.
+
+Os valores de exemplo são ilustrativos. O aplicativo exibe os dados realmente detectados no computador.
+
+### 7. Recursos de backup, auditoria e benchmark
+- `BackupManager`: cria backups de arquivos selecionados explicitamente, gera um manifesto e verifica SHA-256.
+- Restauração em uma pasta escolhida pelo usuário, com verificação de integridade e sem sobrescrever arquivos existentes.
+- `AuditLogger`: registra localmente um resumo dos diagnósticos no diretório de estado do usuário.
+- `BenchmarkEngine`: microbenchmark opcional e limitado de CPU, sem alterar configurações do sistema.
+- Arquivos do sistema não são copiados nem restaurados automaticamente; a restauração nunca grava nos caminhos originais do sistema.
+
+### 8. Bases de segurança e backup
 - Classificação de níveis de risco para ações futuras.
 - Validação inicial de ações antes de considerá-las executáveis.
 - Classes-base para manifestos de backup e verificação de checksums.
