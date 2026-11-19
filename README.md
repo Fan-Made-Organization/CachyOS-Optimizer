@@ -435,3 +435,7 @@ Estos niveles no son equivalentes. En particular, Gentoo, Void y NixOS pueden de
 5. Después de cada cambio, repite el diagnóstico y compara el estado; modifica una sola variable cada vez.
 
 El nombre Linux Optimizer no implica compatibilidad con BSD, Windows, macOS, Android ni con todas las arquitecturas. El soporte actual está centrado en distribuciones GNU/Linux y en las arquitecturas para las que se haya validado el código y el entorno de compilación.
+
+### Compatibilidad de datos locales de versiones anteriores
+
+El nombre del repositorio, la aplicación, el artefacto Maven y los mensajes visibles ahora usan **Linux Optimizer**. Para no perder datos de instalaciones anteriores, algunas ubicaciones internas de estado que contienen `cachyos-optimizer` se conservan temporalmente como rutas heredadas (por ejemplo, historiales y marcadores de acciones reversibles). No son el nombre actual del producto. El lanzador usa la nueva carpeta `~/.config/linux-optimizer/` para preferencias y puede leer la preferencia de idioma anterior; el marcador de primera ejecución también reconoce el archivo heredado.
