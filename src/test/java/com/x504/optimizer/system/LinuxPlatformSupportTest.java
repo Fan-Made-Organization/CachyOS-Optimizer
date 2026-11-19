@@ -37,6 +37,20 @@ class LinuxPlatformSupportTest {
         Files.writeString(file, release);
         assertEquals(expected, new LinuxPlatformSupport(file).detect().family());
     }
+    @Test void followsStandardOsReleaseSymlinkUsedByArchBasedSystems() throws Exception {
+        Path target = temp.resolve("usr-lib-os-release");
+        Path link = temp.resolve("etc-os-release");
+        Files.writeString(target, "ID=cachyos\nID_LIKE=arch\nPRETTY_NAME=\\\"CachyOS\\\"\n");
+        try {
+            Files.createSymbolicLink(link, target.getFileName());
+        } catch (UnsupportedOperationException | java.io.IOException | SecurityException ex) {
+            return; // El sistema de archivos/entorno no permite crear enlaces simbólicos.
+        }
+        var detected = new LinuxPlatformSupport(link).detect();
+        assertEquals(LinuxPlatformSupport.Family.ARCH, detected.family());
+        assertEquals("cachyos", detected.id());
+        assertEquals("CachyOS", detected.name());
+    }
     @Test void currentHostDetectionAlwaysReturnsAPlatform() {
         var platform = support.detect();
         assertNotNull(platform.family());
