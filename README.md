@@ -516,3 +516,14 @@ java -jar target/linux-optimizer-0.1.0-SNAPSHOT.jar --gui
 ```
 
 La compilación multiplataforma se valida en GitHub Actions para Ubuntu, Windows y macOS. Las pruebas completas de diagnóstico Linux se ejecutan en Ubuntu; Windows y macOS verifican compilación y empaquetado.
+
+
+### Inventario de hardware multiplataforma
+
+El panel usa el mismo código Java y selecciona el método de consulta según el sistema:
+
+- Linux: sysfs/DRM para controlador, VRAM, uso/frecuencia y sensores GPU cuando estén publicados; `lsblk` para discos.
+- Windows: CIM/WMI para adaptadores gráficos y `Get-PhysicalDisk` para discos.
+- macOS: `system_profiler SPDisplaysDataType` para gráficos y `diskutil list` para almacenamiento.
+
+Las consultas tienen tiempo límite, son de solo lectura y no ejecutan pruebas SMART ni de estrés. La utilización y temperatura de GPU no tienen una interfaz universal: se muestran solo cuando el controlador o fabricante las expone. Las barras de desplazamiento visibles están ocultas y el desplazamiento horizontal está deshabilitado; el desplazamiento vertical con rueda sigue disponible cuando el contenido supera el alto de la ventana.
