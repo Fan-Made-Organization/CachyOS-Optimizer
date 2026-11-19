@@ -1,6 +1,5 @@
 package com.x504.optimizer.system;
 
-import com.x504.optimizer.compatibility.CompatibilityItem;
 import com.x504.optimizer.compatibility.CompatibilityReport;
 import com.x504.optimizer.compatibility.CompatibilityStatus;
 import com.x504.optimizer.hardware.HardwareSnapshot;
@@ -22,7 +21,7 @@ public final class SystemAnalysisDashboard {
         String architecture = system.architecture();
         String state = stateOf(compatibility);
         String score = compatibility.percentage() + "%";
-        String checks = compatibility.evaluatedComponents() + " evaluados / "
+        String checks = compatibility.evaluatedComponents() + " evaluados | "
                 + compatibility.unknownComponents() + " desconocidos";
         String cpu = hardware.processor();
         String gpu = hardware.graphicsAdapters().isEmpty()
@@ -43,7 +42,7 @@ public final class SystemAnalysisDashboard {
         out.append(row("Arquitectura:  " + architecture)).append('\n');
         out.append(mid()).append('\n');
         out.append(row("Compatibilidad: " + score)).append('\n');
-        out.append(row("Comprobaciones: " + checks)).append('\n');
+        out.append(row("Datos: " + checks)).append('\n');
         out.append(row("Estado:        " + state)).append('\n');
         out.append(mid()).append('\n');
         out.append(row("CPU: " + cpu)).append('\n');
