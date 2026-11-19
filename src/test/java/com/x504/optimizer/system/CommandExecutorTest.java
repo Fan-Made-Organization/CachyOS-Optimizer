@@ -23,6 +23,12 @@ class CommandExecutorTest {
     }
 
     @Test
+    void rejectsNonQueryPacmanArguments() {
+        assertThrows(SecurityException.class,
+                () -> executor.executeReadOnly(List.of("pacman", "-Syu"), Duration.ofSeconds(1)));
+    }
+
+    @Test
     void rejectsEmptyCommand() {
         assertThrows(IllegalArgumentException.class,
                 () -> executor.executeReadOnly(List.of(), Duration.ofSeconds(1)));
