@@ -8,7 +8,12 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    name: Build (\${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    runs-on: \${{ matrix.os }}
     steps:
       - name: Obtener código
         uses: actions/checkout@v4
@@ -18,9 +23,20 @@ jobs:
           distribution: temurin
           java-version: '21'
           cache: maven
-      - name: Validar sintaxis de scripts
+      - name: Validar scripts Bash
+        if: runner.os != 'Windows'
         run: for script in scripts/*.sh; do bash -n "$script"; done
+      - name: Comprobar scripts PowerShell
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = "Stop"
+          Get-ChildItem scripts/*.ps1 | ForEach-Object { $null = [scriptblock]::Create((Get-Content -Raw $_.FullName)) }
       - name: Comprobar espacios y formato del diff
         run: git diff --check
-      - name: Compilar y ejecutar pruebas
+      - name: Compilar y ejecutar pruebas Linux
+        if: runner.os == 'Linux'
         run: mvn --batch-mode --no-transfer-progress clean verify
+      - name: Compilar en Windows y macOS
+        if: runner.os != 'Linux'
+        run: mvn --batch-mode --no-transfer-progress -DskipTests clean package
