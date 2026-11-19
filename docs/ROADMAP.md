@@ -1,10 +1,10 @@
-# Hoja de ruta de CachyOS Optimizer
+# Hoja de ruta de Linux Optimizer
 
 Este documento separa las funciones disponibles de los objetivos de desarrollo. Una carpeta, clase o archivo de configuración no significa que una función esté terminada.
 
 ## Dirección del proyecto
 
-CachyOS Optimizer será una herramienta **Linux-first, terminal-first**, con prioridad de compatibilidad para CachyOS y Arch Linux. No se planea una interfaz gráfica: la experiencia principal será un CLI claro, con menú interactivo opcional, salida legible y comandos automatizables.
+Linux Optimizer será una herramienta **Linux-first, terminal-first**, con prioridad de compatibilidad para CachyOS y Arch Linux. No se planea una interfaz gráfica: la experiencia principal será un CLI claro, con menú interactivo opcional, salida legible y comandos automatizables.
 
 La meta es que una persona pueda clonar el repositorio y ejecutar `bash scripts/launch.sh` sin instalar Java ni Maven globalmente.
 
@@ -111,3 +111,7 @@ Una función solo se considera terminada cuando:
 - La CI pasa en una versión limpia del repositorio.
 
 La prioridad es entregar funciones pequeñas, comprobables y útiles, no marcar todos los módulos como completos prematuramente.
+
+## Criterios para declarar una función lista
+
+Una función solo pasa a **Disponible** cuando tiene implementación alcanzable desde CLI o menú, validación de entradas, manejo de errores, pruebas automatizadas, documentación de requisitos y límites, y una ruta segura para cancelar o revertir cuando modifica el sistema. Para soporte multiplataforma se requiere evidencia por familia; detectar el nombre de una distribución no basta. Las prioridades deben favorecer precisión de diagnósticos, seguridad de acciones y cobertura de pruebas antes que ampliar listas de distribuciones o paquetes sin validación real.
