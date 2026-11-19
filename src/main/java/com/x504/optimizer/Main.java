@@ -78,7 +78,7 @@ public final class Main {
         ModuleManager manager = new ModuleManager(List.of(
                 new CpuModule(), new MemoryModule(), new GpuModule(), new StorageModule(), new KernelModule(), new LinuxPlatformModule(),
                 new PowerModule(), new NetworkModule(), new AudioModule(), new GamingModule(), new GraphicsStackModule(),
-                new HardwareIntelligenceModule(), new DriverInspectorModule(), new SystemHealthModule(),
+                new HardwareIntelligenceModule(), new DriverInspectorModule(),
                 new PowerIntelligenceModule(), new PackageIntelligenceModule(),
                 new DeviceInventoryModule(), new DriverConflictModule(),
                 new KdeModule(), new SteamModule(), new ProtonModule(), new DiagnosticsModule()
