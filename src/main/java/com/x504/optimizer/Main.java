@@ -5,6 +5,7 @@ import com.x504.optimizer.audit.AuditLogger;
 import com.x504.optimizer.backup.BackupManager;
 import com.x504.optimizer.benchmark.BenchmarkEngine;
 import com.x504.optimizer.benchmark.BenchmarkSuite;
+import com.x504.optimizer.benchmark.BenchmarkHistory;
 import com.x504.optimizer.core.SystemCore;
 import com.x504.optimizer.monitor.SystemMonitor;
 import com.x504.optimizer.compatibility.CompatibilityAnalyzer;
@@ -29,6 +30,8 @@ public final class Main {
         if (args.length > 0 && (args[0].equals("--diagnostics") || args[0].equals("--benchmark") || args[0].equals("--report-json") || args[0].equals("--report-html"))) { runDiagnostics(args); return; }
         if (args.length > 0 && args[0].equals("--monitor")) { runMonitor(args); return; }
         if (args.length > 0 && (args[0].equals("--benchmark-memory") || args[0].equals("--benchmark-storage"))) { runExtendedBenchmark(args); return; }
+        if (args.length > 0 && args[0].equals("--benchmark-suite")) { runBenchmarkSuite(args); return; }
+        if (args.length > 0 && args[0].equals("--compare-benchmarks")) { compareBenchmarks(args); return; }
         if (args.length > 0 && args[0].equals("--help")) {
             printHelp();
             return;
@@ -113,6 +116,32 @@ public final class Main {
         System.out.println("Usa --benchmark para la prueba CPU, --backup/--restore para copias verificadas o --help.");
     }
 
+    private static void runBenchmarkSuite(String[] args) {
+        int mib = 16;
+        if (args.length > 1) try { mib = Integer.parseInt(args[1]); }
+        catch (NumberFormatException ex) { System.err.println("Tamaño inválido en MiB."); return; }
+        try {
+            var cpu = new BenchmarkEngine().runDefaultCpuMicrobenchmark();
+            var suite = new BenchmarkSuite();
+            var ram = suite.benchmarkMemory(mib);
+            var storage = suite.benchmarkStorage(Math.min(32, Math.max(8, mib)));
+            Path history = Path.of(System.getProperty("user.home"), ".local", "state", "cachyos-optimizer", "benchmarks.csv");
+            new BenchmarkHistory().append(history, mib, cpu.operationsPerSecond(), ram, storage);
+            System.out.printf("CPU: %,d ops/s | RAM lectura: %.1f MiB/s | Disco lectura: %.1f MiB/s%n", cpu.operationsPerSecond(), ram.readMiBs(), storage.readMiBs());
+            System.out.println("Historial guardado en: " + history);
+            System.out.println("Repite la prueba tras tus cambios y conserva una copia del CSV para comparar resultados.");
+        } catch (IOException | IllegalArgumentException ex) { System.err.println("Suite incompleta: " + ex.getMessage()); }
+    }
+
+    private static void compareBenchmarks(String[] args) {
+        if (args.length != 3) { System.err.println("Uso: --compare-benchmarks <antes.csv> <despues.csv>"); return; }
+        try {
+            var result = new BenchmarkHistory().compare(Path.of(args[1]), Path.of(args[2]));
+            System.out.printf("CPU: %+.1f%% | RAM lectura: %+.1f%% | Disco lectura: %+.1f%%%n", result.cpuPercent(), result.ramReadPercent(), result.storageReadPercent());
+            System.out.println("Antes: " + result.beforeTimestamp() + " | Después: " + result.afterTimestamp());
+            System.out.println("Compara el mismo equipo y condiciones similares.");
+        } catch (IOException | RuntimeException ex) { System.err.println("No se pudo comparar: " + ex.getMessage()); }
+    }
     private static void runMonitor(String[] args) {
         int seconds = 15;
         if (args.length > 1) {
@@ -255,6 +284,8 @@ public final class Main {
                   --benchmark-memory [MiB]  Prueba RAM sintética (8-64 MiB).
                   --benchmark-storage [MiB] Prueba temporal de disco (8-32 MiB).
                   --monitor [segundos]      Monitor CPU/RAM (1-300 s).
+                  --benchmark-suite [MiB]   CPU + RAM + disco; guarda historial.
+                  --compare-benchmarks A B  Compara dos CSV (antes/después).
                   --backup DIR ARCHIVO... 
                                Respalda archivos elegidos en un directorio nuevo.
                   --restore COPIA DESTINO
