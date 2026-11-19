@@ -139,7 +139,8 @@ El menú incluye **Instalar herramientas de optimización** y el comando `--inst
 - Diagnóstico y hardware: `inxi`, `lshw`, `dmidecode`, `smartmontools`, `lm_sensors`.
 - Gráficos y aceleración: `vulkan-tools`, `mesa-utils`, `libva-utils`, `vdpauinfo`, `nvtop`.
 - Energía y temperatura: `power-profiles-daemon`, `thermald`, `powertop`, `cpupower`, `zram-generator`.
-- Gaming y monitorización: `gamemode`, `lib32-gamemode`, `mangohud`, `lib32-mangohud`, `gamescope`, `goverlay`, `vkbasalt`.
+- Gaming y monitorización: `gamemode`, `lib32-gamemode`, `mangohud`, `lib32-mangohud`, `gamescope`, `goverlay`, `vkbasalt`, `lib32-vkbasalt`, `protontricks`.
+- Monitorización y diagnóstico adicional: `btop`, `fastfetch`, `stress-ng`, `intel-gpu-tools` y `radeontop` (las utilidades específicas de GPU muestran datos según el hardware compatible).
 
 En la primera ejecución, el lanzador solicita elegir idioma (Español, English o Português Brasil) y guarda la preferencia en `~/.config/cachyos-optimizer/language`. La preferencia se conserva para los siguientes inicios. El código visible de la aplicación todavía está principalmente en español; la selección ya prepara el idioma del proceso y del lanzador, pero la traducción completa de todos los menús está pendiente.\n\nAntes de empezar la instalación de herramientas, muestra la lista completa y pide confirmación. Después ejecuta `sudo pacman -S --needed` sin `--noconfirm`, por lo que Pacman también presenta su resumen y solicita aprobación. Los paquetes que ya estén instalados se conservan.
 
@@ -176,9 +177,9 @@ Las operaciones CPU y TRIM solicitan confirmación. El perfil de energía se pue
 
 ### 12. Creador de parámetros de Steam
 
-Desde el menú principal (opción 8), el centro de optimización (opción 7) o con `bash scripts/launch.sh --steam-options`, abre un asistente para generar una línea lista para pegar en **Steam → Propiedades → General → Parámetros de lanzamiento**. Incluye plantillas para `%command%`, GameMode, MangoHud, Gamescope, registro de Proton y FSR de Proton, combinaciones personalizadas, resolución y frecuencia objetivo de Gamescope, y perfiles de juego (competitivo, equilibrado, diagnóstico y escalado). Puede guardar la línea en `~/.local/share/cachyos-optimizer/` sin sobrescribir archivos existentes.
+Desde el menú principal (opción 8), el centro de optimización (opción 7) o con `bash scripts/launch.sh --steam-options`, abre un asistente para generar una línea lista para pegar en **Steam → Propiedades → General → Parámetros de lanzamiento**. Incluye plantillas para `%command%`, GameMode, MangoHud, Gamescope, registro de Proton, FSR de Proton y WineD3D (`PROTON_USE_WINED3D=1`), combinaciones personalizadas, resolución y frecuencia objetivo de Gamescope, y perfiles de juego (competitivo, equilibrado, diagnóstico y escalado). Puede guardar la línea en `~/.local/share/cachyos-optimizer/` sin sobrescribir archivos existentes.
 
-Las opciones son plantillas: no instalan herramientas ni garantizan compatibilidad con todos los juegos. GameMode, MangoHud y Gamescope deben estar instalados; FSR depende de la versión de Proton y del juego. La resolución y frecuencia son objetivos para Gamescope, no promesas de FPS ni cambios automáticos de los ajustes gráficos internos del juego. El registro de Proton es para diagnóstico y puede generar archivos de log.
+Las opciones son plantillas: no instalan herramientas ni garantizan compatibilidad con todos los juegos. GameMode, MangoHud y Gamescope deben estar instalados; FSR depende de la versión de Proton y del juego. WineD3D fuerza la traducción Direct3D a OpenGL en lugar de DXVK/Vulkan. Puede servir como alternativa cuando Vulkan o DXVK presenta problemas, pero no es una optimización universal y suele ofrecer menos rendimiento que DXVK; actívalo solo si el juego lo necesita. La resolución y frecuencia son objetivos para Gamescope, no promesas de FPS ni cambios automáticos de los ajustes gráficos internos del juego. El registro de Proton es para diagnóstico y puede generar archivos de log.
 
 ### 13. Límites de seguridad
 - El diagnóstico normal es de solo lectura; las acciones disponibles se muestran por separado y requieren confirmación explícita.
