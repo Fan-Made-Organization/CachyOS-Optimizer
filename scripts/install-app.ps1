@@ -27,8 +27,8 @@ if errorlevel 1 (
   pause
   exit /b 1
 )
-java -version 2>&1 | findstr /R /C:"version ""21" >nul
-if errorlevel 1 (
+for /f "tokens=3" %%V in ('java -version 2^>^&1 ^| findstr /i "version"') do set "JAVA_VERSION=%%~V"
+if not "%JAVA_VERSION:~0,3%"=="21." (
   echo Se requiere Java 21.
   pause
   exit /b 1
