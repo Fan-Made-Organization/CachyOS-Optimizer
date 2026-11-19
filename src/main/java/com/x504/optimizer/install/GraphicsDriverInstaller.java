@@ -72,6 +72,6 @@ public final class GraphicsDriverInstaller {
     }
     /** Ejecuta el plan usando el gestor validado para la distribución detectada. */
     public int install(LinuxPlatformSupport support, LinuxPlatformSupport.Platform platform, List<String> packages) throws IOException, InterruptedException {
-        return new LinuxPlatformSupport().install(platform, packages);
+        return support.install(platform, packages);
     }
 }
