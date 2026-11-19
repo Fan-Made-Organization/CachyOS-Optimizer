@@ -51,7 +51,7 @@ public final class LinuxPlatformSupport {
             case ARCH -> { if (!platform.packageManager().equals("pacman")) throw new IllegalStateException("Pacman no está disponible."); command.addAll(List.of("sudo", "pacman", "-S", "--needed")); }
             case DEBIAN -> { if (!platform.packageManager().equals("apt-get") && !platform.packageManager().equals("apt")) throw new IllegalStateException("APT no está disponible."); command.addAll(List.of("sudo", platform.packageManager(), "install", "--no-install-recommends")); }
             case FEDORA -> { if (!platform.packageManager().equals("dnf") && !platform.packageManager().equals("yum")) throw new IllegalStateException("DNF/YUM no está disponible."); command.addAll(List.of("sudo", platform.packageManager(), "install")); }
-            case SUSE -> { if (!platform.packageManager().equals("zypper")) throw new IllegalStateException("Zypper no está disponible."); command.addAll(List.of("sudo", "zypper", "--non-interactive", "install")); }
+            case SUSE -> { if (!platform.packageManager().equals("zypper")) throw new IllegalStateException("Zypper no está disponible."); command.addAll(List.of("sudo", "zypper", "install")); }
             case UNKNOWN -> throw new IllegalStateException("Distribución no reconocida: no se ejecutará ningún instalador genérico.");
         }
         command.addAll(List.copyOf(packages));
