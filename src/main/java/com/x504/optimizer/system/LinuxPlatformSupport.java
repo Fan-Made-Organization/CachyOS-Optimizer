@@ -31,12 +31,12 @@ public final class LinuxPlatformSupport {
     }
 
     static Family classify(String id, String tokens) {
-        if (List.of("cachyos","arch","manjaro","endeavouros","garuda","arcolinux","artix","rebornos","steamos","holoiso").contains(id) || has(tokens,"arch","manjaro","endeavouros","cachyos")) return Family.ARCH;
-        if (List.of("debian","ubuntu","linuxmint","pop","pop os","elementary","kali"," zorin","zorin","mx","mx linux","deepin","raspbian","parrot","devuan").contains(id) || has(tokens,"debian","ubuntu","linuxmint","pop","elementary","kali")) return Family.DEBIAN;
-        if (List.of("fedora","rhel","centos","rocky","almalinux","ol","oracle").contains(id) || has(tokens,"fedora","rhel","centos","rocky","almalinux")) return Family.FEDORA;
-        if (id.startsWith("opensuse") || List.of("sles","sled","opensuse","tumbleweed").contains(id) || has(tokens,"opensuse","suse")) return Family.SUSE;
+        if (List.of("cachyos","arch","manjaro","endeavouros","garuda","arcolinux","artix","rebornos","steamos","holoiso","archcraft","blendos").contains(id) || has(tokens,"arch","manjaro","endeavouros","cachyos")) return Family.ARCH;
+        if (List.of("debian","ubuntu","linuxmint","pop","elementary","kali","zorin","mx","deepin","raspbian","parrot","devuan","neon","kubuntu","xubuntu","lubuntu","ubuntu-mate","ubuntu-budgie","bodhi","antix","siduction","trisquel","pureos").contains(id) || has(tokens,"debian","ubuntu","linuxmint","elementary","kali")) return Family.DEBIAN;
+        if (List.of("fedora","rhel","centos","rocky","almalinux","ol","oracle","nobara","ultramarine","bazzite","bluefin","silverblue","kinoite").contains(id) || has(tokens,"fedora","rhel","centos","rocky","almalinux")) return Family.FEDORA;
+        if (id.startsWith("opensuse") || List.of("sles","sled","tumbleweed","geckolinux").contains(id) || has(tokens,"opensuse","suse")) return Family.SUSE;
         if (id.equals("alpine") || has(tokens,"alpine")) return Family.ALPINE;
-        if (id.equals("gentoo") || id.equals("calculate") || has(tokens,"gentoo")) return Family.GENTOO;
+        if (id.equals("gentoo") || id.equals("calculate") || id.equals("funtoo") || has(tokens,"gentoo")) return Family.GENTOO;
         if (id.equals("void") || has(tokens,"void")) return Family.VOID;
         if (id.equals("nixos") || has(tokens,"nixos")) return Family.NIXOS;
         return Family.UNKNOWN;
@@ -55,17 +55,55 @@ public final class LinuxPlatformSupport {
             case UNKNOWN -> "No detectado";
         };
     }
+    /** Categorías de herramientas con nombres de paquete adaptados a cada familia. */
+    public Map<String,List<String>> toolCategories(Platform p) {
+        Map<String,List<String>> result = new java.util.LinkedHashMap<>();
+        switch (p.family()) {
+            case ARCH -> {
+                result.put("Diagnóstico y hardware", List.of("inxi","lshw","dmidecode","smartmontools","lm_sensors","pciutils","usbutils"));
+                result.put("Gráficos y vídeo", List.of("vulkan-tools","mesa-utils","libva-utils","vdpauinfo","nvtop"));
+                result.put("Almacenamiento", List.of("nvme-cli","hdparm","iotop"));
+                result.put("Red", List.of("iperf3","ethtool","bind"," traceroute"));
+                result.put("Monitorización", List.of("btop","fastfetch","htop","glances","sysstat"));
+                result.put("Gaming", List.of("gamemode","mangohud","gamescope","goverlay","vkbasalt","protontricks","lib32-gamemode","lib32-mangohud"));
+            }
+            case DEBIAN -> {
+                result.put("Diagnóstico y hardware", List.of("inxi","lshw","dmidecode","smartmontools","lm-sensors","pciutils","usbutils"));
+                result.put("Gráficos y vídeo", List.of("vulkan-tools","mesa-utils","vainfo","nvtop"));
+                result.put("Almacenamiento", List.of("nvme-cli","hdparm","iotop"));
+                result.put("Red", List.of("iperf3","ethtool","dnsutils","traceroute"));
+                result.put("Monitorización", List.of("btop","fastfetch","htop","glances","sysstat"));
+                result.put("Gaming", List.of("gamemode","mangohud","gamescope","protontricks"));
+            }
+            case FEDORA -> {
+                result.put("Diagnóstico y hardware", List.of("inxi","lshw","dmidecode","smartmontools","lm_sensors","pciutils","usbutils"));
+                result.put("Gráficos y vídeo", List.of("vulkan-tools","mesa-demos","libva-utils","nvtop"));
+                result.put("Almacenamiento", List.of("nvme-cli","hdparm","iotop"));
+                result.put("Red", List.of("iperf3","ethtool","bind-utils","traceroute"));
+                result.put("Monitorización", List.of("btop","fastfetch","htop","glances","sysstat"));
+                result.put("Gaming", List.of("gamemode","mangohud","gamescope","protontricks"));
+            }
+            case SUSE -> {
+                result.put("Diagnóstico y hardware", List.of("inxi","lshw","dmidecode","smartmontools","sensors","pciutils","usbutils"));
+                result.put("Gráficos y vídeo", List.of("vulkan-tools","Mesa-demo-x","libva-utils","nvtop"));
+                result.put("Almacenamiento", List.of("nvme-cli","hdparm","iotop"));
+                result.put("Red", List.of("iperf3","ethtool","bind-utils","traceroute"));
+                result.put("Monitorización", List.of("btop","fastfetch","htop","sysstat"));
+                result.put("Gaming", List.of("gamemode","mangohud","gamescope"));
+            }
+            case ALPINE -> {
+                result.put("Diagnóstico y hardware", List.of("inxi","smartmontools","lm-sensors","pciutils","usbutils"));
+                result.put("Gráficos y vídeo", List.of("vulkan-tools","mesa-utils"));
+                result.put("Almacenamiento", List.of("nvme-cli","hdparm"));
+                result.put("Red", List.of("iperf3","ethtool","bind-tools"));
+                result.put("Monitorización", List.of("btop","fastfetch","htop"));
+            }
+            case GENTOO, VOID, NIXOS, UNKNOWN -> { }
+        }
+        return java.util.Collections.unmodifiableMap(result);
+    }
     public List<String> diagnosticTools(Platform p) {
-        return switch (p.family()) {
-            case ARCH -> List.of("inxi","lshw","smartmontools","lm_sensors","btop","fastfetch","vulkan-tools","mesa-utils","libva-utils","nvtop","pciutils","usbutils","iperf3","ethtool");
-            case DEBIAN -> List.of("inxi","lshw","smartmontools","lm-sensors","btop","fastfetch","vulkan-tools","mesa-utils","vainfo","pciutils","usbutils","iperf3","ethtool");
-            case FEDORA -> List.of("inxi","lshw","smartmontools","lm_sensors","btop","fastfetch","vulkan-tools","mesa-demos","libva-utils","pciutils","usbutils","iperf3","ethtool");
-            case SUSE -> List.of("inxi","lshw","smartmontools","sensors","btop","fastfetch","vulkan-tools","Mesa-demo-x","libva-utils","pciutils","usbutils","iperf3","ethtool");
-            case ALPINE -> List.of("inxi","smartmontools","lm-sensors","btop","fastfetch","vulkan-tools","mesa-utils","pciutils","usbutils");
-            case GENTOO -> List.of("inxi","smartmontools","lm_sensors","btop","fastfetch","vulkan-tools","mesa-progs","pciutils","usbutils");
-            case VOID -> List.of("inxi","smartmontools","lm_sensors","btop","fastfetch","vulkan-tools","mesa-demos","pciutils","usbutils");
-            case NIXOS, UNKNOWN -> List.of();
-        };
+        return toolCategories(p).values().stream().flatMap(List::stream).distinct().toList();
     }
     public List<String> installCommand(Platform p, List<String> packages) {
         if (packages == null || packages.isEmpty() || packages.stream().anyMatch(x -> !x.matches("[A-Za-z0-9@._+-]+"))) throw new IllegalArgumentException("Lista de paquetes no válida.");
