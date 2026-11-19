@@ -114,6 +114,8 @@ bash scripts/launch.sh --diagnostics --report-html "$HOME/cachyos-report.html"
 - `--monitor [segundos]`: monitor CPU/RAM/carga en vivo; duración de 1 a 300 segundos.
 - `--benchmark-memory [MiB]`: prueba sintética acotada de memoria (8-64 MiB).
 - `--benchmark-storage [MiB]`: lectura/escritura temporal de 8-32 MiB; el archivo de prueba se elimina al terminar.
+- `--benchmark-suite [MiB]`: ejecuta CPU, RAM y almacenamiento, y guarda una fila CSV en `~/.local/state/cachyos-optimizer/benchmarks.csv`.
+- `--compare-benchmarks antes.csv despues.csv`: compara las últimas filas de dos historiales CSV.
 - `SystemCore`: captura común e inmutable de los informes modulares.
 - Inventario PCI/USB y revisión indicativa de dispositivos sin enlace de controlador.
 
@@ -122,6 +124,8 @@ Ejemplos:
 bash scripts/launch.sh --monitor 30
 bash scripts/launch.sh --benchmark-memory 32
 bash scripts/launch.sh --benchmark-storage 16
+bash scripts/launch.sh --benchmark-suite 16
+bash scripts/launch.sh --compare-benchmarks antes.csv despues.csv
 ```
 
 Los benchmarks de RAM y almacenamiento son sintéticos: influyen JIT, cachés, sistema de archivos y carga del equipo. No equivalen a mediciones de laboratorio ni a FPS. No se incluye todavía un benchmark de GPU real; no se inventan puntuaciones gráficas cuando no hay un motor gráfico de pruebas disponible.
@@ -152,7 +156,7 @@ El inventario sin controlador asociado no demuestra por sí solo un fallo o conf
 | Microbenchmark CPU local | Implementado como prueba opcional; no mide FPS ni GPU |
 | Exportación de informes JSON/HTML | Implementación inicial |
 | Monitor CPU/RAM y carga en vivo | Implementación inicial, sesión limitada a 5 minutos |
-| Benchmarks sintéticos de RAM y almacenamiento | Implementación inicial, tamaños acotados |
+| Benchmarks sintéticos de RAM y almacenamiento | Implementación inicial, tamaños acotados |\n| Historial y comparación antes/después de benchmarks | Implementación inicial, CSV |
 | Inventario PCI/USB y revisión indicativa de controladores | Implementación inicial |
 | System Core y captura común de módulos | Implementación inicial |
 
