@@ -3,9 +3,9 @@
 ## Requisitos
 
 - Linux recomendado; CachyOS y Arch Linux son los objetivos principales.
-- JDK 21.
-- `curl`, `tar`, `sha512sum`, `awk` y `sed` para el bootstrap.
-- Conexión a Internet durante la primera compilación.
+- Linux x86_64 o ARM64 para descargar el JDK automáticamente.
+- `curl`, `tar`, `sha256sum`, `sha512sum`, `awk`, `sed`, `python3` y `uname`.
+- Conexión a Internet durante la preparación inicial.
 
 ## Preparar y compilar
 
