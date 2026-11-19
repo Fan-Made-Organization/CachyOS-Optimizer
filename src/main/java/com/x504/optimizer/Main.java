@@ -9,6 +9,7 @@ import com.x504.optimizer.benchmark.BenchmarkHistory;
 import com.x504.optimizer.core.SystemCore;
 import com.x504.optimizer.monitor.SystemMonitor;
 import com.x504.optimizer.install.OptimizationToolsInstaller;
+import com.x504.optimizer.install.GraphicsDriverInstaller;
 import com.x504.optimizer.optimize.OptimizationCenter;
 import com.x504.optimizer.steam.SteamLaunchOptionsBuilder;
 import com.x504.optimizer.compatibility.CompatibilityAnalyzer;
@@ -201,6 +202,7 @@ public final class Main {
             System.out.println("\n1) CPU: perfiles de energía");
             System.out.println("2) RAM: revisar memoria y zram");
             System.out.println("3) GPU: revisar controlador y herramientas");
+            System.out.println("8) Instalar controladores gráficos (OpenGL/Vulkan/Intel/AMD/NVIDIA/DirectX)");
             System.out.println("4) Gaming: instalar herramientas");
             System.out.println("5) Almacenamiento: administrar TRIM programado");
             System.out.println("6) Kernel: información y compatibilidad");
@@ -221,6 +223,7 @@ public final class Main {
                         System.out.println("La elección depende de la GPU, kernel y sesión gráfica. Revisa también Vulkan/OpenGL en el diagnóstico.");
                     }
                     case "4" -> runInstallTools(scanner);
+                    case "8" -> runGraphicsDriverInstaller(scanner);
                     case "5" -> runStorageOptimization(center, scanner);
                     case "6" -> {
                         System.out.println("\nKernel activo: " + System.getProperty("os.version"));
@@ -244,6 +247,56 @@ public final class Main {
                 System.err.println("Operación no disponible: " + ex.getMessage());
             }
         }
+    }
+
+    private static void runGraphicsDriverInstaller(java.util.Scanner scanner) {
+        GraphicsDriverInstaller installer = new GraphicsDriverInstaller();
+        if (!new OptimizationToolsInstaller().isArchBased()) {
+            System.out.println("Este instalador automático está limitado a Arch Linux y CachyOS.");
+            return;
+        }
+        System.out.println("\\n=== INSTALADOR DE CONTROLADORES GRÁFICOS ===");
+        System.out.println("GPU detectadas:");
+        installer.detectGpuVendors().forEach(line -> System.out.println("  • " + line));
+        System.out.println("\\n1) Intel: Mesa/OpenGL + ANV Vulkan + Intel media");
+        System.out.println("2) AMD: Mesa/OpenGL + RADV Vulkan + VA-API");
+        System.out.println("3) NVIDIA: controlador NVIDIA open kernel module + Vulkan");
+        System.out.println("4) Compatibilidad DirectX para Wine/Proton: DXVK + VKD3D");
+        System.out.println("5) Componentes gráficos comunes: Mesa + Vulkan loader");
+        System.out.println("0) Cancelar");
+        System.out.print("Selecciona el paquete adecuado para tu GPU: ");
+        if (!scanner.hasNextLine()) return;
+        String choice = scanner.nextLine().strip();
+        List<String> packages = switch (choice) {
+            case "1" -> installer.packages(GraphicsDriverInstaller.Vendor.INTEL);
+            case "2" -> installer.packages(GraphicsDriverInstaller.Vendor.AMD);
+            case "3" -> installer.packages(GraphicsDriverInstaller.Vendor.NVIDIA);
+            case "4" -> installer.compatibilityPackages();
+            case "5" -> installer.packages(GraphicsDriverInstaller.Vendor.UNKNOWN);
+            default -> List.of();
+        };
+        if (packages.isEmpty()) { System.out.println("Instalación cancelada."); return; }
+        System.out.println("\\nPaquetes que se solicitarán a Pacman:");
+        packages.forEach(pkg -> System.out.println("  • " + pkg));
+        if (choice.equals("3")) {
+            System.out.println("ADVERTENCIA NVIDIA: nvidia-open depende de compatibilidad con tu GPU y kernel. Verifica que tu modelo soporte el módulo abierto y conserva un kernel arrancable de respaldo.");
+        }
+        System.out.println("DirectX no tiene un controlador nativo instalable en Linux: DXVK/VKD3D traducen Direct3D a Vulkan. Proton ya incluye sus propias versiones y puede no necesitar estos paquetes globales.");
+        System.out.println("FSR no es un driver: se habilita mediante Proton/juego o Gamescope cuando el juego y la GPU lo permiten.");
+        System.out.println("No se instalarán paquetes de fabricantes distintos ni se eliminarán controladores existentes.");
+        System.out.print("\\n¿Continuar? Pacman mostrará su transacción y pedirá confirmación. [s/N]: ");
+        if (!scanner.hasNextLine() || !scanner.nextLine().strip().equalsIgnoreCase("s")) {
+            System.out.println("Instalación cancelada."); return;
+        }
+        try {
+            int exit = installer.install(packages);
+            if (exit == 0) {
+                System.out.println("Paquetes instalados o ya presentes. Reinicia la sesión si el controlador lo requiere y ejecuta --diagnostics para verificar OpenGL/Vulkan.");
+                writeAuditEvent("graphics_packages_installed", String.join(",", packages));
+            } else System.err.println("Pacman terminó con código " + exit + ". Revisa los mensajes anteriores.");
+        } catch (IOException ex) { System.err.println("No se pudo iniciar Pacman: " + ex.getMessage()); }
+        catch (InterruptedException ex) { Thread.currentThread().interrupt(); System.err.println("Instalación interrumpida."); }
+        catch (IllegalStateException | IllegalArgumentException ex) { System.err.println("No se pudo instalar: " + ex.getMessage()); }
     }
 
     private static void runSteamOptions() {
