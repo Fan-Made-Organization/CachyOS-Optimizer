@@ -35,6 +35,11 @@ public final class Main {
     private Main() {}
 
     public static void main(String[] args) {
+        if (!System.getProperty("os.name", "").toLowerCase(java.util.Locale.ROOT).contains("linux")) {
+            System.err.println("Linux Optimizer solo es compatible con sistemas Linux. Windows y macOS no están soportados.");
+            System.exit(1);
+            return;
+        }
         if (args.length > 0 && args[0].equals("--gui")) { LinuxOptimizerGui.launch(); return; }
         if (args.length == 0 || args[0].equals("--menu")) { runTerminalMenu(); return; }
         if (args.length > 0 && (args[0].equals("--diagnostics") || args[0].equals("--benchmark") || args[0].equals("--report-json") || args[0].equals("--report-html"))) { runDiagnostics(args); return; }
