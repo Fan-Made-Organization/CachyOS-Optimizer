@@ -8,8 +8,8 @@ MAVEN_VERSION="3.9.9"
 MAVEN_HOME="$TOOLS_DIR/apache-maven-$MAVEN_VERSION"
 JDK_HOME="$TOOLS_DIR/temurin-jdk-21"
 
-say() { printf '[X504] %s\n' "$*"; }
-fail() { printf '[X504] ERROR: %s\n' "$*" >&2; exit 1; }
+say() { printf '[CachyOS Optimizer] %s\n' "$*"; }
+fail() { printf '[CachyOS Optimizer] ERROR: %s\n' "$*" >&2; exit 1; }
 
 for tool in curl tar sha512sum sha256sum awk sed python3 uname; do
   command -v "$tool" >/dev/null 2>&1 || fail "Falta la herramienta base requerida: $tool"
