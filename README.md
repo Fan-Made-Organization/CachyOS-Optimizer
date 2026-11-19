@@ -109,7 +109,26 @@ bash scripts/launch.sh --diagnostics --report-html "$HOME/cachyos-report.html"
 - `BenchmarkEngine`: microbenchmark CPU opcional, limitado y sin cambios de configuración.
 - No se respaldan ni restauran archivos del sistema automáticamente; la restauración no escribe sobre las rutas originales.
 
-### 9. Límites de seguridad
+### 9. Monitorización y benchmarks ampliados
+
+- `--monitor [segundos]`: monitor CPU/RAM/carga en vivo; duración de 1 a 300 segundos.
+- `--benchmark-memory [MiB]`: prueba sintética acotada de memoria (8-64 MiB).
+- `--benchmark-storage [MiB]`: lectura/escritura temporal de 8-32 MiB; el archivo de prueba se elimina al terminar.
+- `SystemCore`: captura común e inmutable de los informes modulares.
+- Inventario PCI/USB y revisión indicativa de dispositivos sin enlace de controlador.
+
+Ejemplos:
+```bash
+bash scripts/launch.sh --monitor 30
+bash scripts/launch.sh --benchmark-memory 32
+bash scripts/launch.sh --benchmark-storage 16
+```
+
+Los benchmarks de RAM y almacenamiento son sintéticos: influyen JIT, cachés, sistema de archivos y carga del equipo. No equivalen a mediciones de laboratorio ni a FPS. No se incluye todavía un benchmark de GPU real; no se inventan puntuaciones gráficas cuando no hay un motor gráfico de pruebas disponible.
+
+El inventario sin controlador asociado no demuestra por sí solo un fallo o conflicto. Para confirmar problemas se necesita correlacionar modelo, kernel y registros.
+
+### 10. Límites de seguridad
 - Las acciones se validan y preparan, pero el motor no ejecuta modificaciones del sistema.
 - Las operaciones críticas se bloquean.
 - Los cambios requieren aprobación explícita y las operaciones administrativas requieren respaldo.
@@ -131,7 +150,7 @@ bash scripts/launch.sh --diagnostics --report-html "$HOME/cachyos-report.html"
 | Registro local de auditoría | Implementado con rotación básica |
 | Interfaz gráfica | No prevista; el proyecto prioriza una interfaz de terminal. |
 | Microbenchmark CPU local | Implementado como prueba opcional; no mide FPS ni GPU |
-| Exportación de informes JSON/HTML | Implementación inicial |
+| Exportación de informes JSON/HTML | Implementación inicial |\n| Monitor CPU/RAM y carga en vivo | Implementación inicial, sesión limitada a 5 minutos |\n| Benchmarks sintéticos de RAM y almacenamiento | Implementación inicial, tamaños acotados |\n| Inventario PCI/USB y revisión indicativa de controladores | Implementación inicial |\n| System Core y captura común de módulos | Implementación inicial |
 
 El código Java que Maven compila se encuentra en `src/main/java`. Los archivos bajo `src/main/resources/java` son recursos heredados y no forman parte del conjunto de clases compiladas por la configuración Maven actual.
 
