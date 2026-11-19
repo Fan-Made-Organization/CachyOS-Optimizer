@@ -109,7 +109,7 @@ bash scripts/launch.sh --diagnostics --report-html "$HOME/cachyos-report.html"
 - `BenchmarkEngine`: microbenchmark CPU opcional, limitado y sin cambios de configuración.
 - No se respaldan ni restauran archivos del sistema automáticamente; la restauración no escribe sobre las rutas originales.
 
-### 8. Límites de seguridad
+### 9. Límites de seguridad
 - Las acciones se validan y preparan, pero el motor no ejecuta modificaciones del sistema.
 - Las operaciones críticas se bloquean.
 - Los cambios requieren aprobación explícita y las operaciones administrativas requieren respaldo.
