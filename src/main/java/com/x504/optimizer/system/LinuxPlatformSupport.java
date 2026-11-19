@@ -65,7 +65,10 @@ public final class LinuxPlatformSupport {
                 result.put("Gráficos y vídeo", List.of("vulkan-tools","mesa-utils","libva-utils","vdpauinfo"));
                 result.put("Almacenamiento", List.of("nvme-cli","hdparm"));
                 result.put("Red", List.of("iperf3","ethtool","bind","traceroute"));
-                result.put("Gaming", List.of("gamemode","mangohud","gamescope","goverlay","vkbasalt","protontricks","lib32-gamemode","lib32-mangohud"));
+                List<String> gaming = new ArrayList<>(List.of("gamemode","mangohud","gamescope","goverlay"));
+                gaming.add(p.id().equals("cachyos") ? "vkbasalt-cli" : "vkbasalt");
+                gaming.addAll(List.of("protontricks","lib32-gamemode","lib32-mangohud"));
+                result.put("Gaming", List.copyOf(gaming));
                 result.put("Audio y multimedia", List.of("alsa-utils","pavucontrol","ffmpeg","v4l-utils"));
                 result.put("Desarrollo y depuración", List.of("strace","gdb","valgrind"));
                 result.put("Energía y sensores", List.of("acpi","upower"));
