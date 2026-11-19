@@ -183,7 +183,8 @@ Las operaciones CPU y TRIM solicitan confirmación. El perfil de energía se pue
 | Validación y preparación de acciones | Implementada; las modificaciones reales siguen deshabilitadas |
 | Backup de archivos seleccionados y restauración verificada a otra carpeta | Implementado |
 | Instalación guiada de herramientas de diagnóstico y gaming en Arch/CachyOS | Implementada; confirmación previa y Pacman interactivo |
-| Centro guiado CPU/RAM/GPU/Gaming/almacenamiento/kernel | Implementación inicial; CPU y TRIM tienen acciones reversibles; RAM/GPU/kernel son inspección guiada |\n| Configuración automática de zram, controladores y kernel | **Pendiente; no se aplica** |
+| Centro guiado CPU/RAM/GPU/Gaming/almacenamiento/kernel | Implementación inicial; CPU y TRIM tienen acciones reversibles; RAM/GPU/kernel son inspección guiada |
+| Configuración automática de zram, controladores y kernel | **Pendiente; no se aplica** |
 | Restauración sobre rutas originales y rollback del sistema | **Pendiente** |
 | Registro local de auditoría | Implementado con rotación básica |
 | Interfaz gráfica | No prevista; el proyecto prioriza una interfaz de terminal. |
