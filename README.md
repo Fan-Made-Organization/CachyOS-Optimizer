@@ -132,7 +132,25 @@ Los benchmarks de RAM y almacenamiento son sintéticos: influyen JIT, cachés, s
 
 El inventario sin controlador asociado no demuestra por sí solo un fallo o conflicto. Para confirmar problemas se necesita correlacionar modelo, kernel y registros.
 
-### 10. Límites de seguridad
+### 10. Instalador de herramientas de optimización
+
+El menú incluye **Instalar herramientas de optimización** y el comando `--install-tools`. En CachyOS/Arch instala un conjunto aprobado de utilidades:
+
+- Diagnóstico y hardware: `inxi`, `lshw`, `dmidecode`, `smartmontools`, `lm_sensors`.
+- Gráficos y aceleración: `vulkan-tools`, `mesa-utils`, `libva-utils`, `vdpauinfo`, `nvtop`.
+- Gaming y monitorización: `gamemode`, `mangohud`, `gamescope`, `goverlay`.
+
+Antes de empezar, muestra la lista completa y pide confirmación. Después ejecuta `sudo pacman -S --needed` sin `--noconfirm`, por lo que Pacman también presenta su resumen y solicita aprobación. Los paquetes que ya estén instalados se conservan.
+
+**Alcance importante:** esta opción instala herramientas de usuario; no instala controladores a ciegas ni cambia kernel, servicios, parámetros de arranque, gobernadores CPU o ajustes de energía. Esos cambios dependen del hardware y requieren módulos específicos, comprobaciones y reversión. Si Pacman no encuentra un paquete o una dependencia, la transacción puede cancelarse sin completar.
+
+Ejecutar directamente:
+
+```bash
+bash scripts/launch.sh --install-tools
+```
+
+### 11. Límites de seguridad
 - Las acciones se validan y preparan, pero el motor no ejecuta modificaciones del sistema.
 - Las operaciones críticas se bloquean.
 - Los cambios requieren aprobación explícita y las operaciones administrativas requieren respaldo.
@@ -149,7 +167,7 @@ El inventario sin controlador asociado no demuestra por sí solo un fallo o conf
 | Catálogo de perfiles | Disponible como catálogo informativo |
 | Validación y preparación de acciones | Implementada; las modificaciones reales siguen deshabilitadas |
 | Backup de archivos seleccionados y restauración verificada a otra carpeta | Implementado |
-| Aplicación automática de optimizaciones | **Deshabilitada; no se ejecutan cambios** |
+| Instalación guiada de herramientas de diagnóstico y gaming en Arch/CachyOS | Implementada; confirmación previa y Pacman interactivo |\n| Ajustes automáticos de rendimiento (CPU, energía, kernel, servicios y controladores) | **Pendientes; no se aplican** |
 | Restauración sobre rutas originales y rollback del sistema | **Pendiente** |
 | Registro local de auditoría | Implementado con rotación básica |
 | Interfaz gráfica | No prevista; el proyecto prioriza una interfaz de terminal. |
@@ -213,7 +231,7 @@ Puedes pasar opciones directamente al programa:
 ```bash
 bash scripts/launch.sh                 # abre el menú de terminal
 bash scripts/launch.sh --diagnostics   # diagnóstico directo
-bash scripts/launch.sh --benchmark     # diagnóstico + microbenchmark CPU
+bash scripts/launch.sh --benchmark     # diagnóstico + microbenchmark CPU\nbash scripts/launch.sh --install-tools # instala herramientas recomendadas (Arch/CachyOS)
 bash scripts/launch.sh --help
 ```
 
