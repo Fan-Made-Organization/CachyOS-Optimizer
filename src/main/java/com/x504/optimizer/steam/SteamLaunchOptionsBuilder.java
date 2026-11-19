@@ -5,14 +5,23 @@ import java.util.List;
 
 /** Genera parámetros de lanzamiento conocidos para Steam sin aceptar comandos arbitrarios. */
 public final class SteamLaunchOptionsBuilder {
-    public record Options(boolean gameMode, boolean mangoHud, boolean gamescope, boolean protonLog, boolean fsr) {}
+    public record Options(boolean gameMode, boolean mangoHud, boolean gamescope, boolean protonLog, boolean fsr, boolean wined3d) {
+        public Options(boolean gameMode, boolean mangoHud, boolean gamescope, boolean protonLog, boolean fsr) {
+            this(gameMode, mangoHud, gamescope, protonLog, fsr, false);
+        }
+    }
     public record AdvancedOptions(boolean gameMode, boolean mangoHud, boolean gamescope, boolean protonLog,
-                                  boolean fsr, int width, int height, int refreshRate, int fsrStrength) {}
+                                  boolean fsr, int width, int height, int refreshRate, int fsrStrength, boolean wined3d) {
+        public AdvancedOptions(boolean gameMode, boolean mangoHud, boolean gamescope, boolean protonLog,
+                               boolean fsr, int width, int height, int refreshRate, int fsrStrength) {
+            this(gameMode, mangoHud, gamescope, protonLog, fsr, width, height, refreshRate, fsrStrength, false);
+        }
+    }
 
     public String build(Options options) {
         if (options == null) throw new IllegalArgumentException("Debes elegir una configuración.");
         return build(new AdvancedOptions(options.gameMode(), options.mangoHud(), options.gamescope(),
-                options.protonLog(), options.fsr(), 1920, 1080, 60, 2));
+                options.protonLog(), options.fsr(), 1920, 1080, 60, 2, options.wined3d()));
     }
 
     public String build(AdvancedOptions options) {
@@ -52,7 +61,7 @@ public final class SteamLaunchOptionsBuilder {
                 "GameMode + MangoHud: gamemoderun mangohud %command%",
                 "Gamescope: gamescope -f -- %command%",
                 "Registro Proton: PROTON_LOG=1 %command%",
-                "FSR de Proton: WINE_FULLSCREEN_FSR=1 WINE_FULLSCREEN_FSR_STRENGTH=2 %command%"
+                "FSR de Proton: WINE_FULLSCREEN_FSR=1 WINE_FULLSCREEN_FSR_STRENGTH=2 %command%",\n                "WineD3D (OpenGL): PROTON_USE_WINED3D=1 %command%"
         );
     }
 
