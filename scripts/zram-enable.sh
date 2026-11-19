@@ -6,7 +6,7 @@ if [[ ! -x /usr/lib/systemd/system-generators/zram-generator ]]; then echo 'Inst
 config='/etc/systemd/zram-generator.conf'
 state='/var/lib/cachyos-optimizer'
 marker="$state/zram-managed"
-expected=$(printf '[zram0]\\nzram-size = min(ram / 2, 4096)\\ncompression-algorithm = zstd\\nswap-priority = 100')
+expected=$(printf '[zram0]\nzram-size = min(ram / 2, 4096)\ncompression-algorithm = zstd\nswap-priority = 100')
 if [[ -e "$marker" ]]; then
   if [[ -f "$config" ]] && [[ "$(cat "$config")" == "$expected" ]]; then
     systemctl daemon-reload
