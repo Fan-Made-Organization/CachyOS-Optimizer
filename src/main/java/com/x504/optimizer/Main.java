@@ -367,7 +367,8 @@ public final class Main {
             System.out.println("\n" + launchOptions + "\n");
             System.out.println("GameMode, MangoHud y Gamescope deben estar instalados si se seleccionaron.");
             System.out.println("FSR depende de Proton/juego; resolución y Hz son objetivos de Gamescope, no garantizan FPS.");
-            if ((advanced != null && advanced.wined3d()) || (options != null && options.wined3d())) {\n                System.out.println("WineD3D fuerza la traducción Direct3D→OpenGL. Úsalo como alternativa de compatibilidad si Vulkan/DXVK falla; normalmente puede rendir menos que DXVK.");
+            if ((advanced != null && advanced.wined3d()) || (options != null && options.wined3d())) {
+                System.out.println("WineD3D fuerza la traducción Direct3D→OpenGL. Úsalo como alternativa de compatibilidad si Vulkan/DXVK falla; normalmente puede rendir menos que DXVK.");
             }
             if (askYesNo(scanner, "¿Guardar la línea en un archivo local?")) {
                 Path directory = Path.of(System.getProperty("user.home"), ".local", "share", "cachyos-optimizer");
