@@ -75,7 +75,8 @@ El CLI presenta un panel ASCII con distribución, base inferida, kernel, escrito
 ║Escritorio:    KDE Plasma                  ║
 ║Arquitectura:  x86_64                      ║
 ╠════════════════════════════════════════════╣
-║Compatibilidad: 90% (4 evaluados, 0 desconocidos)║
+║Compatibilidad: 90%                       ║
+║Datos: 4 evaluados | 0 desconocidos       ║
 ║Estado:        EXCELENTE                   ║
 ╚════════════════════════════════════════════╝
 ```
@@ -111,6 +112,7 @@ Estas piezas son una base de desarrollo; todavía no representan un sistema comp
 | Aplicación automática de optimizaciones | **Deshabilitada; no se ejecutan cambios** |
 | Restauración sobre rutas originales y rollback del sistema | **Pendiente** |
 | Registro local de auditoría | Implementado con rotación básica |
+| Interfaz gráfica | **Pendiente** |
 | Microbenchmark CPU local | Implementado como prueba opcional; no mide FPS ni GPU |
 
 El código Java que Maven compila se encuentra en `src/main/java`. Los archivos bajo `src/main/resources/java` son recursos heredados y no forman parte del conjunto de clases compiladas por la configuración Maven actual.
