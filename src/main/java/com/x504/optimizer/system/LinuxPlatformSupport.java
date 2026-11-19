@@ -78,9 +78,6 @@ public final class LinuxPlatformSupport {
                 result.put("Red", List.of("iperf3","ethtool","dnsutils","traceroute"));
                 result.put("Monitorización", List.of("btop","fastfetch","htop","glances","sysstat"));
                 result.put("Gaming", List.of("gamemode","mangohud","gamescope","protontricks"));
-                result.put("Audio y multimedia", List.of("alsa-utils","pavucontrol","ffmpeg-free","v4l-utils"));
-                result.put("Desarrollo y depuración", List.of("strace","gdb","valgrind"));
-                result.put("Energía y sensores", List.of("powertop","acpi","upower"));
                 result.put("Audio y multimedia", List.of("alsa-utils","pavucontrol","ffmpeg","v4l-utils"));
                 result.put("Desarrollo y depuración", List.of("strace","gdb","valgrind"));
                 result.put("Energía y sensores", List.of("powertop","acpi","upower"));
