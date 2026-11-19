@@ -7,7 +7,6 @@ import com.x504.optimizer.benchmark.BenchmarkEngine;
 import com.x504.optimizer.benchmark.BenchmarkSuite;
 import com.x504.optimizer.benchmark.BenchmarkHistory;
 import com.x504.optimizer.core.SystemCore;
-import com.x504.optimizer.monitor.SystemMonitor;
 import com.x504.optimizer.install.OptimizationToolsInstaller;
 import com.x504.optimizer.install.GraphicsDriverInstaller;
 import com.x504.optimizer.install.CrossDistroGraphicsCatalog;
@@ -39,7 +38,6 @@ public final class Main {
         if (args.length > 0 && args[0].equals("--gui")) { LinuxOptimizerGui.launch(); return; }
         if (args.length == 0 || args[0].equals("--menu")) { runTerminalMenu(); return; }
         if (args.length > 0 && (args[0].equals("--diagnostics") || args[0].equals("--benchmark") || args[0].equals("--report-json") || args[0].equals("--report-html"))) { runDiagnostics(args); return; }
-        if (args.length > 0 && args[0].equals("--monitor")) { runMonitor(args); return; }
         if (args.length > 0 && (args[0].equals("--benchmark-memory") || args[0].equals("--benchmark-storage"))) { runExtendedBenchmark(args); return; }
         if (args.length > 0 && args[0].equals("--benchmark-suite")) { runBenchmarkSuite(args); return; }
         if (args.length > 0 && args[0].equals("--compare-benchmarks")) { compareBenchmarks(args); return; }
@@ -679,23 +677,6 @@ public final class Main {
             }
         } catch (java.io.IOException | RuntimeException ex) { System.err.println("No se pudo completar la limpieza: " + ex.getMessage()); }
     }
-    private static void runMonitor(String[] args) {
-        int seconds = 15;
-        if (args.length > 1) {
-            try { seconds = Integer.parseInt(args[1]); }
-            catch (NumberFormatException ex) { System.err.println("Duración inválida. Usa --monitor 15."); return; }
-        }
-        try {
-            System.out.println("Monitor en vivo; duración máxima: 300 segundos.");
-            for (var sample : new SystemMonitor().monitor(java.time.Duration.ofSeconds(seconds), java.time.Duration.ofSeconds(1))) {
-                System.out.printf("%s | CPU: %s | RAM: %s | Carga: %s%n", sample.time(),
-                    sample.cpuPercent() < 0 ? "N/D" : String.format("%.1f%%", sample.cpuPercent()),
-                    sample.memoryPercent() < 0 ? "N/D" : String.format("%.1f%%", sample.memoryPercent()), sample.loadAverage());
-            }
-        } catch (InterruptedException ex) { Thread.currentThread().interrupt(); System.out.println("Monitor interrumpido."); }
-        catch (IllegalArgumentException ex) { System.err.println(ex.getMessage()); }
-    }
-
     private static void runExtendedBenchmark(String[] args) {
         int mib = 16;
         if (args.length > 1) try { mib = Integer.parseInt(args[1]); }
@@ -740,7 +721,6 @@ public final class Main {
                 System.out.println("║  1) Analizar y diagnosticar el sistema   ║");
                 System.out.println("║  2) Diagnóstico + benchmark CPU          ║");
                 System.out.println("║  3) Mostrar ayuda y comandos             ║");
-                System.out.println("║  4) Monitor CPU/RAM (15 segundos)        ║");
                 System.out.println("║  5) Benchmark completo                   ║");
                 System.out.println("║  6) Instalar herramientas de optimización ║");
                 System.out.println("║  7) Centro de optimización               ║");
@@ -757,7 +737,6 @@ public final class Main {
                     case "1" -> runDiagnostics(new String[]{"--diagnostics"});
                     case "2" -> runDiagnostics(new String[]{"--benchmark"});
                     case "3" -> printHelp();
-                    case "4" -> runMonitor(new String[]{"--monitor", "15"});
                     case "5" -> runBenchmarkSuite(new String[]{"--benchmark-suite"});
                     case "6" -> runInstallTools(scanner);
                     case "7" -> runOptimizationCenter(scanner);
