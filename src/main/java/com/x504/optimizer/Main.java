@@ -1,6 +1,7 @@
 package com.x504.optimizer;
 
 import com.x504.optimizer.compatibility.CompatibilityAnalyzer;
+import com.x504.optimizer.advisor.OptimizationAdvisor;
 import com.x504.optimizer.hardware.HardwareDetector;
 import com.x504.optimizer.modules.*;
 import com.x504.optimizer.profiles.ProfileCatalog;
