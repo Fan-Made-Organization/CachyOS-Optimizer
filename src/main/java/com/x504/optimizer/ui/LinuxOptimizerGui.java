@@ -230,7 +230,7 @@ public final class LinuxOptimizerGui {
                     var hw = new HardwareDetector().detect();
                     distro.setText(info.distro() + "  •  " + info.kernel() + "  •  " + info.desktop());
                     cpu.setText(hw.processor());
-                    ram.setText(hw.totalMemoryKiB() > 0 ? String.format("%.1f GiB", hw.totalMemoryKb()/1024.0/1024.0) : "No disponible");
+                    ram.setText(hw.totalMemoryKiB() > 0 ? String.format("%.1f GiB", hw.totalMemoryKiB()/1024.0/1024.0) : "No disponible");
                     gpu.setText(hw.graphicsAdapters().isEmpty() ? "No detectada" : hw.graphicsAdapters().get(0));
                     status.setText("Actualizado • " + java.time.LocalTime.now().withNano(0));
                     renderDetails();
