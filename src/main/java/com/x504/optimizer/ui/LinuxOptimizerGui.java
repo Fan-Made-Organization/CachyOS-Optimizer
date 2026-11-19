@@ -63,7 +63,7 @@ public final class LinuxOptimizerGui {
 
     private void build() {
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        frame.setMinimumSize(new Dimension(900, 620));
+        frame.setMinimumSize(new Dimension(820, 620));
         frame.setSize(1180, 780);
         frame.setLocationRelativeTo(null);
         frame.getContentPane().setBackground(BG);
@@ -96,7 +96,7 @@ public final class LinuxOptimizerGui {
         caption.setFont(new Font("SansSerif", Font.BOLD, 10));
         caption.setBorder(new EmptyBorder(0, 8, 12, 0));
         side.add(caption);
-        for (String page : List.of("Resumen", "CPU y memoria", "Gráficos", "Almacenamiento", "Red", "Sistema", "Gaming")) {
+        for (String page : List.of("Resumen", "CPU y memoria", "Gráficos", "Almacenamiento", "Sistema", "Gaming")) {
             JToggleButton button = new JToggleButton(page);
             button.setUI(new javax.swing.plaf.basic.BasicButtonUI());
             button.setHorizontalAlignment(SwingConstants.LEFT);
@@ -118,7 +118,7 @@ public final class LinuxOptimizerGui {
             side.add(Box.createVerticalStrut(5));
         }
         side.add(Box.createVerticalGlue());
-        JLabel safe = new JLabel("<html><font color='#8D9AB2'>● MODO SEGURO<br>Diagnóstico de solo lectura</font></html>");
+        JLabel safe = new JLabel("<html><font color='#8D9AB2'>● CAMBIOS CON CONFIRMACIÓN<br>Optimización controlada</font></html>");
         safe.setFont(new Font("SansSerif", Font.PLAIN, 11));
         safe.setBorder(new EmptyBorder(12, 8, 0, 0));
         side.add(safe);
@@ -193,21 +193,7 @@ public final class LinuxOptimizerGui {
             cards.add(metricCard("MEMORIA RAM", ram));
             cards.add(metricCard("GRÁFICOS", gpu));
             body.add(cards);
-            body.add(Box.createVerticalStrut(18));
-            body.add(section("Vista general", "Estado detectado del equipo y resumen de los componentes."));
-            body.add(section("Diagnóstico", "Selecciona una categoría en el menú lateral para consultar información detallada."));
-            body.add(Box.createVerticalStrut(14));
-            body.add(section("Optimización", "Selecciona un módulo para revisar ajustes compatibles y aplicar únicamente los cambios que autorices."));
-        } else {
-            body.add(section(page, description(page)));
-            body.add(Box.createVerticalStrut(14));
-            if (page.equals("CPU y memoria")) {
-                body.add(section("Ajustes disponibles", "Revisa gobernador, perfiles de energía y configuración de memoria antes de aplicar cambios."));
-            } else if (page.equals("Gráficos")) {
-                body.add(section("Optimización gráfica", "Revisa controladores, Vulkan, OpenGL y compatibilidad de la pila gráfica."));
-            } else {
-                body.add(section("Mantenimiento", "Revisa TRIM, sistemas de archivos y herramientas disponibles antes de realizar cambios."));
-            }
+            body.add(Box.createVerticalStrut(16));
         }
         JPanel actionsPanel = actionPanel(page);
         if (actionsPanel != null) {
@@ -228,7 +214,13 @@ public final class LinuxOptimizerGui {
         scroll.getViewport().setBackground(PANEL);
         scroll.getVerticalScrollBar().setUnitIncrement(18);
         details.setWrapStyleWord(true);
+        scroll.setPreferredSize(new Dimension(700, 230));
+        scroll.setMaximumSize(new Dimension(960, 250));
+        scroll.setAlignmentX(Component.CENTER_ALIGNMENT);
+        body.add(Box.createVerticalStrut(14));
         body.add(scroll);
+        body.setBorder(new EmptyBorder(4, 8, 12, 8));
+        body.setAlignmentX(Component.CENTER_ALIGNMENT);
         JScrollPane pageScroll = new JScrollPane(body);
         pageScroll.setBorder(BorderFactory.createEmptyBorder());
         pageScroll.setOpaque(false);
@@ -248,7 +240,7 @@ public final class LinuxOptimizerGui {
         JPanel panel = new JPanel();
         panel.setOpaque(false);
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-        panel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        panel.setAlignmentX(Component.CENTER_ALIGNMENT);
         if (!isLinuxHost()) {
             panel.add(actionCard("Acciones no disponibles en este sistema",
                     "La interfaz es multiplataforma, pero las operaciones de optimización Linux requieren sus herramientas y APIs nativas.",
@@ -296,9 +288,6 @@ public final class LinuxOptimizerGui {
                     button("Revisar limpieza", this::previewCleaner),
                     button("Instalar herramientas de optimización", this::installOptimizationTools),
                     button("Opciones de kernel", this::chooseKernel)));
-            case "Red" -> panel.add(actionCard("Optimización de red",
-                    "Primero consulta las recomendaciones del módulo de red. No se aplican sysctl ni cambios de NetworkManager a ciegas.",
-                    button("Consultar recomendaciones", () -> showMessage("Consulta el diagnóstico de red mostrado abajo. Los cambios de red automáticos aún no tienen un perfil validado para este equipo."))));
             default -> { return null; }
         }
         return panel;
@@ -310,12 +299,18 @@ public final class LinuxOptimizerGui {
         JLabel heading = new JLabel(title);
         heading.setForeground(TEXT);
         heading.setFont(new Font("SansSerif", Font.BOLD, 15));
-        JLabel subtitle = new JLabel("<html><div style='width:620px'>" + description + "</div></html>");
+        JLabel subtitle = new JLabel("<html><div style='width:520px'>" + description + "</div></html>");
         subtitle.setForeground(MUTED);
         subtitle.setFont(new Font("SansSerif", Font.PLAIN, 12));
-        JPanel buttonRow = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
+        JPanel buttonRow = new JPanel(new GridLayout(0, 2, 10, 9));
         buttonRow.setOpaque(false);
-        for (JButton button : buttons) buttonRow.add(button);
+        buttonRow.setAlignmentX(Component.CENTER_ALIGNMENT);
+        for (JButton button : buttons) {
+            button.setHorizontalAlignment(SwingConstants.CENTER);
+            button.setPreferredSize(new Dimension(210, 42));
+            button.setMinimumSize(new Dimension(0, 42));
+            buttonRow.add(button);
+        }
         JPanel text = new JPanel();
         text.setOpaque(false);
         text.setLayout(new BoxLayout(text, BoxLayout.Y_AXIS));
@@ -324,8 +319,9 @@ public final class LinuxOptimizerGui {
         text.add(subtitle);
         card.add(text, BorderLayout.NORTH);
         card.add(buttonRow, BorderLayout.SOUTH);
-        card.setMaximumSize(new Dimension(Integer.MAX_VALUE, 180));
-        card.setAlignmentX(Component.LEFT_ALIGNMENT);
+        card.setMaximumSize(new Dimension(960, 230));
+        card.setPreferredSize(new Dimension(760, Math.max(150, 112 + ((buttons.length + 1) / 2) * 51)));
+        card.setAlignmentX(Component.CENTER_ALIGNMENT);
         return card;
     }
 
@@ -758,7 +754,6 @@ public final class LinuxOptimizerGui {
             case "CPU y memoria" -> combine("CPU", lastReport.cpu(), "MEMORIA", lastReport.memory());
             case "Gráficos" -> combine("GPU Y STACK GRÁFICO", lastReport.graphics());
             case "Almacenamiento" -> combine("ALMACENAMIENTO", lastReport.storage());
-            case "Red" -> combine("RED", lastReport.network());
             case "Gaming" -> combine("GAMING", lastReport.gaming());
             case "Sistema" -> combine("SERVICIOS", lastReport.services(), "KERNEL", lastReport.kernel());
             default -> combine("CPU", lastReport.cpu(), "MEMORIA", lastReport.memory(),
