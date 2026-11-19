@@ -58,6 +58,7 @@ public final class LinuxPlatformSupport {
     /** Categorías de herramientas con nombres de paquete adaptados a cada familia. */
     public Map<String,List<String>> toolCategories(Platform p) {
         Map<String,List<String>> result = new java.util.LinkedHashMap<>();
+        if (isImmutableOrImageBased(p)) return java.util.Collections.unmodifiableMap(result);
         switch (p.family()) {
             case ARCH -> {
                 result.put("Diagnóstico y hardware", List.of("inxi","lshw","dmidecode","smartmontools","lm_sensors","pciutils","usbutils"));
