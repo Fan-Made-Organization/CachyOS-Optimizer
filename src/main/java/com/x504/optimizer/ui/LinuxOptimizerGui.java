@@ -3,7 +3,7 @@ package com.x504.optimizer.ui;
 import com.x504.optimizer.hardware.HardwareDetector;
 import com.x504.optimizer.system.AdvancedDiagnostics;
 import com.x504.optimizer.system.LinuxSystemDetector;
-import com.x504.optimizer.monitor.SystemMonitor;
+import com.x504.optimizer.monitor.LiveMetrics;
 import com.x504.optimizer.update.GitHubUpdater;
 
 import javax.swing.*;
@@ -14,6 +14,8 @@ import java.util.List;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
+import java.util.ArrayDeque;
+import java.util.Deque;
 
 /** Interfaz gráfica Swing: panel de diagnóstico de solo lectura. */
 public final class LinuxOptimizerGui {
@@ -35,6 +37,18 @@ public final class LinuxOptimizerGui {
     private final Map<String, JToggleButton> navigation = new LinkedHashMap<>();
     private final ButtonGroup navigationGroup = new ButtonGroup();
     private JButton updateButton;
+    private final LiveMetrics liveMetrics = new LiveMetrics();
+    private final Deque<Double> cpuHistory = new ArrayDeque<>();
+    private final Deque<Double> ramHistory = new ArrayDeque<>();
+    private final Deque<Double> gpuHistory = new ArrayDeque<>();
+    private final JLabel liveCpu = new JLabel("—");
+    private final JLabel liveRam = new JLabel("—");
+    private final JLabel liveTemp = new JLabel("No disponible");
+    private final JLabel liveGpu = new JLabel("No expuesta por el controlador");
+    private final ChartPanel cpuChart = new ChartPanel("CPU", cpuHistory);
+    private final ChartPanel ramChart = new ChartPanel("RAM", ramHistory);
+    private final ChartPanel gpuChart = new ChartPanel("GPU", gpuHistory);
+    private javax.swing.Timer liveTimer;
     private AdvancedDiagnostics.Report lastReport;
 
     private LinuxOptimizerGui() {
@@ -47,7 +61,9 @@ public final class LinuxOptimizerGui {
         SwingUtilities.invokeLater(() -> {
             try { UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName()); }
             catch (Exception ignored) { }
-            new LinuxOptimizerGui().frame.setVisible(true);
+            LinuxOptimizerGui app = new LinuxOptimizerGui();
+            app.frame.setVisible(true);
+            app.startLiveMonitoring();
         });
     }
 
@@ -183,8 +199,44 @@ public final class LinuxOptimizerGui {
             body.add(Box.createVerticalStrut(18));
             body.add(section("Vista general", "Estado detectado del equipo y resumen de los componentes."));
             body.add(section("Diagnóstico", "Selecciona una categoría en el menú lateral para consultar información detallada."));
+            body.add(Box.createVerticalStrut(14));
+            JPanel liveCards = new JPanel(new GridLayout(1, 4, 12, 0));
+            liveCards.setOpaque(false);
+            liveCards.add(metricCard("CPU EN VIVO", liveCpu));
+            liveCards.add(metricCard("RAM EN VIVO", liveRam));
+            liveCards.add(metricCard("TEMPERATURA MÁX.", liveTemp));
+            liveCards.add(metricCard("GPU EN VIVO", liveGpu));
+            body.add(liveCards);
+            body.add(Box.createVerticalStrut(14));
+            JPanel charts = new JPanel(new GridLayout(1, 2, 12, 0));
+            charts.setOpaque(false);
+            charts.add(cpuChart);
+            charts.add(ramChart);
+            body.add(charts);
+            body.add(Box.createVerticalStrut(12));
+            body.add(gpuChart);
         } else {
             body.add(section(page, description(page)));
+            body.add(Box.createVerticalStrut(14));
+            if (page.equals("CPU y memoria")) {
+                JPanel charts = new JPanel(new GridLayout(1, 2, 12, 0));
+                charts.setOpaque(false);
+                charts.add(cpuChart);
+                charts.add(ramChart);
+                body.add(charts);
+                body.add(Box.createVerticalStrut(12));
+                body.add(metricCard("TEMPERATURA MÁXIMA DETECTADA", liveTemp));
+            } else if (page.equals("Gráficos")) {
+                body.add(gpuChart);
+                body.add(Box.createVerticalStrut(12));
+                body.add(metricCard("USO GPU", liveGpu));
+            } else {
+                JPanel charts = new JPanel(new GridLayout(1, 2, 12, 0));
+                charts.setOpaque(false);
+                charts.add(cpuChart);
+                charts.add(ramChart);
+                body.add(charts);
+            }
         }
         details.setEditable(false);
         details.setLineWrap(true);
@@ -274,6 +326,29 @@ public final class LinuxOptimizerGui {
         }.execute();
     }
 
+    private void startLiveMonitoring() {
+        if (liveTimer != null) liveTimer.stop();
+        liveTimer = new javax.swing.Timer(1000, event -> {
+            LiveMetrics.Sample sample = liveMetrics.sample();
+            addSample(cpuHistory, sample.cpuPercent());
+            addSample(ramHistory, sample.memoryPercent());
+            if (sample.gpuPercent() >= 0) addSample(gpuHistory, sample.gpuPercent());
+            liveCpu.setText(String.format("%.0f%%", sample.cpuPercent()));
+            liveRam.setText(String.format("%.0f%%", sample.memoryPercent()));
+            liveTemp.setText(sample.temperatureCelsius() < 0 ? "No disponible" : String.format("%.1f °C", sample.temperatureCelsius()));
+            liveGpu.setText(sample.gpuPercent() < 0 ? "No expuesta" : String.format("%.0f%%", sample.gpuPercent()));
+            cpuChart.repaint();
+            ramChart.repaint();
+            gpuChart.repaint();
+        });
+        liveTimer.start();
+    }
+
+    private static void addSample(Deque<Double> history, double value) {
+        history.addLast(value);
+        while (history.size() > 60) history.removeFirst();
+    }
+
     private void refresh() {
         status.setText("Analizando el sistema…");
         new SwingWorker<AdvancedDiagnostics.Report, Void>() {
@@ -327,6 +402,54 @@ public final class LinuxOptimizerGui {
             result.add("");
         }
         return result;
+    }
+
+    private static final class ChartPanel extends JPanel {
+        private final String title;
+        private final Deque<Double> values;
+        ChartPanel(String title, Deque<Double> values) {
+            this.title = title;
+            this.values = values;
+            setBackground(PANEL);
+            setBorder(new EmptyBorder(14, 15, 12, 15));
+            setPreferredSize(new Dimension(300, 175));
+        }
+        @Override protected void paintComponent(Graphics graphics) {
+            super.paintComponent(graphics);
+            Graphics2D g = (Graphics2D) graphics.create();
+            g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            g.setColor(TEXT);
+            g.setFont(new Font("SansSerif", Font.BOLD, 13));
+            g.drawString(title + " · últimos 60 segundos", 15, 20);
+            int left=18, top=37, width=getWidth()-36, height=getHeight()-58;
+            g.setColor(new Color(48, 56, 73));
+            for(int i=0;i<4;i++) {
+                int y=top+i*height/3;
+                g.drawLine(left,y,left+width,y);
+            }
+            java.util.List<Double> points = new java.util.ArrayList<>(values);
+            if(points.size()>1) {
+                g.setStroke(new BasicStroke(2.4f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+                g.setColor(ACCENT);
+                int prevX=left, prevY=top+height-(int)(points.get(0)/100.0*height);
+                for(int i=1;i<points.size();i++) {
+                    int x=left+(i*width/(points.size()-1));
+                    int y=top+height-(int)(points.get(i)/100.0*height);
+                    g.drawLine(prevX,prevY,x,y);
+                    g.fillOval(x-3,y-3,6,6);
+                    prevX=x; prevY=y;
+                }
+            } else {
+                g.setColor(MUTED);
+                g.setFont(new Font("SansSerif", Font.PLAIN, 11));
+                g.drawString("Recopilando muestras…", left, top+height/2);
+            }
+            g.setColor(MUTED);
+            g.setFont(new Font("SansSerif", Font.PLAIN, 10));
+            g.drawString("100%", left, top+9);
+            g.drawString("0%", left, top+height);
+            g.dispose();
+        }
     }
 
     private void styleButton(JButton button) {
