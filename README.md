@@ -178,6 +178,7 @@ La aplicación no debe ejecutarse como root para realizar diagnósticos normales
 ## Documentación
 
 - [Arquitectura](docs/ARCHITECTURE.md)
+- [Gestor de respaldos](docs/BACKUPS.md)
 - [Módulos](docs/MODULES.md)
 - [Compatibilidad](docs/COMPATIBILITY.md)
 - [Dependencias y preparación](docs/DEPENDENCIES.md)
