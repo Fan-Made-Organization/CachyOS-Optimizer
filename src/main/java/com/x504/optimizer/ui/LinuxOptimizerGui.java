@@ -296,7 +296,8 @@ public final class LinuxOptimizerGui {
             case "Sistema" -> panel.add(actionCard("Mantenimiento seguro",
                     "Revisa cachés de miniaturas y fuentes con más de 30 días. No toca shaders, juegos ni archivos personales.",
                     button("Revisar limpieza", this::previewCleaner),
-                    button("Instalar herramientas de optimización", this::installOptimizationTools),\n                    button("Opciones de kernel", this::chooseKernel)));
+                    button("Instalar herramientas de optimización", this::installOptimizationTools),
+                    button("Opciones de kernel", this::chooseKernel)));
             case "Red" -> panel.add(actionCard("Optimización de red",
                     "Primero consulta las recomendaciones del módulo de red. No se aplican sysctl ni cambios de NetworkManager a ciegas.",
                     button("Consultar recomendaciones", () -> showMessage("Consulta el diagnóstico de red mostrado abajo. Los cambios de red automáticos aún no tienen un perfil validado para este equipo."))));
