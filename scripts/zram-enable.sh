@@ -28,12 +28,16 @@ compression-algorithm = zstd
 swap-priority = 100
 EOF
 install -o root -g root -m 0644 "$tmp" "$config"
+if ! printf '%s\n' 'CachyOS Optimizer managed zram config v1' > "$marker"; then
+  rm -f "$config"
+  echo 'No se pudo guardar el marcador de reversión; se canceló la configuración.' >&2
+  exit 1
+fi
 if ! systemctl daemon-reload || ! systemctl start dev-zram0.swap; then
   systemctl stop dev-zram0.swap >/dev/null 2>&1 || true
-  rm -f "$config"
+  rm -f "$config" "$marker"
   systemctl daemon-reload || true
   echo 'No se pudo activar zram; se revirtió el archivo de configuración.' >&2
   exit 1
 fi
-printf '%s\n' 'CachyOS Optimizer managed zram config v1' > "$marker"
 echo 'zram se configuró y activó. Tamaño objetivo: hasta la mitad de la RAM, con máximo de 4 GiB.'
