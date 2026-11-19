@@ -69,4 +69,8 @@ public final class GraphicsDriverInstaller {
         Process process = new ProcessBuilder(command(packages)).inheritIO().start();
         return process.waitFor();
     }
+    /** Ejecuta el plan usando el gestor validado para la distribución detectada. */
+    public int install(LinuxPlatformSupport support, LinuxPlatformSupport.Platform platform, List<String> packages) throws IOException, InterruptedException {
+        return new LinuxPlatformSupport().install(platform, packages);
+    }
 }
