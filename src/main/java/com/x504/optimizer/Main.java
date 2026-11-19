@@ -359,6 +359,12 @@ public final class Main {
         var platform = support.detect();
         CrossDistroGraphicsCatalog catalog = new CrossDistroGraphicsCatalog();
         System.out.println("\n=== CONTROLADORES GRÁFICOS MULTIDISTRIBUCIÓN ===");
+        if (support.isImmutableOrImageBased(platform)) {
+            System.out.println("Esta distribución usa un sistema inmutable o basado en imágenes.");
+            System.out.println("La instalación genérica de drivers está bloqueada para evitar cambios fuera del flujo oficial.");
+            System.out.println("Usa el mecanismo documentado por tu distribución para extensiones y controladores.");
+            return;
+        }
         System.out.println("Sistema: " + platform.name() + " | Familia: " + platform.family() + " | Gestor: " + platform.packageManager());
         new GraphicsDriverInstaller().detectGpuVendors().forEach(line -> System.out.println("  • " + line));
         System.out.println("1) Intel  2) AMD  3) NVIDIA  4) Compatibilidad Wine/Proton  5) Componentes comunes  0) Cancelar");
