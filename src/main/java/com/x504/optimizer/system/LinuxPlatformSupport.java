@@ -62,14 +62,13 @@ public final class LinuxPlatformSupport {
         switch (p.family()) {
             case ARCH -> {
                 result.put("Diagnóstico y hardware", List.of("inxi","lshw","dmidecode","smartmontools","lm_sensors","pciutils","usbutils"));
-                result.put("Gráficos y vídeo", List.of("vulkan-tools","mesa-utils","libva-utils","vdpauinfo","nvtop"));
-                result.put("Almacenamiento", List.of("nvme-cli","hdparm","iotop"));
+                result.put("Gráficos y vídeo", List.of("vulkan-tools","mesa-utils","libva-utils","vdpauinfo"));
+                result.put("Almacenamiento", List.of("nvme-cli","hdparm"));
                 result.put("Red", List.of("iperf3","ethtool","bind","traceroute"));
-                result.put("Monitorización", List.of("btop","fastfetch","htop","glances","sysstat"));
                 result.put("Gaming", List.of("gamemode","mangohud","gamescope","goverlay","vkbasalt","protontricks","lib32-gamemode","lib32-mangohud"));
                 result.put("Audio y multimedia", List.of("alsa-utils","pavucontrol","ffmpeg","v4l-utils"));
                 result.put("Desarrollo y depuración", List.of("strace","gdb","valgrind"));
-                result.put("Energía y sensores", List.of("powertop","acpi","upower"));
+                result.put("Energía y sensores", List.of("acpi","upower"));
             }
             case DEBIAN -> {
                 result.put("Diagnóstico y hardware", List.of("inxi","lshw","dmidecode","smartmontools","lm-sensors","pciutils","usbutils"));
@@ -95,7 +94,6 @@ public final class LinuxPlatformSupport {
                 result.put("Gráficos y vídeo", List.of("vulkan-tools","Mesa-demo-x","libva-utils","nvtop"));
                 result.put("Almacenamiento", List.of("nvme-cli","hdparm","iotop"));
                 result.put("Red", List.of("iperf3","ethtool","bind-utils","traceroute"));
-                result.put("Monitorización", List.of("btop","fastfetch","htop","sysstat"));
                 result.put("Gaming", List.of("gamemode","mangohud","gamescope"));
                 result.put("Audio y multimedia", List.of("alsa-utils","pavucontrol","ffmpeg","v4l-utils"));
                 result.put("Desarrollo y depuración", List.of("strace","gdb","valgrind"));
@@ -106,7 +104,6 @@ public final class LinuxPlatformSupport {
                 result.put("Gráficos y vídeo", List.of("vulkan-tools","mesa-utils"));
                 result.put("Almacenamiento", List.of("nvme-cli","hdparm"));
                 result.put("Red", List.of("iperf3","ethtool","bind-tools"));
-                result.put("Monitorización", List.of("btop","fastfetch","htop"));
                 result.put("Audio y multimedia", List.of("alsa-utils","pavucontrol","ffmpeg","v4l-utils"));
                 result.put("Desarrollo y depuración", List.of("strace","gdb","valgrind"));
             }
