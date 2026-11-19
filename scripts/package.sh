@@ -8,6 +8,6 @@ if [[ -x "$ROOT/.tools/temurin-jdk-21/bin/java" ]]; then
 fi
 if command -v mvn >/dev/null 2>&1; then MVN="$(command -v mvn)"
 elif [[ -x "$ROOT/.tools/apache-maven-3.9.9/bin/mvn" ]]; then MVN="$ROOT/.tools/apache-maven-3.9.9/bin/mvn"
-else printf '[CachyOS Optimizer] Ejecuta primero: bash scripts/bootstrap.sh\n' >&2; exit 1; fi
+else printf '[Linux Optimizer] Ejecuta primero: bash scripts/bootstrap.sh\n' >&2; exit 1; fi
 "$MVN" -Dmaven.repo.local="$ROOT/.cache/maven-repository" --batch-mode --no-transfer-progress package
-printf '[CachyOS Optimizer] Paquete generado en target/cachyos-optimizer-0.1.0-SNAPSHOT.jar\n'
+printf '[Linux Optimizer] Paquete generado en target/linux-optimizer-0.1.0-SNAPSHOT.jar\n'
