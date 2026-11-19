@@ -62,9 +62,17 @@ PY
     || fail "La API de Adoptium devolvió metadatos de descarga no válidos."
 
   JDK_ARCHIVE="$TOOLS_DIR/temurin-jdk21.tar.gz"
-  curl --fail --location --retry 3 "$JDK_URL" -o "$JDK_ARCHIVE"
-  printf '%s  %s\n' "$JDK_SHA256" "$JDK_ARCHIVE" | sha256sum --check --status \
-    || fail "La verificación SHA-256 del JDK 21 no coincide."
+  verified=false
+  for attempt in 1 2 3; do
+    rm -f "$JDK_ARCHIVE"
+    curl --fail --location --retry 3 "$JDK_URL" -o "$JDK_ARCHIVE"
+    if printf '%s  %s\n' "$JDK_SHA256" "$JDK_ARCHIVE" | sha256sum --check --status; then
+      verified=true
+      break
+    fi
+    say "La verificación SHA-256 no coincidió (intento $attempt/3). Se volverá a descargar."
+  done
+  [[ "$verified" == "true" ]] || fail "El JDK 21 no superó la verificación SHA-256 después de 3 descargas."
 
   rm -rf -- "$JDK_HOME"
   mkdir -p "$JDK_HOME"
