@@ -15,8 +15,10 @@ public final class PowerModule implements DiagnosticModule {
         if (Files.isDirectory(thermal)) {
             try (var paths = Files.list(thermal)) {
                 paths.filter(p -> p.getFileName().toString().startsWith("thermal_zone"))
-                        .forEach(p -> findings.add(p.getFileName() + ": " +
-                                LinuxProbe.unknown(LinuxProbe.firstLine(p.resolve("temp"))) + " (mili °C)"))));
+                        .forEach(p -> {
+                            String temperature = LinuxProbe.unknown(LinuxProbe.firstLine(p.resolve("temp")));
+                            findings.add(p.getFileName() + ": " + temperature + " (mili °C)");
+                        });
             } catch (Exception exception) { findings.add("No se pudieron consultar sensores térmicos."); }
         }
         Path power = Path.of("/sys/class/power_supply");
