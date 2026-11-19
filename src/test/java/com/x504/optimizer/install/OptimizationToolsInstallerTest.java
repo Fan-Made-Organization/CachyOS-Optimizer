@@ -26,7 +26,7 @@ class OptimizationToolsInstallerTest {
         assertFalse(archPackages.contains("vkbasalt-cli"));
     }
 
-    @    @Test void commandUsesOnlyFixedPacmanArgumentsAndPackages() {
+    @Test void commandUsesOnlyFixedPacmanArgumentsAndPackages() {
         var command = installer.command(true);
         assertEquals(java.util.List.of("sudo", "pacman", "-S", "--needed"), command.subList(0, 4));
         assertFalse(command.contains("-Rns"));
