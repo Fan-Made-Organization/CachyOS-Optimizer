@@ -212,23 +212,23 @@ public final class Main {
             try {
                 switch (choice) {
                     case "1" -> runCpuOptimization(center, scanner);
-                    case "2" -> {
-                        System.out.println("\n=== MEMORIA ===");
-                        System.out.println("zram: " + (java.nio.file.Files.exists(Path.of("/sys/block/zram0")) ? "detectado" : "no detectado"));
-                        System.out.println("No se borrarán cachés ni se finalizarán procesos automáticamente.");
-                        System.out.println("Si zram no está configurado, el instalador de herramientas incluye zram-generator; su activación requiere una configuración revisada y reinicio.");
-                    }
+                    case "2" -> runRamOptimization(center, scanner);
                     case "3" -> {
-                        System.out.println("\n=== GPU ===");
-                        System.out.println("Se conserva el controlador actual. No se instalarán controladores propietarios sin identificar modelo, kernel y sesión gráfica.");
-                        System.out.println("Ejecuta la opción 1 (diagnóstico) para consultar GPU, Vulkan, OpenGL y módulos asociados.");
+                        System.out.println("\n=== GPU Y CONTROLADORES ===");
+                        center.gpuSummary().forEach(line -> System.out.println("• " + line));
+                        System.out.println("No se instala ni reemplaza ningún controlador automáticamente.");
+                        System.out.println("Intel suele usar i915/xe; AMD usa amdgpu; NVIDIA puede usar nouveau o el controlador propietario.");
+                        System.out.println("La elección depende de la GPU, kernel y sesión gráfica. Revisa también Vulkan/OpenGL en el diagnóstico.");
                     }
                     case "4" -> runInstallTools(scanner);
                     case "5" -> runStorageOptimization(center, scanner);
                     case "6" -> {
                         System.out.println("\nKernel activo: " + System.getProperty("os.version"));
-                        System.out.println("No se sustituye ni elimina el kernel activo automáticamente.");
-                        System.out.println("Primero se verifica compatibilidad de GPU, initramfs, módulos y entradas de arranque.");
+                        System.out.println("Kernels instalados en /usr/lib/modules:");
+                        var kernels = center.installedKernels();
+                        if (kernels.isEmpty()) System.out.println("  No se encontraron directorios de módulos.");
+                        else kernels.forEach(kernel -> System.out.println("  • " + kernel));
+                        System.out.println("No se elimina ni reemplaza ningún kernel. Conserva siempre un kernel de respaldo arrancable.");
                     }
                     case "7" -> runSteamOptions(scanner);
                     case "0" -> { return; }
@@ -359,6 +359,32 @@ public final class Main {
             center.applyPowerProfile(profile);
             writeAuditEvent("power_profile_changed", "Perfil aplicado: " + profile);
             System.out.println("Perfil aplicado. Puedes revertirlo desde esta misma opción.");
+        }
+    }
+    private static void runRamOptimization(OptimizationCenter center, java.util.Scanner scanner)
+            throws java.io.IOException, InterruptedException {
+        System.out.println("\n=== MEMORIA Y ZRAM ===");
+        System.out.println("zram activo: " + (center.isZramActive() ? "sí" : "no"));
+        System.out.println("Configuración administrada por la app: /etc/systemd/zram-generator.conf (si se creó aquí).");
+        System.out.println("El perfil usa zstd y un tamaño máximo de la mitad de la RAM, limitado a 4 GiB.");
+        System.out.println("No se purgan cachés ni se cierran procesos.");
+        if (center.isZramActive()) {
+            System.out.print("¿Desactivar y retirar solamente la configuración creada por esta app? [s/N]: ");
+            if (scanner.hasNextLine() && scanner.nextLine().strip().equalsIgnoreCase("s")) {
+                int exit = center.configureManagedZram(false);
+                if (exit == 0) writeAuditEvent("zram_disabled", "Se retiró la configuración zram administrada");
+                else System.err.println("No se pudo desactivar zram; código " + exit);
+            }
+            return;
+        }
+        System.out.println("La activación requiere zram-generator instalado y sudo.");
+        System.out.print("¿Crear y activar una configuración administrada y reversible? [s/N]: ");
+        if (scanner.hasNextLine() && scanner.nextLine().strip().equalsIgnoreCase("s")) {
+            int exit = center.configureManagedZram(true);
+            if (exit == 0) {
+                writeAuditEvent("zram_enabled", "Se creó y activó la configuración zram administrada");
+                System.out.println("zram activado. La configuración puede retirarse desde este menú.");
+            } else System.err.println("No se pudo activar zram; código " + exit + ". Revisa si zram-generator está instalado y si ya existe una configuración propia.");
         }
     }
     private static void runStorageOptimization(OptimizationCenter center, java.util.Scanner scanner)
