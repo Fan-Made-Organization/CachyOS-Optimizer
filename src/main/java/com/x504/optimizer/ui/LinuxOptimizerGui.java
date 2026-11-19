@@ -198,7 +198,10 @@ public final class LinuxOptimizerGui {
         JPanel body = new ResponsivePanel();
         body.setOpaque(false);
         body.setLayout(new BoxLayout(body, BoxLayout.Y_AXIS));
-        if (page.equals("Resumen") || page.equals("Información general")) {
+        if (page.equals("Información general")) {
+            body.add(projectInformationPanel());
+            body.add(Box.createVerticalStrut(14));
+        } else if (page.equals("Resumen")) {
             JPanel cards = new JPanel(new GridLayout(1, 3, 14, 0));
             cards.setOpaque(false);
             cards.add(metricCard("PROCESADOR", cpu));
@@ -229,8 +232,10 @@ public final class LinuxOptimizerGui {
         scroll.setPreferredSize(new Dimension(600, 230));
         scroll.setMaximumSize(new Dimension(Integer.MAX_VALUE, 250));
         scroll.setAlignmentX(Component.CENTER_ALIGNMENT);
-        body.add(Box.createVerticalStrut(14));
-        body.add(scroll);
+        if (!page.equals("Información general")) {
+            body.add(Box.createVerticalStrut(14));
+            body.add(scroll);
+        }
         body.setBorder(new EmptyBorder(4, 8, 12, 8));
         body.setAlignmentX(Component.CENTER_ALIGNMENT);
         JScrollPane pageScroll = new JScrollPane(body);
@@ -270,12 +275,7 @@ public final class LinuxOptimizerGui {
                         button("Instalar herramientas", this::installOptimizationTools)));
             }
             case "CPU y memoria" -> {
-                panel.add(actionCard("Perfiles de energía",
-                        "Cambia entre equilibrado, rendimiento y ahorro. Se guarda el perfil anterior para poder restaurarlo.",
-                        button("Equilibrado", () -> applyPowerProfile("balanced")),
-                        button("Rendimiento", () -> applyPowerProfile("performance")),
-                        button("Ahorro", () -> applyPowerProfile("power-saver")),
-                        button("Restaurar perfil anterior", this::restorePowerProfile)));
+                panel.add(powerProfileCard());
                 panel.add(Box.createVerticalStrut(10));
                 panel.add(actionCard("Gobernador CPU",
                         "Aplica un gobernador disponible en el kernel y guarda el valor anterior.",
@@ -305,6 +305,88 @@ public final class LinuxOptimizerGui {
             default -> { return null; }
         }
         return panel;
+    }
+
+
+    private JPanel projectInformationPanel() {
+        JPanel panel = new JPanel();
+        panel.setOpaque(false);
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        panel.add(actionCard("Linux Optimizer · Información del proyecto",
+                "Herramienta libre y en desarrollo para conocer, diagnosticar y optimizar sistemas Linux de distintas distribuciones.",
+                button("Abrir repositorio en GitHub", () -> {
+                    try { java.awt.Desktop.getDesktop().browse(java.net.URI.create("https://github.com/Fan-Made-Organization/Linux-Optimizer")); }
+                    catch (Exception ex) { showMessage("No se pudo abrir GitHub: " + ex.getMessage()); }
+                })));
+        panel.add(Box.createVerticalStrut(10));
+        panel.add(section("PROPÓSITO", "Centralizar información del sistema, hardware, compatibilidad, controladores, kernel y herramientas gaming. Explica los cambios antes de aplicarlos."));
+        panel.add(Box.createVerticalStrut(10));
+        panel.add(section("FUNCIONES PRINCIPALES", "Diagnóstico de CPU, RAM, GPU, almacenamiento, energía, red, audio, kernel y escritorio. Incluye perfiles de optimización, instaladores compatibles, mantenimiento reversible y generador de parámetros de Steam."));
+        panel.add(Box.createVerticalStrut(10));
+        panel.add(section("SEGURIDAD Y CONTROL", "No promete aumentos mágicos de rendimiento ni modifica el sistema a escondidas. Las operaciones disponibles solicitan confirmación y, cuando es posible, permiten revertir los cambios."));
+        panel.add(Box.createVerticalStrut(10));
+        panel.add(section("TECNOLOGÍAS Y COMPATIBILIDAD", "Desarrollado en Java 21 con Maven y Swing. Diseñado para distintas familias Linux; la disponibilidad depende de la distribución, sus herramientas y el hardware."));
+        panel.add(Box.createVerticalStrut(10));
+        panel.add(section("PROYECTO", "Versión 0.1.0-SNAPSHOT · Licencia GNU GPL v3 · Fan-Made Organization."));
+        panel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        return panel;
+    }
+
+    private JPanel powerProfileCard() {
+        JPanel card = new GlassPanel(new BorderLayout(0, 13));
+        card.setBorder(new EmptyBorder(18, 19, 18, 19));
+        JLabel title = new JLabel("Perfil de energía");
+        title.setForeground(TEXT);
+        title.setFont(new Font("SansSerif", Font.BOLD, 15));
+        JLabel description = new JLabel("<html>Elige un perfil. No se aplicará hasta pulsar el botón.</html>");
+        description.setForeground(MUTED);
+        description.setFont(new Font("SansSerif", Font.PLAIN, 12));
+        String[] values = {"balanced", "performance", "power-saver"};
+        String[] labels = {"Equilibrado", "Rendimiento", "Ahorro de energía"};
+        JComboBox<String> selector = new JComboBox<>(labels);
+        selector.setFont(new Font("SansSerif", Font.PLAIN, 13));
+        selector.setForeground(TEXT);
+        selector.setBackground(PANEL_ALT);
+        selector.setFocusable(false);
+        JLabel hint = new JLabel("Equilibrado: uso general y consumo moderado.");
+        hint.setForeground(MUTED);
+        hint.setFont(new Font("SansSerif", Font.PLAIN, 11));
+        selector.addActionListener(e -> {
+            String[] hints = {"Equilibrado: uso general y consumo moderado.",
+                    "Rendimiento: prioriza la respuesta y potencia disponible.",
+                    "Ahorro: prioriza reducir el consumo energético."};
+            int index = Math.max(0, selector.getSelectedIndex());
+            hint.setText(hints[index]);
+            hint.setForeground(new Color(190, 174, 255));
+            javax.swing.Timer animation = new javax.swing.Timer(20, null);
+            int[] tick = {0};
+            animation.addActionListener(event -> {
+                tick[0]++;
+                if (tick[0] >= 8) animation.stop();
+            });
+            animation.start();
+        });
+        JPanel center = new JPanel(new BorderLayout(0, 9));
+        center.setOpaque(false);
+        center.add(description, BorderLayout.NORTH);
+        center.add(selector, BorderLayout.CENTER);
+        center.add(hint, BorderLayout.SOUTH);
+        JButton apply = button("Aplicar", () -> {
+            int index = selector.getSelectedIndex();
+            if (index >= 0) applyPowerProfile(values[index]);
+        });
+        JButton restore = button("Restaurar anterior", this::restorePowerProfile);
+        JPanel buttons = new JPanel(new GridLayout(1, 2, 10, 0));
+        buttons.setOpaque(false);
+        buttons.add(apply);
+        buttons.add(restore);
+        card.add(title, BorderLayout.NORTH);
+        card.add(center, BorderLayout.CENTER);
+        card.add(buttons, BorderLayout.SOUTH);
+        card.setMaximumSize(new Dimension(Integer.MAX_VALUE, 230));
+        card.setPreferredSize(new Dimension(600, 180));
+        card.setAlignmentX(Component.CENTER_ALIGNMENT);
+        return card;
     }
 
     private JPanel actionCard(String title, String description, JButton... buttons) {
