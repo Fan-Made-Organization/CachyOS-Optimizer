@@ -40,7 +40,7 @@ class LinuxPlatformSupportTest {
     @Test void followsStandardOsReleaseSymlinkUsedByArchBasedSystems() throws Exception {
         Path target = temp.resolve("usr-lib-os-release");
         Path link = temp.resolve("etc-os-release");
-        Files.writeString(target, "ID=cachyos\nID_LIKE=arch\nPRETTY_NAME=\\\"CachyOS\\\"\n");
+        Files.writeString(target, "ID=cachyos\nID_LIKE=arch\nPRETTY_NAME=\"CachyOS\"\n");
         try {
             Files.createSymbolicLink(link, target.getFileName());
         } catch (UnsupportedOperationException | java.io.IOException | SecurityException ex) {
