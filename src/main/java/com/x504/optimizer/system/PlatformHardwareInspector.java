@@ -44,10 +44,6 @@ public final class PlatformHardwareInspector {
                 } catch (IOException ignored) { }
                 gpu.add(card.getFileName() + ": vendor=" + fallback(vendor) + ", device=" + fallback(device) + ", driver=" + driver);
                 addValue(gpu, "VRAM total", dev.resolve("mem_info_vram_total"), true);
-                addValue(gpu, "VRAM usada", dev.resolve("mem_info_vram_used"), true);
-                addValue(gpu, "Uso GPU", dev.resolve("gpu_busy_percent"), false);
-                addValue(gpu, "Frecuencia GPU", dev.resolve("pp_dpm_sclk"), false);
-                addHwmonTemperatures(gpu, dev);
             }
         } catch (IOException ex) {
             gpu.add("No se pudo consultar /sys/class/drm.");
@@ -56,24 +52,6 @@ public final class PlatformHardwareInspector {
         List<String> storage = run(List.of("lsblk", "-o", "NAME,TYPE,SIZE,ROTA,TRAN,FSTYPE,MOUNTPOINTS"), 5);
         if (storage.isEmpty()) storage = List.of("lsblk no disponible; no se pudo crear el inventario de discos.");
         return new Report(gpu, storage);
-    }
-
-    private void addHwmonTemperatures(List<String> out, Path device) {
-        Path hwmon = device.resolve("hwmon");
-        if (!Files.isDirectory(hwmon)) return;
-        try (var dirs = Files.list(hwmon)) {
-            for (Path dir : dirs.toList()) {
-                try (var files = Files.list(dir)) {
-                    for (Path input : files.filter(p -> p.getFileName().toString().matches("temp[0-9]+_input")).toList()) {
-                        String raw = read(input);
-                        try {
-                            double value = Double.parseDouble(raw);
-                            out.add("Sensor " + input.getFileName() + ": " + String.format(Locale.ROOT, "%.1f °C", value > 1000 ? value / 1000 : value));
-                        } catch (NumberFormatException ignored) { }
-                    }
-                } catch (IOException ignored) { }
-            }
-        } catch (IOException ignored) { }
     }
 
     private Report inspectWindows() {
