@@ -6,12 +6,16 @@ En Linux, desde la raíz del repositorio:
 bash scripts/bootstrap.sh
 ```
 
-El script comprueba Java 21. Si Maven falta, descarga Maven 3.9.9 desde el archivo oficial de Apache y verifica su SHA-512 antes de extraerlo en `.tools/`. Después descarga las dependencias Maven en `.cache/maven-repository/` y ejecuta `clean verify`.
+El script comprueba si hay un JDK 21 disponible. Si falta, descarga Temurin JDK 21 para Linux x86_64 o ARM64 desde la API oficial de Adoptium, verifica SHA-256 y lo extrae en `.tools/temurin-jdk-21/`. No instala Java en todo el sistema ni necesita privilegios de administrador.
+
+Si Maven falta, descarga Maven 3.9.9 desde el archivo oficial de Apache y verifica su SHA-512 antes de extraerlo en `.tools/`. Después descarga las dependencias Maven en `.cache/maven-repository/` y ejecuta `clean verify`.
+
+## Herramientas base
+
+Se requieren `curl`, `tar`, `sha256sum`, `sha512sum`, `awk`, `sed`, `python3` y `uname`. Son herramientas de preparación; el script no intenta instalar paquetes del sistema ni ejecutar comandos de administrador.
 
 Los directorios `.tools/`, `.cache/` y `target/` están excluidos de Git. Las herramientas y dependencias se descargan dentro de la copia local del repositorio, pero no se suben al repositorio remoto ni se mezclan con el código fuente.
 
-## Requisito Java
+## Herramientas opcionales
 
-Java 21 debe estar instalado previamente. El script no instala un JDK ni ejecuta comandos de administrador de forma silenciosa. En CachyOS/Arch, el usuario puede instalar el JDK 21 mediante el gestor de paquetes tras revisar la operación.
-
-Las herramientas opcionales como `vulkaninfo`, `glxinfo` e `inxi` no son necesarias para compilar. Si faltan, el diagnóstico lo informa; no instala controladores ni paquetes del sistema automáticamente.
+Herramientas como `vulkaninfo`, `glxinfo` e `inxi` no son necesarias para compilar. Si faltan, los diagnósticos lo informan; no se instalan controladores ni paquetes del sistema automáticamente.
