@@ -73,13 +73,11 @@ The values in the sample below are illustrative. The application prints data act
 - `BenchmarkEngine` provides an optional bounded CPU microbenchmark without changing system configuration.
 - System files are not backed up or restored automatically; restore never writes to original system paths.
 
-### 8. Safety and backup foundations
-- Risk-level classification for future actions.
-- Initial validation of actions before they can be considered executable.
-- Foundation classes for backup manifests and checksum verification.
-- An emphasis on explicit and reversible changes.
-
-These are development foundations, not a complete backup, restore, or automatic rollback system.
+### 8. Safety boundaries
+- Actions can be validated and prepared, but the engine does not execute system modifications.
+- Critical operations are blocked.
+- Changes require explicit approval; administrative operations require a backup.
+- Backups restore verified copies into another directory and do not automatically overwrite original files.
 
 ## Actual project status
 
