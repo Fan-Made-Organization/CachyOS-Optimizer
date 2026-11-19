@@ -162,7 +162,7 @@ El menú incluye **Instalar herramientas de optimización** y el comando `--inst
 | Gráficos y vídeo | `vulkan-tools`, utilidades Mesa, VA-API, `vdpauinfo`, `nvtop` según distribución |
 | Almacenamiento | `nvme-cli`, `hdparm`, `iotop` |
 | Red | `iperf3`, `ethtool`, herramientas DNS y `traceroute` |
-| Gaming | `gamemode`, `mangohud`, `gamescope`, `goverlay`, `vkbasalt`, `protontricks` y paquetes multilib cuando corresponda |
+| Gaming | `gamemode`, `mangohud`, `gamescope`, `goverlay`, `vkbasalt` (Arch) / `vkbasalt-cli` (CachyOS), `protontricks` y paquetes multilib cuando corresponda |
 | Audio y multimedia | `alsa-utils`, `pavucontrol`, `ffmpeg`/`ffmpeg-free`, `v4l-utils` |
 | Desarrollo y depuración | `strace`, `gdb`, `valgrind` |
 | Energía y sensores | `powertop`, `acpi`, `upower` |
