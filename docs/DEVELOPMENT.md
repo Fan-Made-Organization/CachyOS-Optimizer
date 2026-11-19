@@ -25,3 +25,13 @@ mvn clean verify
 ## Arquitectura
 
 Los módulos implementan `DiagnosticModule`. `ModuleManager` recopila informes; `OptimizationAdvisor` produce recomendaciones informativas; `SafetyValidator` valida acciones propuestas, pero no las ejecuta. `BackupManager` crea respaldos de archivos seleccionados y restaura copias verificadas en una carpeta elegida. `AuditLogger` registra eventos resumidos localmente.
+
+## Lista de verificación para contribuciones
+
+- Mantener separadas detección, recomendación y ejecución de cambios.
+- Añadir pruebas para entradas válidas, malformadas, archivos ausentes y comandos externos no disponibles.
+- Usar `ProcessBuilder` con argumentos separados, tiempos de espera y captura controlada de salida.
+- No asumir que `systemd`, `sudo`, `pacman` o rutas de Arch existen en todas las distribuciones.
+- Documentar familias y condiciones exactas en las que una función está habilitada.
+- Actualizar README y documentación específica cuando cambie el comportamiento.
+- Ejecutar `mvn clean verify`, validar con `bash -n` cada script y revisar `git diff --check`.
