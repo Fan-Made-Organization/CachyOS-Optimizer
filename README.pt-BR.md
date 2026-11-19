@@ -95,6 +95,7 @@ Esses componentes são uma base de desenvolvimento; ainda não constituem um sis
 | Aplicação automática de otimizações | **Desativada; nenhuma alteração é executada** |
 | Restauração nos caminhos originais do sistema e rollback completo | **Planejados** |
 | Registro local de auditoria | Implementado com rotação básica |
+| Interface gráfica | **Planejada** |
 | Microbenchmark local de CPU | Implementado como teste opcional; não mede FPS nem GPU |
 
 O código Java compilado pelo Maven fica em `src/main/java`. Os arquivos em `src/main/resources/java` são recursos herdados e não são compilados como classes Java pela configuração Maven atual.
