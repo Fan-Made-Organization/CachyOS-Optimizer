@@ -73,13 +73,11 @@ Os valores de exemplo são ilustrativos. O aplicativo exibe os dados realmente d
 - `BenchmarkEngine`: microbenchmark opcional e limitado de CPU, sem alterar configurações do sistema.
 - Arquivos do sistema não são copiados nem restaurados automaticamente; a restauração nunca grava nos caminhos originais do sistema.
 
-### 8. Bases de segurança e backup
-- Classificação de níveis de risco para ações futuras.
-- Validação inicial de ações antes de considerá-las executáveis.
-- Classes-base para manifestos de backup e verificação de checksums.
-- Foco em alterações explícitas e reversíveis.
-
-Esses componentes são uma base de desenvolvimento; ainda não constituem um sistema completo de backup, restauração ou reversão automática.
+### 8. Limites de segurança
+- As ações podem ser validadas e preparadas, mas o motor não executa modificações no sistema.
+- Operações críticas são bloqueadas.
+- Alterações exigem aprovação explícita; operações administrativas exigem backup.
+- Os backups restauram cópias verificadas em outra pasta e não sobrescrevem automaticamente os arquivos originais.
 
 ## Estado real do projeto
 
