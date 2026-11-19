@@ -319,7 +319,7 @@ public final class LinuxOptimizerGui {
         panel.add(Box.createVerticalStrut(10));
         panel.add(section("PROPÓSITO", "Centralizar información del sistema, hardware, compatibilidad, controladores, kernel y herramientas gaming. Explica los cambios antes de aplicarlos."));
         panel.add(Box.createVerticalStrut(10));
-        panel.add(section("FUNCIONES PRINCIPALES", "Diagnóstico de CPU, RAM, GPU, almacenamiento, energía, red, audio, kernel y escritorio. Incluye perfiles de optimización, instaladores compatibles, mantenimiento reversible y generador de parámetros de Steam."));
+        panel.add(section("FUNCIONES PRINCIPALES", "Diagnóstico de CPU, RAM, GPU, almacenamiento, energía, red, audio, kernel y escritorio. Incluye perfiles de energía, gobernadores CPU, ZRAM, ajuste temporal de swappiness, TRIM programado, mantenimiento de cachés, instaladores compatibles y parámetros de Steam."));
         panel.add(Box.createVerticalStrut(10));
         panel.add(section("SEGURIDAD Y CONTROL", "No promete aumentos mágicos de rendimiento ni modifica el sistema a escondidas. Las operaciones disponibles solicitan confirmación y, cuando es posible, permiten revertir los cambios."));
         panel.add(Box.createVerticalStrut(10));
@@ -818,10 +818,6 @@ public final class LinuxOptimizerGui {
             }
         }.execute();
     }
-    private static boolean isLinuxHost() {
-        return System.getProperty("os.name", "").toLowerCase(java.util.Locale.ROOT).contains("linux");
-    }
-
     private void renderDetails() {
         if (lastReport == null) { details.setText("Esperando el primer análisis…"); return; }
         List<String> lines = switch (activePage) {
