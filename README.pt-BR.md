@@ -2,7 +2,7 @@
 
 <p align="center">
   <strong>Diagnóstico Linux, análise de compatibilidade e uma base de otimização com foco em segurança.</strong><br>
-  Desenvolvido para Linux, com suporte ampliado a Arch/CachyOS, Debian/Ubuntu, Fedora e openSUSE.
+  Desenvolvido para várias famílias GNU/Linux, incluindo Arch, Debian, Fedora, SUSE, Alpine, Gentoo, Void e NixOS, com disponibilidade de recursos variável por família.
 </p>
 
 <p align="center">
