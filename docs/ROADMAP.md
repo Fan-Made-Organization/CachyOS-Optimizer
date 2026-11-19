@@ -4,7 +4,7 @@ Este documento separa las funciones disponibles de los objetivos de desarrollo. 
 
 ## Dirección del proyecto
 
-Linux Optimizer será una herramienta **Linux-first, terminal-first**, con prioridad de compatibilidad para CachyOS y Arch Linux. No se planea una interfaz gráfica: la experiencia principal será un CLI claro, con menú interactivo opcional, salida legible y comandos automatizables.
+Linux Optimizer es una herramienta exclusivamente Linux con interfaz gráfica Swing y CLI complementario. La prioridad de compatibilidad sigue siendo CachyOS/Arch Linux, ampliando detección y catálogos donde haya validación.
 
 La meta es que una persona pueda clonar el repositorio y ejecutar `bash scripts/launch.sh` sin instalar Java ni Maven globalmente.
 
@@ -44,15 +44,16 @@ Estado: **planificada**.
 - Distinguir datos detectados, inferidos, desconocidos y no aplicables.
 - Exportar informes en JSON para comparaciones y automatización, sin exponer datos personales por defecto.
 
-### Fase 3 — Monitorización y benchmarks
+### Fase 3 — Benchmarks puntuales
 Estado: **parcial**.
 
 - [x] Microbenchmark CPU acotado.
-- [ ] Monitor de CPU, memoria, GPU, temperatura, energía y almacenamiento con intervalos configurables.
-- [ ] Registrar muestras con límites de duración y tamaño.
-- [ ] Comparación antes/después usando la misma carga y condiciones.
-- [ ] Benchmarks específicos de GPU y juegos solo cuando existan herramientas fiables y pruebas reproducibles.
+- [x] Pruebas sintéticas acotadas de RAM y almacenamiento.
+- [x] Historial CSV y comparación antes/después.
+- [ ] Benchmarks específicos de GPU solo cuando existan herramientas fiables y pruebas reproducibles.
 - [ ] Evitar presentar un microbenchmark sintético como predicción de FPS.
+
+No se plantea monitorización continua: el diagnóstico puntual y los benchmarks bajo demanda son suficientes para el alcance actual.
 
 ### Fase 4 — Asesor y perfiles inteligentes
 Estado: **parcial**.
@@ -65,7 +66,7 @@ Estado: **parcial**.
 - [ ] Permitir simular un plan y mostrar exactamente qué cambiaría antes de solicitar autorización.
 
 ### Fase 5 — Optimizaciones reales, reversibles y optativas
-Estado: **no habilitada**.
+Estado: **parcial; hay acciones disponibles y otras siguen planificadas**.
 
 No se habilitarán ajustes masivos ni "tweaks" universales. Cada acción se implementará individualmente, solo después de pruebas.
 
@@ -88,17 +89,18 @@ Estado: **parcial**.
 - [x] Registro local de auditoría con rotación básica.
 - [ ] Comprobación de espacio disponible, permisos y enlaces simbólicos antes de cada operación.
 - [ ] Pruebas de recuperación para cada tipo de cambio reversible.
-- [ ] Mantenimiento de cachés y temporales con vista previa y confirmación.
+- [x] Mantenimiento limitado de cachés regenerables con vista previa y confirmación.
+- [x] Perfiles de energía y gobernador CPU con respaldo del valor anterior.
+- [x] ZRAM administrada y reversible; ajuste temporal de `vm.swappiness`.
+- [x] TRIM programado para almacenamiento no rotacional detectado.
 - [ ] Revisión de dependencias y cadena de suministro en CI.
 
-## Experiencia de terminal prevista
+## Experiencia de usuario
 
-- Menú interactivo sencillo para uso cotidiano.
-- Comandos directos para scripts y usuarios avanzados.
-- Salida compacta por defecto y opción detallada.
-- Códigos de salida consistentes para automatización.
+- Interfaz gráfica Swing con navegación por secciones y controles de optimización.
+- CLI complementario para diagnósticos, benchmarks, instalación y automatización.
 - Informes legibles y exportables.
-- Sin interfaz gráfica: el CLI es la interfaz principal del proyecto.
+- Sin monitorización continua en segundo plano.
 
 ## Definición de "listo para usuarios"
 
