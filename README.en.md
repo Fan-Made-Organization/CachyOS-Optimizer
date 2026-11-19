@@ -177,7 +177,7 @@ mvn clean verify
 
 ## License
 
-See [LICENSE](LICENSE) for usage and distribution terms.
+**A project license has not been selected yet.** The [LICENSE](LICENSE) file explains this status. Until the maintainers add an explicit license, do not assume that the project may be freely redistributed or modified.
 
 ---
 
