@@ -1,4 +1,4 @@
-# CachyOS Optimizer
+# Linux Optimizer
 
 <p align="center">
   <strong>Linux diagnostics, compatibility analysis, and a safety-first foundation for optimization.</strong><br>
@@ -13,9 +13,9 @@
 
 > **Current status: early development (0.1.0-SNAPSHOT).** The executable code currently focuses on read-only inspection and diagnostics. The project contains foundations for profiles, safety validation, and backups, but it does not yet apply performance tweaks automatically. See [the actual project status](#actual-project-status).
 
-## What is CachyOS Optimizer?
+## What is Linux Optimizer?
 
-CachyOS Optimizer is a free-software project under development that aims to bring system, hardware, compatibility, and Linux gaming diagnostics together in one tool.
+Linux Optimizer is a free-software project under development that aims to bring system, hardware, compatibility, and Linux gaming diagnostics together in one tool.
 
 Its goal is to help users understand their machines before changing settings: detect the environment, display useful information, identify unavailable tools, and prepare recommendations that can be evaluated safely.
 
@@ -123,8 +123,8 @@ If Java 21 is missing, bootstrap downloads Temurin JDK 21 and verifies SHA-256; 
 Clone the repository:
 
 ```bash
-git clone https://github.com/Fan-Made-Organization/CachyOS-Optimizer.git
-cd CachyOS-Optimizer
+git clone https://github.com/Fan-Made-Organization/Linux-Optimizer.git
+cd Linux-Optimizer
 ```
 
 Prepare the environment and run the tests:
@@ -138,13 +138,13 @@ You can also use Maven installed on your system:
 ```bash
 mvn clean verify
 mvn package
-java -jar target/cachyos-optimizer-0.1.0-SNAPSHOT.jar
+java -jar target/linux-optimizer-0.1.0-SNAPSHOT.jar
 
 # Back up only files you explicitly select
-java -jar target/cachyos-optimizer-0.1.0-SNAPSHOT.jar --backup "$HOME/x504-backups" "$HOME/.config/example.conf"
+java -jar target/linux-optimizer-0.1.0-SNAPSHOT.jar --backup "$HOME/x504-backups" "$HOME/.config/example.conf"
 
 # Restore verified copies into a separate directory without overwriting
-java -jar target/cachyos-optimizer-0.1.0-SNAPSHOT.jar --restore "$HOME/x504-backups/backup-..." "$HOME/x504-restored"
+java -jar target/linux-optimizer-0.1.0-SNAPSHOT.jar --restore "$HOME/x504-backups/backup-..." "$HOME/x504-restored"
 ```
 
 Available helper scripts:
@@ -202,4 +202,13 @@ This project is licensed under the **GNU General Public License v3.0 (GPL-3.0-on
 
 ---
 
-**CachyOS Optimizer** — understand the system first; optimize responsibly next.
+**Linux Optimizer** — understand the system first; optimize responsibly next.
+
+
+## Platform support levels and practical limits
+
+Linux Optimizer is **Linux-first**. Distribution detection and read-only diagnostics are designed to rely on common Linux interfaces where possible. Installers and system-changing actions are narrower: they depend on the distribution family, package repositories, init system, kernel, hardware and local policy.
+
+Support has distinct levels: a distribution can be detected without having a validated package catalog, and a package catalog does not imply that every optimization is available. Gentoo, Void and NixOS are recognized, while some installation workflows remain intentionally read-only. Immutable/image-based systems need distribution-specific handling and must not be treated as conventional mutable installations.
+
+Before applying changes, run diagnostics, review the exact package transaction, keep a known-working kernel, change one setting at a time, and rerun diagnostics afterward. The Linux name does not claim support for BSD, Windows, macOS, Android or every Linux architecture; support is limited to GNU/Linux environments and architectures validated by the project.
