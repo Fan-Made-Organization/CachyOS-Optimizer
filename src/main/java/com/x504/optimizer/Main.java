@@ -225,6 +225,11 @@ public final class Main {
                     int index = Integer.parseInt(choice) - 1;
                     if (index < 0 || index >= options.size()) throw new IllegalArgumentException("Selección fuera de rango.");
                     var selected = options.get(index);
+                    System.out.println("\nEstado actual de los paquetes:");
+                    for (String pkg : selected.packages()) {
+                        Boolean installed = kernels.isPackageInstalled(platform, pkg);
+                        System.out.println("  • " + pkg + ": " + (installed == null ? "no se pudo comprobar" : installed ? "instalado" : "no instalado"));
+                    }
                     var command = kernels.installCommand(support, platform, selected);
                     System.out.println("\nPlan revisable:");
                     System.out.println("  " + String.join(" ", command));
