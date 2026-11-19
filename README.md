@@ -149,7 +149,7 @@ El menú incluye **Instalar herramientas de optimización** y el comando `--inst
 | Almacenamiento | `nvme-cli`, `hdparm`, `iotop` |
 | Red | `iperf3`, `ethtool`, herramientas DNS y `traceroute` |
 | Monitorización | `btop`, `fastfetch`, `htop`, `glances`, `sysstat` según distribución |
-| Gaming | `gamemode`, `mangohud`, `gamescope`, `goverlay`, `vkbasalt`, `protontricks` y paquetes multilib cuando corresponda |
+| Gaming | `gamemode`, `mangohud`, `gamescope`, `goverlay`, `vkbasalt`, `protontricks` y paquetes multilib cuando corresponda |\n| Audio y multimedia | `alsa-utils`, `pavucontrol`, `ffmpeg`/`ffmpeg-free`, `v4l-utils` |\n| Desarrollo y depuración | `strace`, `gdb`, `valgrind` |\n| Energía y sensores | `powertop`, `acpi`, `upower` |
 
 Los nombres de paquetes se adaptan a Arch, Debian/Ubuntu, Fedora y openSUSE; Alpine tiene un catálogo más reducido. Gentoo, Void y NixOS se reconocen, pero todavía no reciben un perfil automático de herramientas: se mantiene el modo de solo lectura hasta validar sus paquetes y particularidades. No se supone que un mismo nombre exista en todos los repositorios.
 
