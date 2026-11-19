@@ -35,7 +35,7 @@ bash scripts/launch.sh --install-tools
 
 ## Compatibilidad Linux
 
-Los diagnósticos se ejecutan en Linux y la detección de distribución reconoce familias Arch, Debian, Fedora/RHEL y SUSE. El instalador de herramientas ofrece listas específicas para esas familias; no instala drivers ni kernels. Distribuciones desconocidas mantienen diagnósticos de solo lectura. La administración de kernels no está automatizada.
+Los diagnósticos se ejecutan en Linux y la detección de distribución reconoce familias Arch, Debian, Fedora/RHEL y SUSE. El instalador de herramientas ofrece listas específicas para esas familias. La opción 10 también presenta planes de kernel/headers para esas familias y una guía de recuperación. Antes de instalar muestra el comando y exige escribir INSTALAR; bloquea la operación si no detecta un posible kernel alternativo. La detección de respaldo es heurística y debe verificarse manualmente. Nunca elimina kernels ni modifica GRUB/systemd-boot o parámetros de arranque. Distribuciones desconocidas mantienen diagnósticos de solo lectura.
 
 ## Requisitos base
 
