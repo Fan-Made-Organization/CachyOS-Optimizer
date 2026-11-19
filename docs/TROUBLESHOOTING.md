@@ -9,3 +9,7 @@
 - **Respaldo no restaurable:** el gestor verifica SHA-256 y se niega a restaurar datos alterados. Elige una carpeta de destino donde no existan archivos con el mismo nombre.
 
 No ejecutes el programa como root para solucionar problemas de diagnóstico.
+
+## Diagnóstico por capas
+
+Si una función falla, identifica si el problema está en el lanzador, Java/Maven, permisos, herramienta externa o compatibilidad de la distribución. Según corresponda, ejecuta `bash -n scripts/launch.sh`, `java -version`, `mvn -version` y `bash scripts/launch.sh --diagnostics`. Conserva el mensaje completo y evita ejecutar el programa como administrador para resolver un fallo de permisos. Si un paquete no existe, cancela la transacción y comprueba su nombre en los repositorios habilitados para tu versión y arquitectura.
