@@ -5,17 +5,53 @@ ROOT="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
 JAR="$ROOT/target/cachyos-optimizer-0.1.0-SNAPSHOT.jar"
 LOCAL_JAVA="$ROOT/.tools/temurin-jdk-21/bin/java"
 LOCAL_MAVEN="$ROOT/.tools/apache-maven-3.9.9/bin/mvn"
+CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/cachyos-optimizer"
+LANGUAGE_FILE="$CONFIG_DIR/language"
 
 say() { printf '[CachyOS Optimizer] %s\n' "$*"; }
+
+choose_language() {
+  local selected=""
+  if [[ -r "$LANGUAGE_FILE" ]]; then
+    selected="$(<"$LANGUAGE_FILE")"
+  fi
+  if [[ ! "$selected" =~ ^(es|en|pt_BR)$ ]]; then
+    printf '\n==============================================\n'
+    printf '       CachyOS Optimizer - Idioma / Language\n'
+    printf '==============================================\n'
+    printf '1) Español\n2) English\n3) Português (Brasil)\n'
+    while true; do
+      printf 'Selecciona / Choose [1-3]: '
+      IFS= read -r choice || choice=1
+      case "$choice" in
+        1) selected="es"; break ;;
+        2) selected="en"; break ;;
+        3) selected="pt_BR"; break ;;
+        *) printf 'Opción no válida / Invalid option.\n' ;;
+      esac
+    done
+    mkdir -p "$CONFIG_DIR"
+    printf '%s\n' "$selected" > "$LANGUAGE_FILE"
+    chmod 600 "$LANGUAGE_FILE"
+  fi
+  export CACHYOS_OPTIMIZER_LANGUAGE="$selected"
+  case "$selected" in
+    es) say "Idioma seleccionado: Español." ;;
+    en) say "Selected language: English." ;;
+    pt_BR) say "Idioma selecionado: Português (Brasil)." ;;
+  esac
+}
 
 java_is_21() {
   local binary="$1" version
   [[ -x "$binary" ]] || return 1
-  version="$("$binary" -version 2>&1 | sed -nE '1s/.*version "([0-9]+).*/\\1/p')"
+  version="$("$binary" -version 2>&1 | sed -nE '1s/.*version "([0-9]+).*/\1/p')"
   [[ "$version" == "21" ]]
 }
 
-# Prefer the project-local JDK so the user does not need to configure JAVA_HOME.
+# La selección de idioma es el primer paso del lanzador.
+choose_language
+
 if [[ -x "$LOCAL_JAVA" ]]; then
   export JAVA_HOME="$ROOT/.tools/temurin-jdk-21"
   export PATH="$JAVA_HOME/bin:$PATH"
@@ -53,4 +89,4 @@ fi
   exit 1
 }
 
-exec "$JAVA_BIN" -jar "$JAR" "$@"
+exec "$JAVA_BIN" -Duser.language="${CACHYOS_OPTIMIZER_LANGUAGE%%_*}" -Duser.country="${CACHYOS_OPTIMIZER_LANGUAGE#*_}" -jar "$JAR" "$@"
