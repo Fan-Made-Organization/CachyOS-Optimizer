@@ -37,3 +37,7 @@ No elimina kernels, no cambia GRUB/systemd-boot, no regenera initramfs manualmen
 
 ## Límites
 La detección inicial no certifica todos los controladores ni módulos. La compatibilidad de CPU, GPU, Vulkan, OpenGL, kernel y herramientas de juego debe evaluarse por separado antes de activar cada función.
+
+## Interpretación de resultados
+
+La detección de una distribución, la disponibilidad de un gestor y la posibilidad de ejecutar una acción son comprobaciones independientes. Una derivada puede cambiar repositorios, nombres de paquetes, kernel, sistema de inicio o políticas de solo lectura. En equipos híbridos, máquinas virtuales, contenedores y sistemas inmutables, parte del hardware puede estar oculto o gestionado por otra capa. Un dato desconocido no equivale a incompatibilidad; un controlador detectado tampoco garantiza aceleración funcional.
