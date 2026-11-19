@@ -829,6 +829,7 @@ public final class Main {
 
                 Opciones:
                   --menu        Abre el menú interactivo de terminal.
+                  --gui         Abre el panel gráfico de escritorio.
                   --diagnostics Ejecuta el análisis completo directamente.
                   --report-json ARCHIVO  Exporta el diagnóstico a JSON.
                   --report-html ARCHIVO  Exporta el diagnóstico a HTML.
