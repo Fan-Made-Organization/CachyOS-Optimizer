@@ -28,7 +28,6 @@ public final class GitHubUpdater {
         String tag = capture(response.body(), "\"tag_name\"\\s*:\\s*\"([^\"]+)\"");
         if (response.statusCode() == 404) return new Result(false, "No hay una versión publicada todavía.");
         if (response.statusCode() != 200) throw new IOException("GitHub respondió HTTP " + response.statusCode());
-        String tag = capture(response.body(), "\\"tag_name\\"\\s*:\\s*\\"([^\\"]+)\\"");
         String jarUrl = asset(response.body(), "linux-optimizer.jar");
         String sumUrl = asset(response.body(), "linux-optimizer.jar.sha256");
         if (tag == null || jarUrl == null || sumUrl == null)
@@ -79,7 +78,6 @@ public final class GitHubUpdater {
         return m.find() ? m.group(1) : null;
     }
     private static String asset(String json, String name) {
-        Pattern p = Pattern.compile("\\"name\\"\\s*:\\s*\\""+Pattern.quote(name)+"\\"[\\s\\S]*?\\"browser_download_url\\"\\s*:\\s*\\"([^\\"]+)\\"");
         Matcher m = p.matcher(json);
         return m.find() ? m.group(1).replace("\\/", "/") : null;
     }
