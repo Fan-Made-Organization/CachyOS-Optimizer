@@ -527,14 +527,19 @@ public final class LinuxOptimizerGui {
         ChartPanel(String title, Deque<Double> values) {
             this.title = title;
             this.values = values;
-            setBackground(PANEL);
+            setOpaque(false);
             setBorder(new EmptyBorder(14, 15, 12, 15));
             setPreferredSize(new Dimension(300, 175));
         }
         @Override protected void paintComponent(Graphics graphics) {
-            super.paintComponent(graphics);
             Graphics2D g = (Graphics2D) graphics.create();
             g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            g.setColor(new Color(0, 0, 0, 42));
+            g.fillRoundRect(2, 4, getWidth() - 4, getHeight() - 5, 20, 20);
+            g.setPaint(new GradientPaint(0, 0, new Color(35, 42, 60, 248), getWidth(), getHeight(), new Color(19, 25, 39, 248)));
+            g.fillRoundRect(0, 0, getWidth() - 4, getHeight() - 7, 20, 20);
+            g.setColor(new Color(174, 158, 255, 34));
+            g.drawRoundRect(0, 0, getWidth() - 5, getHeight() - 8, 20, 20);
             g.setColor(TEXT);
             g.setFont(new Font("SansSerif", Font.BOLD, 13));
             g.drawString(title + " · últimos 60 segundos", 15, 20);
