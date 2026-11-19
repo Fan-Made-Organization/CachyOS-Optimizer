@@ -15,7 +15,7 @@
 
 ## O que é o CachyOS Optimizer?
 
-X504 é um projeto de software livre em desenvolvimento que pretende reunir em uma única ferramenta informações do sistema, hardware, compatibilidade e componentes relacionados ao uso diário e a jogos no Linux.
+CachyOS Optimizer é um projeto de software livre em desenvolvimento que pretende reunir em uma única ferramenta informações do sistema, hardware, compatibilidade e componentes relacionados ao uso diário e a jogos no Linux.
 
 O objetivo é ajudar a entender o computador antes de alterar configurações: detectar o ambiente, mostrar informações úteis, indicar ferramentas indisponíveis e preparar recomendações que possam ser avaliadas com segurança.
 
