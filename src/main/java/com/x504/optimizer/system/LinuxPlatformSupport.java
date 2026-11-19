@@ -70,7 +70,9 @@ public final class LinuxPlatformSupport {
 
     private java.util.Map<String,String> readRelease() {
         var values = new java.util.HashMap<String,String>();
-        if (!Files.isReadable(osRelease) || Files.isSymbolicLink(osRelease)) return values;
+        // /etc/os-release suele ser un enlace simbólico legítimo a /usr/lib/os-release en Arch y derivadas.
+        // Se sigue el enlace de solo lectura en vez de descartar la identificación de la distribución.
+        if (!Files.isReadable(osRelease) || !Files.isRegularFile(osRelease)) return values;
         try {
             for (String line : Files.readAllLines(osRelease)) {
                 int i = line.indexOf('=');
