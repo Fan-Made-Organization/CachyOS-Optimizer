@@ -444,7 +444,9 @@ public final class Main {
                   --benchmark-storage [MiB] Prueba temporal de disco (8-32 MiB).
                   --monitor [segundos]      Monitor CPU/RAM (1-300 s).
                   --benchmark-suite [MiB]   CPU + RAM + disco; guarda historial.
-                  --compare-benchmarks A B  Compara dos CSV (antes/después).\n                  --install-tools          Instala herramientas recomendadas en Arch/CachyOS.\n                  --optimizer              Abre el centro de optimización guiada.
+                  --compare-benchmarks A B  Compara dos CSV (antes/después).
+                  --install-tools          Instala herramientas recomendadas en Arch/CachyOS.
+                  --optimizer              Abre el centro de optimización guiada.
                   --backup DIR ARCHIVO... 
                                Respalda archivos elegidos en un directorio nuevo.
                   --restore COPIA DESTINO
