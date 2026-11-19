@@ -425,7 +425,7 @@ El proyecto se distribuye bajo la **GNU General Public License v3.0 (GPL-3.0-onl
 **Linux Optimizer** — entender el sistema primero; optimizar con responsabilidad después.
 
 
-## Alcance multiplataforma y límites por distribución
+## Alcance Linux y límites por distribución
 
 Linux Optimizer adopta un enfoque **Linux-first**: la detección del sistema y los diagnósticos intentan funcionar sin depender de un gestor de paquetes concreto. La disponibilidad de una acción depende, en cambio, de la familia, las herramientas instaladas, el sistema de inicio, el kernel y las políticas de la distribución. Detectar una distribución no equivale a certificar todas sus variantes.
 
@@ -471,53 +471,9 @@ La aplicación comprueba en segundo plano la última GitHub Release al abrir la 
 Las releases se publican al crear y subir una etiqueta Git con formato `vX.Y.Z`. El flujo `.github/workflows/release.yml` ejecuta `mvn clean verify` y adjunta `linux-optimizer.jar` más su checksum. Hasta que exista una primera GitHub Release, la aplicación indicará que todavía no hay una versión publicada.
 
 
-## Compatibilidad multiplataforma
+## Compatibilidad: solo Linux
 
-Linux Optimizer comparte el mismo código Java y la misma interfaz Swing en Linux, Windows y macOS. No hay una reescritura de la interfaz por sistema operativo.
+Linux Optimizer está diseñado exclusivamente para distribuciones GNU/Linux. La aplicación, el lanzador, los diagnósticos, las optimizaciones y los instaladores se ejecutan únicamente en Linux. Windows y macOS no están soportados y el programa se cierra al detectar esos sistemas.
 
-- **Linux:** diagnóstico avanzado de distro, kernel, controladores, servicios, almacenamiento, red y herramientas de gaming; las capacidades concretas dependen de la distribución.
-- **Windows y macOS:** interfaz gráfica, navegación animada y actualización desde GitHub. Las funciones de optimización específicas de Linux se habilitan únicamente en distribuciones compatibles; la detección del sistema no implica que se apliquen ajustes Linux en otros sistemas.
-- **Otras distribuciones Linux:** la interfaz y el núcleo Java son comunes. Los perfiles de instalación de paquetes se habilitan únicamente en familias con comandos y nombres de paquetes conocidos; NixOS, Gentoo, Void y sistemas inmutables mantienen sus limitaciones documentadas.
+La compatibilidad de cada función depende de la distribución, el kernel, el hardware y las herramientas disponibles. Las operaciones modificadoras solicitan confirmación y las opciones reversibles documentan sus límites.
 
-### Instalar en Windows
-
-Requisitos: Java 21 y Maven. Desde PowerShell, en la carpeta clonada:
-
-```powershell
-mvn clean package
-.\scripts\install-app.ps1
-```
-
-El instalador crea un acceso directo en el menú Inicio. Para quitarlo:
-
-```powershell
-.\scripts\uninstall-app.ps1
-```
-
-### Instalar en Linux
-
-```bash
-bash scripts/install-app.sh
-```
-
-### macOS
-
-Con Java 21 y Maven instalados:
-
-```bash
-mvn clean package
-java -jar target/linux-optimizer-0.1.0-SNAPSHOT.jar --gui
-```
-
-La compilación multiplataforma se valida en GitHub Actions para Ubuntu, Windows y macOS. Las pruebas completas de diagnóstico Linux se ejecutan en Ubuntu; Windows y macOS verifican compilación y empaquetado.
-
-
-### Inventario de hardware multiplataforma
-
-El panel usa el mismo código Java y selecciona el método de consulta según el sistema:
-
-- Linux: sysfs/DRM para controlador, VRAM, uso/frecuencia y sensores GPU cuando estén publicados; `lsblk` para discos.
-- Windows: CIM/WMI para adaptadores gráficos y `Get-PhysicalDisk` para discos.
-- macOS: `system_profiler SPDisplaysDataType` para gráficos y `diskutil list` para almacenamiento.
-
-Las consultas tienen tiempo límite, son de solo lectura y no ejecutan pruebas SMART ni de estrés. La utilización y temperatura de GPU no tienen una interfaz universal: se muestran solo cuando el controlador o fabricante las expone. Las barras de desplazamiento visibles están ocultas y el desplazamiento horizontal está deshabilitado; el desplazamiento vertical con rueda sigue disponible cuando el contenido supera el alto de la ventana.
