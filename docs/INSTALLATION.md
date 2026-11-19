@@ -29,9 +29,11 @@ Los argumentos se pasan directamente al programa:
 ```bash
 bash scripts/launch.sh --help
 bash scripts/launch.sh --benchmark
+bash scripts/launch.sh --linux-support
+bash scripts/launch.sh --install-tools
 ```
 
-## Requisitos base
+## Compatibilidad Linux\n\nLos diagnósticos se ejecutan en Linux y la detección de distribución reconoce familias Arch, Debian, Fedora/RHEL y SUSE. El instalador de herramientas ofrece listas específicas para esas familias; no instala drivers ni kernels. Distribuciones desconocidas mantienen diagnósticos de solo lectura. La administración de kernels no está automatizada.\n\n## Requisitos base
 
 - Linux x86_64 o ARM64.
 - Conexión a Internet durante la primera preparación.
