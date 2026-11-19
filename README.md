@@ -167,7 +167,8 @@ bash scripts/launch.sh --install-tools
 | Catálogo de perfiles | Disponible como catálogo informativo |
 | Validación y preparación de acciones | Implementada; las modificaciones reales siguen deshabilitadas |
 | Backup de archivos seleccionados y restauración verificada a otra carpeta | Implementado |
-| Instalación guiada de herramientas de diagnóstico y gaming en Arch/CachyOS | Implementada; confirmación previa y Pacman interactivo |\n| Ajustes automáticos de rendimiento (CPU, energía, kernel, servicios y controladores) | **Pendientes; no se aplican** |
+| Instalación guiada de herramientas de diagnóstico y gaming en Arch/CachyOS | Implementada; confirmación previa y Pacman interactivo |
+| Ajustes automáticos de rendimiento (CPU, energía, kernel, servicios y controladores) | **Pendientes; no se aplican** |
 | Restauración sobre rutas originales y rollback del sistema | **Pendiente** |
 | Registro local de auditoría | Implementado con rotación básica |
 | Interfaz gráfica | No prevista; el proyecto prioriza una interfaz de terminal. |
