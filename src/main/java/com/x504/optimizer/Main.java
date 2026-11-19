@@ -580,7 +580,7 @@ public final class Main {
                     case "9" -> runCleaner(scanner);
                     case "10" -> runLinuxSupport();
                     case "0" -> { System.out.println("Hasta luego."); return; }
-                    default -> System.out.println("Opción no válida. Elige una opción del 0 al 8.");
+                    default -> System.out.println("Opción no válida. Elige una opción del 0 al 10.");
                 }
             }
         }
