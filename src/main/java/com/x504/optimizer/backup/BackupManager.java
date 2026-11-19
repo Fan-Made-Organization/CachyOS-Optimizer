@@ -45,7 +45,7 @@ public final class BackupManager {
                 String relative = "files/" + String.format("%04d-", ++index) + fileName;
                 Path destination = snapshot.resolve(relative).normalize();
                 if (!destination.startsWith(snapshot)) throw new SecurityException("Ruta de destino no válida.");
-                Files.copy(source, destination);
+                Files.copy(source, destination, LinkOption.NOFOLLOW_LINKS);
                 String hash = checksums.sha256(destination);
                 entries.add(new BackupManifest.BackupEntry(source.toString(), relative, hash));
             }
@@ -108,6 +108,11 @@ public final class BackupManager {
             if (!source.startsWith(snapshot) || Files.isSymbolicLink(source)
                     || !Files.isRegularFile(source, LinkOption.NOFOLLOW_LINKS)) {
                 throw new IOException("Archivo de respaldo ausente o no válido: " + entry.backupPath());
+            }
+            Path realSnapshot = snapshot.toRealPath();
+            Path realSource = source.toRealPath();
+            if (!realSource.startsWith(realSnapshot)) {
+                throw new SecurityException("El archivo de respaldo apunta fuera del directorio de la copia.");
             }
             if (!checksums.matches(source, entry.sha256())) {
                 throw new IOException("La verificación SHA-256 falló; no se restauró: " + entry.backupPath());
