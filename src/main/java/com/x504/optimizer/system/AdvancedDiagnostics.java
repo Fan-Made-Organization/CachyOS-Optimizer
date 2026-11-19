@@ -9,10 +9,99 @@ import java.util.concurrent.TimeUnit;
 
 /** Inspección avanzada de solo lectura: almacenamiento, servicios, módulos y gaming. */
 public final class AdvancedDiagnostics {
-    public record Report(List<String> storage, List<String> services, List<String> kernel, List<String> gaming) {
-        public Report { storage=List.copyOf(storage); services=List.copyOf(services); kernel=List.copyOf(kernel); gaming=List.copyOf(gaming); }
+    public record Report(List<String> cpu, List<String> memory, List<String> storage, List<String> network, List<String> graphics, List<String> services, List<String> kernel, List<String> gaming) {
+        public Report { cpu=List.copyOf(cpu); memory=List.copyOf(memory); storage=List.copyOf(storage); network=List.copyOf(network); graphics=List.copyOf(graphics); services=List.copyOf(services); kernel=List.copyOf(kernel); gaming=List.copyOf(gaming); }
     }
-    public Report inspect() { return new Report(inspectStorage(),inspectServices(),inspectKernel(),inspectGaming()); }
+    public Report inspect() { return new Report(inspectCpu(),inspectMemory(),inspectStorage(),inspectNetwork(),inspectGraphics(),inspectServices(),inspectKernel(),inspectGaming()); }
+    List<String> inspectCpu() {
+        List<String> out = new ArrayList<>();
+        Path cpu = Path.of("/sys/devices/system/cpu");
+        long online = 0;
+        try (var paths = Files.list(cpu)) {
+            for (Path path : paths.filter(p -> p.getFileName().toString().matches("cpu[0-9]+")).toList()) {
+                if (read(path.resolve("online"), "1").equals("1")) online++;
+            }
+        } catch (IOException ignored) { }
+        if (online == 0) online = Runtime.getRuntime().availableProcessors();
+        out.add("Procesadores lógicos en línea (estimación): " + online);
+        String model = "";
+        try { for (String line : Files.readAllLines(Path.of("/proc/cpuinfo"))) if (line.startsWith("model name") || line.startsWith("Hardware")) { model = line.substring(line.indexOf(":") + 1).strip(); break; } }
+        catch (IOException ignored) { }
+        if (!model.isBlank()) out.add("Modelo detectado: " + model);
+        Path freq = Path.of("/sys/devices/system/cpu/cpu0/cpufreq");
+        out.add("Frecuencia actual CPU0: " + read(freq.resolve("scaling_cur_freq"), "no expuesta") + " kHz");
+        out.add("Gobernador CPU0: " + read(freq.resolve("scaling_governor"), "no expuesto"));
+        out.add("Rango de frecuencia CPU0: " + read(freq.resolve("scaling_min_freq"), "?") + "–" + read(freq.resolve("scaling_max_freq"), "?") + " kHz");
+        out.add("La frecuencia puede variar dinámicamente; una lectura aislada no representa el rendimiento sostenido.");
+        return List.copyOf(out);
+    }
+    List<String> inspectMemory() {
+        List<String> out = new ArrayList<>();
+        Path mem = Path.of("/proc/meminfo");
+        try {
+            for (String line : Files.readAllLines(mem)) {
+                if (line.startsWith("MemTotal:") || line.startsWith("MemAvailable:") || line.startsWith("SwapTotal:") || line.startsWith("SwapFree:")) out.add(line.strip());
+            }
+        } catch (IOException ex) { out.add("No se pudo leer /proc/meminfo."); }
+        Path swaps = Path.of("/proc/swaps");
+        try {
+            List<String> lines = Files.readAllLines(swaps);
+            if (lines.size() <= 1) out.add("Swap: no hay dispositivos/archivos activos reportados.");
+            else for (int i=1;i<lines.size();i++) out.add("Swap activo: " + lines.get(i).strip());
+        } catch (IOException ex) { out.add("No se pudo leer /proc/swaps."); }
+        Path pressure = Path.of("/proc/pressure");
+        for (String resource : List.of("cpu","memory","io")) {
+            Path file = pressure.resolve(resource);
+            if (Files.isReadable(file)) try { for (String line : Files.readAllLines(file)) out.add("PSI " + resource + ": " + line.strip()); } catch (IOException ignored) { }
+        }
+        if (out.isEmpty()) out.add("No hay métricas de memoria disponibles.");
+        out.add("PSI (Pressure Stall Information) mide tiempo de espera por recursos; no es un porcentaje directo de uso.");
+        return List.copyOf(out);
+    }
+    List<String> inspectNetwork() {
+        List<String> out = new ArrayList<>();
+        Path root = Path.of("/sys/class/net");
+        try (var paths = Files.list(root)) {
+            for (Path p : paths.sorted().toList()) {
+                String name = p.getFileName().toString();
+                if (name.equals("lo")) continue;
+                String state = read(p.resolve("operstate"), "desconocido");
+                String carrier = read(p.resolve("carrier"), "");
+                String mtu = read(p.resolve("mtu"), "n/d");
+                String mac = read(p.resolve("address"), "n/d");
+                String wireless = Files.exists(p.resolve("wireless")) ? "Wi-Fi/radio" : "Ethernet/virtual u otro";
+                out.add(name + ": " + wireless + " | estado " + state + " | carrier " + (carrier.isBlank()?"n/d":carrier) + " | MTU " + mtu + " | MAC " + mac);
+            }
+        } catch (IOException ex) { out.add("No se pudo consultar /sys/class/net."); }
+        try {
+            for (String line : Files.readAllLines(Path.of("/proc/net/route"))) {
+                String[] fields = line.trim().split("\\s+");
+                if (fields.length > 7 && fields[1].equals("00000000")) out.add("Ruta IPv4 predeterminada: interfaz " + fields[0] + " (tabla kernel).");
+            }
+        } catch (IOException ex) { out.add("Tabla de rutas IPv4 no disponible."); }
+        if (out.isEmpty()) out.add("No se detectaron interfaces de red no-loopback.");
+        out.add("No se realizan pruebas de velocidad, DNS, latencia ni conectividad externa.");
+        return List.copyOf(out);
+    }
+    List<String> inspectGraphics() {
+        List<String> out = new ArrayList<>();
+        Path drm = Path.of("/sys/class/drm");
+        try (var paths = Files.list(drm)) {
+            for (Path card : paths.filter(p -> p.getFileName().toString().matches("card[0-9]+")).sorted().toList()) {
+                Path device = card.resolve("device");
+                String vendor = read(device.resolve("vendor"), "n/d");
+                String id = read(device.resolve("device"), "n/d");
+                String driver = "sin enlace de driver visible";
+                try { Path link = device.resolve("driver"); if (Files.isSymbolicLink(link)) driver = Files.readSymbolicLink(link).getFileName().toString(); } catch (IOException ignored) { }
+                String name = switch (vendor.toLowerCase()) { case "0x8086" -> "Intel"; case "0x1002" -> "AMD"; case "0x10de" -> "NVIDIA"; default -> "desconocido"; };
+                out.add(card.getFileName() + ": " + name + " | vendor " + vendor + " | device " + id + " | driver " + driver);
+            }
+        } catch (IOException ex) { out.add("No se pudo consultar el subsistema DRM."); }
+        if (out.isEmpty()) out.add("No se detectaron tarjetas DRM en /sys/class/drm.");
+        for (String tool : List.of("vulkaninfo","glxinfo","vainfo","vdpauinfo")) out.add(tool + ": " + (available(tool) ? "disponible" : "no instalado/en PATH"));
+        out.add("La presencia de un driver no garantiza aceleración funcional; valida Vulkan/OpenGL con las herramientas correspondientes.");
+        return List.copyOf(out);
+    }
     List<String> inspectStorage() {
         List<String> out=new ArrayList<>(); Path root=Path.of("/sys/block");
         if(!Files.isDirectory(root)) return List.of("No está disponible /sys/block.");
