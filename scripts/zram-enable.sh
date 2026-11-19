@@ -2,7 +2,7 @@
 set -euo pipefail
 if [[ ${EUID} -ne 0 ]]; then echo 'Ejecuta este script mediante sudo.' >&2; exit 1; fi
 command -v systemctl >/dev/null || { echo 'systemctl no está disponible.' >&2; exit 1; }
-command -v zram-generator >/dev/null 2>&1 || true
+if [[ ! -x /usr/lib/systemd/system-generators/zram-generator ]]; then echo 'Instala primero el paquete zram-generator.' >&2; exit 4; fi
 config='/etc/systemd/zram-generator.conf'
 state='/var/lib/cachyos-optimizer'
 marker="$state/zram-managed"
