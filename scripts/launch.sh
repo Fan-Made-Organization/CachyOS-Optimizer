@@ -91,10 +91,10 @@ fi
 
 # En el primer inicio ofrece el paquete de utilidades; nunca instala en silencio.
 FIRST_RUN_FILE="${XDG_STATE_HOME:-$HOME/.local/state}/cachyos-optimizer/first-run-tools-check"
-if [[ ! -e "$FIRST_RUN_FILE" ]] && { [[ -e /etc/arch-release ]] || [[ -e /etc/cachyos-release ]] || grep -qiE '^ID_LIKE=.*arch' /etc/os-release 2>/dev/null; }; then
+if [[ ! -e "$FIRST_RUN_FILE" ]] && { grep -qiE '^(ID|ID_LIKE)=.*(arch|cachyos|manjaro|debian|ubuntu|linuxmint|fedora|rhel|centos|rocky|almalinux|opensuse|suse)' /etc/os-release 2>/dev/null; }; then
   printf '\n'
   say "Primera ejecución: ¿quieres abrir el instalador de herramientas recomendadas?"
-  say "Puedes aceptar o saltarlo; Pacman solicitará su propia confirmación antes de instalar."
+  say "Puedes aceptar o saltarlo; tu gestor de paquetes solicitará su propia confirmación antes de instalar."
   printf '¿Abrir instalador ahora? [s/N]: '
   IFS= read -r install_choice || install_choice="n"
   mkdir -p "$(dirname "$FIRST_RUN_FILE")"
