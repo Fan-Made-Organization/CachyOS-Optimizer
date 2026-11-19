@@ -29,5 +29,6 @@ class SystemAnalysisDashboardTest {
         assertTrue(dashboard.contains("Compatibilidad: 75%"));
         assertTrue(dashboard.contains("PARCIAL / DATOS INCOMPLETOS"));
         assertFalse(dashboard.contains("EXCELENTE"));
+        assertTrue(dashboard.lines().allMatch(line -> line.codePointCount(0, line.length()) == 46));
     }
 }
