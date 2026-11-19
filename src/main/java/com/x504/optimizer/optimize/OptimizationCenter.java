@@ -79,8 +79,12 @@ public final class OptimizationCenter {
         return List.of(Files.readString(file).strip().split("\\s+"));
     }
 
+    public static boolean isValidGovernor(String governor) {
+        return governor != null && List.of("performance", "powersave", "schedutil", "ondemand", "conservative").contains(governor);
+    }
+
     public void applyGovernor(String governor) throws IOException, InterruptedException {
-        if (governor == null || !List.of("performance", "powersave", "schedutil", "ondemand", "conservative").contains(governor))
+        if (!isValidGovernor(governor))
             throw new IllegalArgumentException("Gobernador no permitido.");
         if (!availableGovernors().contains(governor)) throw new IllegalArgumentException("Ese gobernador no está disponible en este kernel/controlador.");
         String current = currentGovernor();
