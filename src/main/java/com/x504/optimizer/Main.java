@@ -203,6 +203,8 @@ public final class Main {
                 System.out.println("║  1) Analizar y diagnosticar el sistema   ║");
                 System.out.println("║  2) Diagnóstico + benchmark CPU          ║");
                 System.out.println("║  3) Mostrar ayuda y comandos             ║");
+                System.out.println("║  4) Monitor CPU/RAM (15 segundos)        ║");
+                System.out.println("║  5) Benchmark CPU + RAM + almacenamiento ║");
                 System.out.println("║  0) Salir                                ║");
                 System.out.println("╚══════════════════════════════════════════╝");
                 System.out.print("Selecciona una opción: ");
@@ -212,8 +214,10 @@ public final class Main {
                     case "1" -> runDiagnostics(new String[]{"--diagnostics"});
                     case "2" -> runDiagnostics(new String[]{"--benchmark"});
                     case "3" -> printHelp();
+                    case "4" -> runMonitor(new String[]{"--monitor", "15"});
+                    case "5" -> runBenchmarkSuite(new String[]{"--benchmark-suite"});
                     case "0" -> { System.out.println("Hasta luego."); return; }
-                    default -> System.out.println("Opción no válida. Elige 1, 2, 3 o 0.");
+                    default -> System.out.println("Opción no válida. Elige 1, 2, 3, 4, 5 o 0.");
                 }
             }
         }
