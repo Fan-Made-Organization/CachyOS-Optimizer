@@ -19,7 +19,7 @@ CachyOS Optimizer es un proyecto libre y en desarrollo para reunir en una sola h
 
 Su objetivo es ayudar a entender el equipo antes de cambiar configuraciones: detectar el entorno, mostrar información útil, señalar herramientas que no estén disponibles y preparar recomendaciones que puedan evaluarse de forma segura.
 
-**No promete aumentos mágicos de FPS ni modifica el sistema a escondidas.** Primero observa y explica; las futuras acciones de optimización deberán ser específicas, reversibles y autorizadas por el usuario.
+**No promete aumentos mágicos de FPS ni modifica el sistema a escondidas.** Primero observa y explica; las acciones disponibles son específicas, optativas y requieren autorización del usuario.
 
 ## Lo que ofrece actualmente
 
@@ -42,12 +42,12 @@ Su objetivo es ayudar a entender el equipo antes de cambiar configuraciones: det
 
 | Módulo | Qué inspecciona |
 |---|---|
-| CPU | Información del procesador y datos accesibles de la CPU. |
-| Memoria | Información de memoria disponible para el sistema. |
+| CPU | Modelo, núcleos lógicos, gobernador y frecuencias reportadas. |
+| Memoria | RAM, swap, cachés, dispositivos zram y presión PSI del kernel. |
 | GPU | Información gráfica expuesta por Linux y herramientas disponibles. |
 | Almacenamiento | Dispositivos y datos de almacenamiento detectables. |
-| Energía y temperatura | Información energética y sensores térmicos disponibles. |
-| Red | Interfaces y datos básicos de red. |
+| Energía y temperatura | Sensores térmicos tipados, dispositivos de refrigeración y estado de batería. |
+| Red | Estado de enlace, velocidad anunciada y contadores RX/TX acumulados. |
 | Audio | Entorno de audio y señales disponibles de PipeWire/PulseAudio. |
 | Gaming | Indicadores y herramientas relacionadas con juegos en Linux. |
 | KDE Plasma | Información del entorno KDE cuando está presente. |
@@ -128,7 +128,7 @@ bash scripts/launch.sh --benchmark-suite 16
 bash scripts/launch.sh --compare-benchmarks antes.csv despues.csv
 ```
 
-Los benchmarks de RAM y almacenamiento son sintéticos: influyen JIT, cachés, sistema de archivos y carga del equipo. No equivalen a mediciones de laboratorio ni a FPS. No se incluye todavía un benchmark de GPU real; no se inventan puntuaciones gráficas cuando no hay un motor gráfico de pruebas disponible.
+Los benchmarks de RAM y almacenamiento son sintéticos: influyen JIT, cachés, sistema de archivos y carga del equipo. No equivalen a mediciones de laboratorio ni a FPS. No se incluye todavía un benchmark de GPU real; no se inventan puntuaciones gráficas cuando no hay un motor gráfico de pruebas disponible. Los diagnósticos de CPU, memoria, red y energía son lecturas del kernel, no pruebas de estrés.
 
 El inventario sin controlador asociado no demuestra por sí solo un fallo o conflicto. Para confirmar problemas se necesita correlacionar modelo, kernel y registros.
 
