@@ -35,7 +35,10 @@ public final class BenchmarkEngine {
         }
         long[] sorted = durations.clone();
         Arrays.sort(sorted);
-        long median = sorted[sorted.length / 2];
+        long median = sorted.length % 2 == 1
+                ? sorted[sorted.length / 2]
+                : sorted[sorted.length / 2 - 1] / 2 + sorted[sorted.length / 2] / 2
+                    + (sorted[sorted.length / 2 - 1] % 2 + sorted[sorted.length / 2] % 2) / 2;
         long totalOps = (long) iterationsPerRun * runs;
         long totalNanos = Arrays.stream(durations).sum();
         long opsPerSecond = totalNanos == 0 ? 0
