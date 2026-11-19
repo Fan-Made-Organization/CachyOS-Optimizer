@@ -92,10 +92,21 @@ El CLI presenta un panel ASCII con distribución, base inferida, kernel, escrito
 
 Los valores anteriores son ilustrativos; el programa muestra los datos reales detectados en cada equipo.
 
-Para abrir la aplicación gráfica:
+Para abrir la aplicación gráfica desde el repositorio:
 ```bash
 bash scripts/launch.sh --gui
 ```
+
+**Instalar como aplicación de escritorio (KDE Plasma, GNOME y otros escritorios):**
+```bash
+bash scripts/install-app.sh
+```
+El instalador crea el acceso “Linux Optimizer” en el menú de aplicaciones, instala el icono y deja un lanzador en `~/.local/bin/linux-optimizer`. Si el repositorio ya tiene el runtime Java 21 descargado por el bootstrap, lo incluye en la instalación; de lo contrario requiere Java 21 del sistema. Para quitar la aplicación:
+```bash
+bash scripts/uninstall-app.sh
+```
+
+El panel de rendimiento recoge CPU y RAM cada segundo, grafica los últimos 60 segundos y muestra la temperatura máxima que el kernel expone. El uso de GPU solo aparece cuando el controlador publica una métrica compatible (por ejemplo, `gpu_busy_percent` en algunos controladores AMD); en otros equipos se indicará “No expuesta”. Las lecturas de temperatura dependen de los sensores disponibles y no sustituyen una herramienta específica del fabricante.
 
 
 ### 7. Informes exportables
