@@ -10,6 +10,8 @@ import com.x504.optimizer.core.SystemCore;
 import com.x504.optimizer.monitor.SystemMonitor;
 import com.x504.optimizer.install.OptimizationToolsInstaller;
 import com.x504.optimizer.install.GraphicsDriverInstaller;
+import com.x504.optimizer.install.CrossDistroGraphicsCatalog;
+import com.x504.optimizer.system.AdvancedDiagnostics;
 import com.x504.optimizer.cleaner.SystemCleaner;
 import com.x504.optimizer.optimize.OptimizationCenter;
 import com.x504.optimizer.steam.SteamLaunchOptionsBuilder;
@@ -44,6 +46,7 @@ public final class Main {
         if (args.length > 0 && args[0].equals("--steam-options")) { runSteamOptions(); return; }
         if (args.length > 0 && args[0].equals("--cleaner")) { runCleaner(); return; }
         if (args.length > 0 && args[0].equals("--linux-support")) { runLinuxSupport(); return; }
+        if (args.length > 0 && args[0].equals("--advanced-diagnostics")) { runAdvancedDiagnostics(); return; }
         if (args.length > 0 && args[0].equals("--help")) {
             printHelp();
             return;
@@ -352,53 +355,63 @@ public final class Main {
     }
 
     private static void runGraphicsDriverInstaller(java.util.Scanner scanner) {
-        GraphicsDriverInstaller installer = new GraphicsDriverInstaller();
-        if (!new OptimizationToolsInstaller().isArchBased()) {
-            System.out.println("Este instalador automático está limitado a Arch Linux y CachyOS.");
+        LinuxPlatformSupport support = new LinuxPlatformSupport();
+        var platform = support.detect();
+        CrossDistroGraphicsCatalog catalog = new CrossDistroGraphicsCatalog();
+        System.out.println("\n=== CONTROLADORES GRÁFICOS MULTIDISTRIBUCIÓN ===");
+        System.out.println("Sistema: " + platform.name() + " | Familia: " + platform.family() + " | Gestor: " + platform.packageManager());
+        new GraphicsDriverInstaller().detectGpuVendors().forEach(line -> System.out.println("  • " + line));
+        System.out.println("1) Intel  2) AMD  3) NVIDIA  4) Compatibilidad Wine/Proton  5) Componentes comunes  0) Cancelar");
+        System.out.print("Selecciona perfil: ");
+        if (!scanner.hasNextLine()) return;
+        String choice=scanner.nextLine().strip();
+        CrossDistroGraphicsCatalog.Vendor vendor=switch(choice) {
+            case "1" -> CrossDistroGraphicsCatalog.Vendor.INTEL;
+            case "2" -> CrossDistroGraphicsCatalog.Vendor.AMD;
+            case "3" -> CrossDistroGraphicsCatalog.Vendor.NVIDIA;
+            case "5" -> CrossDistroGraphicsCatalog.Vendor.COMMON;
+            default -> null;
+        };
+        List<String> packages = choice.equals("4") ? catalog.compatibilityPackages(platform.family())
+                : vendor==null ? List.of() : catalog.packages(vendor,platform.family());
+        if(packages.isEmpty()) {
+            System.out.println("No existe un perfil automático validado para esta combinación de distribución y fabricante.");
+            System.out.println("No se ejecutó ningún comando. Consulta los repositorios oficiales y conserva el controlador actual.");
             return;
         }
-        System.out.println("\n=== INSTALADOR DE CONTROLADORES GRÁFICOS ===");
-        System.out.println("GPU detectadas:");
-        installer.detectGpuVendors().forEach(line -> System.out.println("  • " + line));
-        System.out.println("\n1) Intel: Mesa/OpenGL + ANV Vulkan + Intel media");
-        System.out.println("2) AMD: Mesa/OpenGL + RADV Vulkan + VA-API");
-        System.out.println("3) NVIDIA: controlador NVIDIA open kernel module + Vulkan");
-        System.out.println("4) Compatibilidad DirectX para Wine/Proton: DXVK + VKD3D");
-        System.out.println("5) Componentes gráficos comunes: Mesa + Vulkan loader");
-        System.out.println("0) Cancelar");
-        System.out.print("Selecciona el paquete adecuado para tu GPU: ");
-        if (!scanner.hasNextLine()) return;
-        String choice = scanner.nextLine().strip();
-        List<String> packages = switch (choice) {
-            case "1" -> installer.packages(GraphicsDriverInstaller.Vendor.INTEL);
-            case "2" -> installer.packages(GraphicsDriverInstaller.Vendor.AMD);
-            case "3" -> installer.packages(GraphicsDriverInstaller.Vendor.NVIDIA);
-            case "4" -> installer.compatibilityPackages();
-            case "5" -> installer.packages(GraphicsDriverInstaller.Vendor.UNKNOWN);
-            default -> List.of();
-        };
-        if (packages.isEmpty()) { System.out.println("Instalación cancelada."); return; }
-        System.out.println("\nPaquetes que se solicitarán a Pacman:");
-        packages.forEach(pkg -> System.out.println("  • " + pkg));
-        if (choice.equals("3")) {
-            System.out.println("ADVERTENCIA NVIDIA: nvidia-open depende de compatibilidad con tu GPU y kernel. Verifica que tu modelo soporte el módulo abierto y conserva un kernel arrancable de respaldo.");
-        }
-        System.out.println("DirectX no tiene un controlador nativo instalable en Linux: DXVK/VKD3D traducen Direct3D a Vulkan. Proton ya incluye sus propias versiones y puede no necesitar estos paquetes globales.");
-        System.out.println("FSR no es un driver: se habilita mediante Proton/juego o Gamescope cuando el juego y la GPU lo permiten.");
-        System.out.println("No se instalarán paquetes de fabricantes distintos ni se eliminarán controladores existentes.");
-        System.out.print("\n¿Continuar? Pacman mostrará su transacción y pedirá confirmación. [s/N]: ");
-        if (!scanner.hasNextLine() || !scanner.nextLine().strip().equalsIgnoreCase("s")) {
-            System.out.println("Instalación cancelada."); return;
-        }
         try {
-            int exit = installer.install(packages);
-            if (exit == 0) {
-                System.out.println("Paquetes instalados o ya presentes. Reinicia la sesión si el controlador lo requiere y ejecuta --diagnostics para verificar OpenGL/Vulkan.");
-                writeAuditEvent("graphics_packages_installed", String.join(",", packages));
-            } else System.err.println("Pacman terminó con código " + exit + ". Revisa los mensajes anteriores.");
-        } catch (IOException ex) { System.err.println("No se pudo iniciar Pacman: " + ex.getMessage()); }
-        catch (InterruptedException ex) { Thread.currentThread().interrupt(); System.err.println("Instalación interrumpida."); }
-        catch (IllegalStateException | IllegalArgumentException ex) { System.err.println("No se pudo instalar: " + ex.getMessage()); }
+            List<String> command=support.installCommand(platform,packages);
+            System.out.println("\nComando revisable: "+String.join(" ",command));
+            System.out.println("Paquetes: "+String.join(", ",packages));
+            if(vendor==CrossDistroGraphicsCatalog.Vendor.NVIDIA) {
+                System.out.println("ADVERTENCIA: comprueba compatibilidad exacta de GPU, kernel, Secure Boot y repositorios antes de instalar.");
+                if(platform.family()==LinuxPlatformSupport.Family.ARCH)
+                    System.out.println("El perfil nvidia-open requiere GPU compatible; en otras variantes de NVIDIA puede requerirse otro paquete.");
+            }
+            System.out.println("DXVK/VKD3D traducen Direct3D a Vulkan; no son drivers DirectX nativos. Proton suele incluir sus propias versiones.");
+            System.out.println("FSR es una técnica de escalado, no un controlador. No se eliminarán drivers ni se cambiará el kernel.");
+            System.out.print("Escribe INSTALAR para continuar; cualquier otra entrada cancela: ");
+            if(!scanner.hasNextLine()||!scanner.nextLine().strip().equals("INSTALAR")) { System.out.println("Cancelado."); return; }
+            int exit=new GraphicsDriverInstaller().install(support,platform,packages);
+            if(exit==0) writeAuditEvent("graphics_packages_installed",platform.family()+": "+String.join(",",packages));
+            else System.err.println("El gestor terminó con código "+exit+".");
+        } catch(IOException ex) { System.err.println("No se pudo iniciar el gestor: "+ex.getMessage()); }
+        catch(InterruptedException ex) { Thread.currentThread().interrupt(); System.err.println("Instalación interrumpida."); }
+        catch(IllegalStateException|IllegalArgumentException ex) { System.err.println("Acción no disponible: "+ex.getMessage()); }
+    }
+
+    private static void runAdvancedDiagnostics() {
+        AdvancedDiagnostics.Report report=new AdvancedDiagnostics().inspect();
+        printDiagnosticSection("ALMACENAMIENTO AVANZADO (SSD/NVMe/HDD)",report.storage());
+        printDiagnosticSection("SERVICIOS FALLIDOS",report.services());
+        printDiagnosticSection("KERNEL Y MÓDULOS",report.kernel());
+        printDiagnosticSection("GAMING Y CAPAS GRÁFICAS",report.gaming());
+        System.out.println("\nDiagnóstico de solo lectura: no se modificó ningún servicio, módulo, disco ni configuración.");
+        writeAuditEvent("advanced_diagnostics_completed","almacenamiento, servicios, kernel y gaming");
+    }
+    private static void printDiagnosticSection(String title,List<String> lines) {
+        System.out.println("\n=== "+title+" ===");
+        lines.forEach(line->System.out.println(" • "+line));
     }
 
     private static void runSteamOptions() {
@@ -809,7 +822,7 @@ public final class Main {
                   --monitor [segundos]      Monitor CPU/RAM (1-300 s).
                   --benchmark-suite [MiB]   CPU + RAM + disco; guarda historial.
                   --compare-benchmarks A B  Compara dos CSV (antes/después).
-                  --install-tools          Instala herramientas por categoría en familias compatibles (Arch, Debian, Fedora, SUSE, Alpine).\n                  --linux-support         Muestra compatibilidad de distro y kernel.
+                  --install-tools          Instala herramientas por categoría en familias compatibles (Arch, Debian, Fedora, SUSE, Alpine).\n                  --linux-support         Muestra compatibilidad de distro y kernel.\n                  --advanced-diagnostics Inspecciona almacenamiento, servicios, módulos y gaming.
                   --optimizer              Abre el centro de optimización guiada.
                   --steam-options          Crea parámetros de lanzamiento para Steam.\n                  --cleaner               Vista previa y limpieza de cachés seguras del usuario.
                   --backup DIR ARCHIVO... 
