@@ -158,7 +158,7 @@ Abre el centro desde el menú principal (opción 7) o ejecuta `bash scripts/laun
 - **RAM:** comprueba si existe zram. El instalador incluye `zram-generator`, pero no escribe una configuración de memoria ni fuerza la limpieza de cachés.
 - **GPU:** mantiene el controlador existente y dirige al diagnóstico de Vulkan/OpenGL; no instala controladores sin identificar hardware y compatibilidad.
 - **Gaming:** instala el conjunto de herramientas opcionales (GameMode, MangoHud, Gamescope, GOverlay y utilidades de diagnóstico).
-- **Almacenamiento:** si detecta un dispositivo no rotacional, permite habilitar `fstrim.timer` con `sudo systemctl enable --now fstrim.timer`. Se puede revertir con `sudo systemctl disable --now fstrim.timer`.
+- **Almacenamiento:** si detecta un dispositivo no rotacional, permite habilitar `fstrim.timer` con `sudo systemctl enable --now fstrim.timer`. Se puede revertir desde el mismo menú o con `sudo systemctl disable --now fstrim.timer`. El menú también muestra el estado y permite volver a habilitarlo.
 - **Kernel:** muestra la versión activa y evita sustituir o eliminar kernels automáticamente.
 
 Las operaciones CPU y TRIM solicitan confirmación. El perfil de energía se puede restaurar desde el mismo centro; TRIM se revierte deshabilitando el temporizador. No se prometen ganancias fijas de rendimiento.
