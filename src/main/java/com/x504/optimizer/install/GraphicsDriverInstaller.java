@@ -1,6 +1,7 @@
 package com.x504.optimizer.install;
 
 import java.io.IOException;
+import com.x504.optimizer.system.LinuxPlatformSupport;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
