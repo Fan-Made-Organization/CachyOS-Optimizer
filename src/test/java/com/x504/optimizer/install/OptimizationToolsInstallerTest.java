@@ -8,7 +8,7 @@ class OptimizationToolsInstallerTest {
 
     @Test void fullBundleContainsDiagnosticsAndGamingTools() {
         var packages = installer.packages(true);
-        assertTrue(packages.containsAll(java.util.List.of("inxi", "smartmontools", "vulkan-tools", "gamemode", "mangohud", "gamescope")));
+        assertTrue(packages.containsAll(java.util.List.of("inxi", "smartmontools", "vulkan-tools", "gamemode", "mangohud", "gamescope", "power-profiles-daemon", "zram-generator")));
         assertEquals(packages.size(), packages.stream().distinct().count());
     }
 
