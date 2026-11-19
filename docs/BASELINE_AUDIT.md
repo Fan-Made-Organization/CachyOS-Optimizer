@@ -1,6 +1,8 @@
 # Auditoría de la base funcional
 
-Fecha de revisión: 2026-11-18.
+Fecha de revisión: 2026-11-19.
+
+Última revisión automatizada: commit `4aeb6dd4aee105335bbfed1ae7afd4bfcde814fe`. GitHub Actions, ejecución [#44545321329](https://github.com/Fan-Made-Organization/Linux-Optimizer/actions/runs/44545321329), finalizó correctamente en Linux/Java 21: validación Bash, `git diff --check` y `mvn clean verify`.
 
 Este documento registra qué está realmente implementado en el código compilado por Maven, qué es parcial y qué sigue pendiente. No se marca una capacidad como completa solo porque exista una clase con un nombre relacionado.
 
@@ -44,6 +46,10 @@ Antes de implementar optimizaciones de mayor riesgo, cada módulo básico debe t
 5. Documentación que describa qué se inspecciona realmente y sus limitaciones.
 
 Las capacidades marcadas como pendientes no deben presentarse como funciones ya disponibles.
+
+## Verificación manual pendiente
+
+La ejecución CI confirma compilación y pruebas automatizadas, pero no sustituye una prueba visual de Swing en KDE Plasma ni una prueba funcional en cada distribución. Antes de publicar una versión estable deben comprobarse manualmente: apertura y visibilidad del generador Steam, selección/copia de parámetros, navegación y escalado de la GUI, detección de hardware en CachyOS/Arch, y comportamiento de las herramientas opcionales cuando no están instaladas. No se debe aplicar un cambio del sistema como parte de estas verificaciones.
 
 ## Mantenimiento de esta auditoría
 
