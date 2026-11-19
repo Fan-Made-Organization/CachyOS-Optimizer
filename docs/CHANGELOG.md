@@ -6,7 +6,7 @@
 - Añadido instalador interactivo de herramientas de diagnóstico con comandos específicos para Pacman, APT, DNF/YUM y Zypper; sin confirmación automática.
 - Añadido diagnóstico de kernel/arranque: variantes, árboles de módulos, headers, módulos cargados, UEFI, lockdown y detección orientativa de GRUB/systemd-boot.
 - Añadido comando `--linux-support` y opción 10 del menú principal.
-- La administración de kernels y cambios de bootloader siguen deliberadamente desactivados.
+- Añadido gestor guiado de kernels por familia: CachyOS/Arch (estándar/LTS/Zen), Debian/Ubuntu, Fedora y openSUSE; incluye headers/devel y consulta de paquetes instalados.
 
 - Incorporada licencia GNU GPL v3.0 (GPL-3.0-only).
 - Añadido asesor de optimización basado en evidencia.
