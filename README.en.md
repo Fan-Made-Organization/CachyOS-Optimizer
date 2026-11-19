@@ -100,7 +100,7 @@ The Java source compiled by Maven is located in `src/main/java`. Files under `sr
 
 ## Compatibility and focus
 
-- **Primary targets:** CachyOS and Arch Linux.
+- **Distribution detection:** Arch/CachyOS, Debian/Ubuntu, Fedora/RHEL and openSUSE/SUSE families.\n- **Package installation:** family-specific diagnostic tools only; package manager prompts remain interactive.\n- **Kernel support:** read-only inventory of active/installed module trees, headers, common kernel variants and boot environment. Kernel installation/removal and bootloader changes are not performed.
 - **Environment:** Linux.
 - **Language:** Java 21.
 - **Desktop:** KDE Plasma is detected when available.
