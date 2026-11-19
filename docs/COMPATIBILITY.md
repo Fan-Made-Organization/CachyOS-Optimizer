@@ -4,14 +4,23 @@ El porcentaje de compatibilidad se calcula a partir de comprobaciones reales dis
 
 ## Plataformas Linux detectadas
 
-El detector lee `/etc/os-release` y usa `ID`/ `ID_LIKE` para clasificar familias:
-- Arch: CachyOS, Arch, Manjaro, EndeavourOS y derivadas que declaren esa familia.
-- Debian: Debian, Ubuntu, Linux Mint, Pop!_OS y derivadas que declaren esa familia.
-- Fedora/RHEL: Fedora, RHEL, CentOS Stream, Rocky y AlmaLinux cuando declaran esa familia.
-- SUSE: openSUSE Leap/Tumbleweed y derivadas que declaren esa familia.
+El detector lee `/etc/os-release` (incluidos enlaces simbólicos estándar) y, si no puede obtener datos, consulta `/usr/lib/os-release` y marcadores clásicos de algunas distribuciones. Usa `ID` y `ID_LIKE`, sin inferir una familia solo porque encuentre un ejecutable de gestor de paquetes.
 
-El gestor de paquetes se detecta por familia (Pacman, APT, DNF/YUM o Zypper). La detección de familia no garantiza que los repositorios estén habilitados ni que cada paquete tenga el mismo nombre. Las distribuciones no reconocidas siguen pudiendo ejecutar diagnósticos de solo lectura; la instalación automática queda desactivada.
+Familias reconocidas:
+- **Arch:** CachyOS, Arch, Manjaro, EndeavourOS, Garuda, ArcoLinux, Artix, RebornOS, SteamOS, HoloISO, Archcraft y blendOS.
+- **Debian:** Debian, Ubuntu y sabores, Linux Mint, Pop!_OS, elementary OS, Kali, Zorin, MX Linux, Deepin, Raspberry Pi OS, Parrot, Devuan, KDE neon y derivadas reconocidas.
+- **Fedora/RHEL:** Fedora, RHEL, CentOS, Rocky, AlmaLinux, Oracle Linux, Nobara, Ultramarine, Bazzite y variantes inmutables basadas en Fedora cuando declaran esos IDs.
+- **SUSE:** openSUSE Leap/Tumbleweed, SLES/SLED y GeckoLinux.
+- **Alpine, Gentoo, Void y NixOS:** se reconocen como familias independientes.
+- **UNKNOWN:** se conserva cuando no hay evidencia suficiente; no se fuerza una familia por detectar `pacman`, `apt` u otro ejecutable.
 
+El gestor se detecta dentro de la familia: Pacman, APT/APT-GET, DNF5/DNF/YUM, Zypper, APK, Emerge, XBPS o Nix. La detección del gestor no implica permiso para instalar paquetes.
+
+## Instalador de herramientas
+
+El catálogo de herramientas se organiza en categorías seleccionables: diagnóstico/hardware, gráficos/vídeo, almacenamiento, red, monitorización y gaming. Los nombres de paquete se adaptan a los perfiles implementados para Arch, Debian, Fedora, SUSE y un subconjunto de Alpine. Gentoo, Void y NixOS se detectan, pero permanecen en solo lectura para este instalador hasta validar listas y particularidades de sus repositorios.
+
+El instalador muestra la distribución, ID, versión, familia, gestor, categoría y paquetes. Requiere escribir `INSTALAR` antes de lanzar el gestor; el gestor conserva su propia confirmación. No usa aceptación automática, no ejecuta actualizaciones globales, no elimina paquetes, no instala drivers/kernels y no habilita servicios. La existencia de un paquete puede variar por versión, arquitectura y repositorios habilitados.
 ## Datos considerados actualmente
 - Sistema operativo Linux y distribución.
 - Disponibilidad de `/etc/os-release`.
