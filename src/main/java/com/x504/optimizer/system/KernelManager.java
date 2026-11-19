@@ -22,13 +22,27 @@ public final class KernelManager {
 
     public List<KernelOption> options(LinuxPlatformSupport.Platform platform) {
         return switch (platform.family()) {
-            case ARCH -> List.of(
-                    new KernelOption("default", "Kernel estándar de la distribución", List.of("linux", "linux-headers"), "Paquete estándar Arch; en derivadas los repositorios pueden variar."),
-                    new KernelOption("lts", "Kernel LTS", List.of("linux-lts", "linux-lts-headers"), "Rama de soporte prolongado; conserva el kernel actual."),
-                    new KernelOption("zen", "Kernel Zen", List.of("linux-zen", "linux-zen-headers"), "Kernel orientado a escritorio; no garantiza más FPS ni menor latencia.")
-            );
-            case DEBIAN -> List.of(new KernelOption("default", "Kernel oficial de la distribución",
-                    List.of("linux-image-amd64", "linux-headers-amd64"), "Metapaquetes oficiales para Debian/Ubuntu x86_64; la disponibilidad depende de repositorios y arquitectura."));
+            case ARCH -> platform.id().equals("cachyos")
+                    ? List.of(
+                            new KernelOption("default", "Kernel estándar CachyOS", List.of("linux-cachyos", "linux-cachyos-headers"), "Paquetes del repositorio CachyOS; verifica que el repositorio correspondiente esté habilitado."),
+                            new KernelOption("lts", "Kernel LTS", List.of("linux-lts", "linux-lts-headers"), "Rama de soporte prolongado; conserva el kernel actual.")
+                    )
+                    : List.of(
+                            new KernelOption("default", "Kernel estándar de la distribución", List.of("linux", "linux-headers"), "Paquete estándar Arch; en derivadas los repositorios pueden variar."),
+                            new KernelOption("lts", "Kernel LTS", List.of("linux-lts", "linux-lts-headers"), "Rama de soporte prolongado; conserva el kernel actual."),
+                            new KernelOption("zen", "Kernel Zen", List.of("linux-zen", "linux-zen-headers"), "Kernel orientado a escritorio; no garantiza más FPS ni menor latencia.")
+                    );
+            case DEBIAN -> {
+                boolean ubuntuBased = platform.id().equals("ubuntu") || platform.idLike().contains("ubuntu");
+                boolean arm64 = System.getProperty("os.arch", "").equalsIgnoreCase("aarch64");
+                List<String> packages = ubuntuBased
+                        ? List.of("linux-generic", "linux-headers-generic")
+                        : arm64 ? List.of("linux-image-arm64", "linux-headers-arm64")
+                        : List.of("linux-image-amd64", "linux-headers-amd64");
+                String label = ubuntuBased ? "Kernel genérico Ubuntu y headers" : "Kernel oficial Debian y headers";
+                yield List.of(new KernelOption("default", label, packages,
+                        "Metapaquetes de la familia detectada; derivadas y repositorios personalizados pueden variar."));
+            }
             case FEDORA -> List.of(new KernelOption("default", "Kernel oficial Fedora",
                     List.of("kernel", "kernel-devel"), "Instala el kernel mantenido por Fedora y los paquetes de desarrollo; kernel-devel puede no coincidir hasta completar actualizaciones."));
             case SUSE -> List.of(new KernelOption("default", "Kernel estándar openSUSE",
