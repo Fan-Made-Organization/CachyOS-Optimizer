@@ -309,7 +309,7 @@ public final class Main {
         System.out.println("1) Básico   2) GameMode   3) MangoHud   4) GameMode + MangoHud");
         System.out.println("5) Gamescope   6) Registro Proton   7) FSR Proton");
         System.out.println("8) Combinación personalizada   9) Gamescope con resolución/FPS");
-        System.out.println("10) Perfiles de juego predefinidos");
+        System.out.println("10) Perfiles de juego predefinidos");\n        System.out.println("11) WineD3D (usar OpenGL en lugar de DXVK/Vulkan)");
         System.out.print("Elige: ");
         if (!scanner.hasNextLine()) return;
         String choice = scanner.nextLine().strip();
@@ -322,7 +322,7 @@ public final class Main {
             case "4" -> options = new SteamLaunchOptionsBuilder.Options(true,true,false,false,false);
             case "5" -> options = new SteamLaunchOptionsBuilder.Options(false,false,true,false,false);
             case "6" -> options = new SteamLaunchOptionsBuilder.Options(false,false,false,true,false);
-            case "7" -> options = new SteamLaunchOptionsBuilder.Options(false,false,false,false,true);
+            case "7" -> options = new SteamLaunchOptionsBuilder.Options(false,false,false,false,true);\n            case "11" -> options = new SteamLaunchOptionsBuilder.Options(false,false,false,false,false,true);
             case "8" -> {
                 boolean gm = askYesNo(scanner, "¿Activar GameMode?");
                 boolean hud = askYesNo(scanner, "¿Activar MangoHud?");
@@ -362,7 +362,7 @@ public final class Main {
             System.out.println("\nCopia esta línea en Steam → Propiedades → General → Parámetros de lanzamiento:");
             System.out.println("\n" + launchOptions + "\n");
             System.out.println("GameMode, MangoHud y Gamescope deben estar instalados si se seleccionaron.");
-            System.out.println("FSR depende de Proton/juego; resolución y Hz son objetivos de Gamescope, no garantizan FPS.");
+            System.out.println("FSR depende de Proton/juego; resolución y Hz son objetivos de Gamescope, no garantizan FPS.");\n            if ((advanced != null && advanced.wined3d()) || (options != null && options.wined3d())) {\n                System.out.println("WineD3D fuerza la traducción Direct3D→OpenGL. Úsalo como alternativa de compatibilidad si Vulkan/DXVK falla; normalmente puede rendir menos que DXVK.");\n            }
             if (askYesNo(scanner, "¿Guardar la línea en un archivo local?")) {
                 Path directory = Path.of(System.getProperty("user.home"), ".local", "share", "cachyos-optimizer");
                 Path destination = directory.resolve("steam-launch-options-" + java.time.LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss")) + ".txt");
