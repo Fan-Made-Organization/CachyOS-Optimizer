@@ -187,12 +187,12 @@ Las opciones son plantillas: no instalan herramientas ni garantizan compatibilid
 | Diagnósticos modulares (incluye hardware, controladores, salud, energía y paquetes) | Implementación inicial; algunas comprobaciones son indicativas |
 | Análisis de compatibilidad | Implementación inicial |
 | Catálogo de perfiles | Disponible como catálogo informativo |
-| Validación y preparación de acciones | Implementada; las modificaciones reales siguen deshabilitadas |
+| Validación y preparación de acciones | Implementada; algunas acciones optativas se ejecutan con confirmación y reversión documentada |
 | Backup de archivos seleccionados y restauración verificada a otra carpeta | Implementado |
 | Instalación guiada de herramientas de diagnóstico y gaming en Arch/CachyOS | Implementada; confirmación previa y Pacman interactivo |
 | Centro guiado CPU/RAM/GPU/Gaming/almacenamiento/kernel | Implementado parcialmente; perfiles de energía, gobernadores CPU, zram administrado y TRIM son acciones optativas; GPU/kernel son inspección guiada |
 | Creador de parámetros de Steam | Implementado; plantillas, perfiles de juego, Gamescope con resolución/Hz y guardado local sin sobrescritura |
-| Configuración automática de zram, controladores y kernel | **Pendiente; no se aplica** |
+| Configuración zram administrada y reversible | Implementada con `zram-generator`; no sobrescribe configuración existente |
 | Restauración sobre rutas originales y rollback del sistema | **Pendiente** |
 | Registro local de auditoría | Implementado con rotación básica |
 | Interfaz gráfica | No prevista; el proyecto prioriza una interfaz de terminal. |
@@ -256,7 +256,10 @@ Puedes pasar opciones directamente al programa:
 ```bash
 bash scripts/launch.sh                 # abre el menú de terminal
 bash scripts/launch.sh --diagnostics   # diagnóstico directo
-bash scripts/launch.sh --benchmark     # diagnóstico + microbenchmark CPU\nbash scripts/launch.sh --install-tools # instala herramientas recomendadas (Arch/CachyOS)\nbash scripts/launch.sh --optimizer     # centro de optimización guiada
+bash scripts/launch.sh --benchmark      # diagnóstico + microbenchmark CPU
+bash scripts/launch.sh --install-tools  # instala herramientas recomendadas
+bash scripts/launch.sh --optimizer      # centro de optimización
+bash scripts/launch.sh --steam-options  # creador de parámetros de Steamdas (Arch/CachyOS)\nbash scripts/launch.sh --optimizer     # centro de optimización guiada
 bash scripts/launch.sh --help
 ```
 
@@ -313,7 +316,7 @@ Si algo falla, revisa [Instalación](docs/INSTALLATION.md), [Dependencias](docs/
 4. Preparar una forma de volver atrás cuando el cambio lo permita.
 5. Registrar qué se propuso y qué se ejecutó.
 
-La aplicación no debe ejecutarse como root para realizar diagnósticos normales. No se deben usar comandos privilegiados silenciosos ni concatenar entradas del usuario dentro de órdenes de shell. Lee [Política de seguridad](docs/SECURITY.md).
+La aplicación no debe ejecutarse como root para realizar diagnósticos normales. Las operaciones administrativas se invocan con `sudo` solo después de una confirmación visible. La configuración zram se crea únicamente si no existe una configuración principal previa y su reversión comprueba que el archivo siga siendo exactamente el generado por la aplicación. Lee [Política de seguridad](docs/SECURITY.md).
 
 ## Documentación
 
