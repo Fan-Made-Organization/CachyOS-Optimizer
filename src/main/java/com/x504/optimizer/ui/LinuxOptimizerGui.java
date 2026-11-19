@@ -9,6 +9,7 @@ import com.x504.optimizer.optimize.OptimizationCenter;
 import com.x504.optimizer.install.OptimizationToolsInstaller;
 import com.x504.optimizer.install.CrossDistroGraphicsCatalog;
 import com.x504.optimizer.system.LinuxPlatformSupport;
+import com.x504.optimizer.system.KernelManager;
 import com.x504.optimizer.cleaner.SystemCleaner;
 import com.x504.optimizer.steam.SteamLaunchOptionsBuilder;
 import java.util.ArrayList;
@@ -295,7 +296,7 @@ public final class LinuxOptimizerGui {
             case "Sistema" -> panel.add(actionCard("Mantenimiento seguro",
                     "Revisa cachés de miniaturas y fuentes con más de 30 días. No toca shaders, juegos ni archivos personales.",
                     button("Revisar limpieza", this::previewCleaner),
-                    button("Instalar herramientas de optimización", this::installOptimizationTools)));
+                    button("Instalar herramientas de optimización", this::installOptimizationTools),\n                    button("Opciones de kernel", this::chooseKernel)));
             case "Red" -> panel.add(actionCard("Optimización de red",
                     "Primero consulta las recomendaciones del módulo de red. No se aplican sysctl ni cambios de NetworkManager a ciegas.",
                     button("Consultar recomendaciones", () -> showMessage("Consulta el diagnóstico de red mostrado abajo. Los cambios de red automáticos aún no tienen un perfil validado para este equipo."))));
@@ -490,6 +491,48 @@ public final class LinuxOptimizerGui {
                         if (exit != 0) throw new IllegalStateException("El gestor terminó con código " + exit);
                         return "Perfil gráfico instalado. Revisa los mensajes del gestor y reinicia solo si la distribución lo requiere."; });
         } catch (Exception ex) { showMessage("No se pudo preparar el perfil gráfico: " + ex.getMessage()); }
+    }
+
+
+    private void chooseKernel() {
+        try {
+            LinuxPlatformSupport support = new LinuxPlatformSupport();
+            LinuxPlatformSupport.Platform platform = support.detect();
+            if (support.isImmutableOrImageBased(platform)) {
+                showMessage("Sistema inmutable o basado en imágenes: administra el kernel mediante el mecanismo oficial de la distribución.");
+                return;
+            }
+            KernelManager manager = new KernelManager();
+            List<KernelManager.KernelOption> options = manager.options(platform);
+            if (options.isEmpty()) {
+                showMessage("No existe un perfil de instalación de kernel validado para " + platform.name() + ". No se ejecutó ningún comando.");
+                return;
+            }
+            KernelManager.BootInventory inventory = manager.inspectBootInventory();
+            String[] labels = options.stream().map(KernelManager.KernelOption::label).toArray(String[]::new);
+            String selectedLabel = (String) JOptionPane.showInputDialog(frame,
+                    "Kernel activo: " + inventory.activeKernel()
+                            + "\\nKernels detectados: " + String.join(", ", inventory.installedModuleTrees())
+                            + "\\nPosible respaldo detectado: " + (inventory.hasPossibleFallback() ? "sí (verificación manual necesaria)" : "no")
+                            + "\\n\\nSelecciona un paquete de kernel:",
+                    "Opciones de kernel", JOptionPane.WARNING_MESSAGE, null, labels, labels[0]);
+            if (selectedLabel == null) return;
+            KernelManager.KernelOption selected = options.stream().filter(o -> o.label().equals(selectedLabel)).findFirst().orElseThrow();
+            List<String> command = manager.installCommand(support, platform, selected);
+            if (!inventory.hasPossibleFallback()) {
+                showMessage("BLOQUEADO: no se detectó un posible kernel/entrada de respaldo. Conserva y verifica un kernel arrancable antes de instalar otro.");
+                return;
+            }
+            confirmAction("Instalar kernel",
+                    "Distribución: " + platform.name() + "\\nPaquetes: " + String.join(", ", selected.packages())
+                            + "\\nComando: " + String.join(" ", command)
+                            + "\\n\\nLa detección de respaldo es heurística. Verifica manualmente que el kernel actual arranca. Linux Optimizer nunca elimina kernels ni modifica el bootloader.",
+                    () -> {
+                        int exit = support.install(platform, selected.packages());
+                        if (exit != 0) throw new IllegalStateException("El gestor terminó con código " + exit + ". Revisa sus mensajes antes de reiniciar.");
+                        return "Instalación de paquetes finalizada. Verifica initramfs y entradas de arranque antes de reiniciar.";
+                    });
+        } catch (Exception ex) { showMessage("No se pudo preparar la opción de kernel: " + ex.getMessage()); }
     }
 
     private void createSteamOptions() {
