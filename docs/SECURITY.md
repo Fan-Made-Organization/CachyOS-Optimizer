@@ -23,3 +23,7 @@ Los privilegios deben limitarse a una operación concreta mediante un mecanismo 
 
 ## Estado
 La capa de validación inicial existe. La ejecución de modificaciones del sistema permanece deshabilitada.
+
+## Privilegios y datos locales
+
+La aplicación debe ejecutarse como usuario normal. Si una operación necesita privilegios, debe invocar únicamente el comando mínimo previsto y dejar que el mecanismo de autorización del sistema solicite credenciales. No debe almacenar contraseñas, aceptar privilegios en silencio ni desactivar controles de seguridad. Los informes pueden contener nombres de dispositivos, rutas, versiones y detalles del entorno; revísalos antes de compartirlos públicamente. Los registros no deben incluir secretos ni datos de autenticación.
