@@ -735,6 +735,7 @@ public final class Main {
                 System.out.println("║  8) Creador de parámetros de Steam       ║");
                 System.out.println("║  9) Limpiador seguro de caché             ║");
                 System.out.println("║ 10) Compatibilidad Linux y kernels       ║");
+                System.out.println("║ 11) Diagnóstico avanzado                 ║");
                 System.out.println("║  0) Salir                                ║");
                 System.out.println("╚══════════════════════════════════════════╝");
                 System.out.print("Selecciona una opción: ");
@@ -751,8 +752,9 @@ public final class Main {
                     case "8" -> runSteamOptions(scanner);
                     case "9" -> runCleaner(scanner);
                     case "10" -> runLinuxSupport(scanner);
+                    case "11" -> runAdvancedDiagnostics();
                     case "0" -> { System.out.println("Hasta luego."); return; }
-                    default -> System.out.println("Opción no válida. Elige una opción del 0 al 10.");
+                    default -> System.out.println("Opción no válida. Elige una opción del 0 al 11.");
                 }
             }
         }
