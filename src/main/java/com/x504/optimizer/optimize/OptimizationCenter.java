@@ -122,7 +122,15 @@ public final class OptimizationCenter {
     }
 
     public int configureManagedZram(boolean enable) throws IOException, InterruptedException {
-        Path script = Path.of("scripts", enable ? "zram-enable.sh" : "zram-disable.sh").toAbsolutePath().normalize();
+        String filename = enable ? "zram-enable.sh" : "zram-disable.sh";
+        Path script = Path.of("scripts", filename).toAbsolutePath().normalize();
+        if (!Files.isRegularFile(script)) {
+            try {
+                Path location = Path.of(OptimizationCenter.class.getProtectionDomain().getCodeSource().getLocation().toURI());
+                Path root = Files.isDirectory(location) ? location.getParent().getParent() : location.getParent().getParent();
+                script = root.resolve("scripts").resolve(filename).normalize();
+            } catch (java.net.URISyntaxException ex) { throw new IOException("No se pudo localizar el proyecto.", ex); }
+        }
         if (!Files.isRegularFile(script) || Files.isSymbolicLink(script))
             throw new IOException("No se encontró el script de configuración zram del proyecto.");
         return runInherited(List.of("sudo", "bash", script.toString()));
