@@ -5,6 +5,14 @@ import com.x504.optimizer.system.AdvancedDiagnostics;
 import com.x504.optimizer.system.LinuxSystemDetector;
 import com.x504.optimizer.system.PlatformHardwareInspector;
 import com.x504.optimizer.update.GitHubUpdater;
+import com.x504.optimizer.optimize.OptimizationCenter;
+import com.x504.optimizer.install.OptimizationToolsInstaller;
+import com.x504.optimizer.install.CrossDistroGraphicsCatalog;
+import com.x504.optimizer.system.LinuxPlatformSupport;
+import com.x504.optimizer.cleaner.SystemCleaner;
+import com.x504.optimizer.steam.SteamLaunchOptionsBuilder;
+import java.util.ArrayList;
+import java.util.concurrent.Callable;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -202,6 +210,11 @@ public final class LinuxOptimizerGui {
                 body.add(section("Mantenimiento", "Revisa TRIM, sistemas de archivos y herramientas disponibles antes de realizar cambios."));
             }
         }
+        JPanel actionsPanel = actionPanel(page);
+        if (actionsPanel != null) {
+            body.add(actionsPanel);
+            body.add(Box.createVerticalStrut(14));
+        }
         details.setEditable(false);
         details.setLineWrap(true);
         details.setWrapStyleWord(true);
@@ -228,6 +241,300 @@ public final class LinuxOptimizerGui {
         content.revalidate();
         content.startTransition(travelDirection);
         renderDetails();
+    }
+
+
+    /** Acciones reales del centro de optimización; las operaciones modificadoras siempre piden confirmación. */
+    private JPanel actionPanel(String page) {
+        JPanel panel = new JPanel();
+        panel.setOpaque(false);
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        panel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        if (!isLinuxHost()) {
+            panel.add(actionCard("Acciones no disponibles en este sistema",
+                    "La interfaz es multiplataforma, pero las operaciones de optimización Linux requieren sus herramientas y APIs nativas.",
+                    button("Ver información", () -> showMessage("Este módulo de aplicación de cambios está disponible en Linux. En Windows/macOS solo se muestran funciones compatibles y no se ejecutan comandos Linux."))));
+            return panel;
+        }
+        switch (page) {
+            case "Resumen" -> {
+                panel.add(actionCard("Centro de optimización",
+                        "Accede a las acciones disponibles para tu distribución. Cada cambio requiere confirmación.",
+                        button("Abrir CPU y memoria", () -> showPage("CPU y memoria")),
+                        button("Abrir gráficos", () -> showPage("Gráficos")),
+                        button("Instalar herramientas", this::installOptimizationTools)));
+            }
+            case "CPU y memoria" -> {
+                panel.add(actionCard("Perfiles de energía",
+                        "Cambia entre equilibrado, rendimiento y ahorro. Se guarda el perfil anterior para poder restaurarlo.",
+                        button("Equilibrado", () -> applyPowerProfile("balanced")),
+                        button("Rendimiento", () -> applyPowerProfile("performance")),
+                        button("Ahorro", () -> applyPowerProfile("power-saver")),
+                        button("Restaurar perfil anterior", this::restorePowerProfile)));
+                panel.add(Box.createVerticalStrut(10));
+                panel.add(actionCard("Gobernador CPU",
+                        "Aplica un gobernador disponible en el kernel y guarda el valor anterior.",
+                        button("Elegir gobernador", this::chooseGovernor),
+                        button("Restaurar gobernador", this::restoreGovernor)));
+                panel.add(Box.createVerticalStrut(10));
+                panel.add(actionCard("Memoria virtual ZRAM",
+                        "Activa o desactiva únicamente la configuración administrada por Linux Optimizer.",
+                        button("Configurar / revertir ZRAM", this::toggleZram)));
+            }
+            case "Gráficos" -> panel.add(actionCard("Controladores y pila gráfica",
+                    "Prepara perfiles de paquetes compatibles con tu distribución y GPU. No elimina ni reemplaza controladores automáticamente.",
+                    button("Instalar perfil gráfico", this::installGraphicsProfile),
+                    button("Instalar herramientas gráficas", this::installOptimizationTools)));
+            case "Almacenamiento" -> panel.add(actionCard("TRIM programado",
+                    "Habilita fstrim.timer solo si se detecta almacenamiento no rotacional. La acción es reversible.",
+                    button("Activar / desactivar TRIM", this::toggleTrim)));
+            case "Gaming" -> panel.add(actionCard("Herramientas y compatibilidad gaming",
+                    "Instala herramientas disponibles en los repositorios de tu distribución y genera parámetros de Steam.",
+                    button("Instalar herramientas gaming", this::installGamingTools),
+                    button("Crear parámetros de Steam", this::createSteamOptions)));
+            case "Sistema" -> panel.add(actionCard("Mantenimiento seguro",
+                    "Revisa cachés de miniaturas y fuentes con más de 30 días. No toca shaders, juegos ni archivos personales.",
+                    button("Revisar limpieza", this::previewCleaner),
+                    button("Instalar herramientas de optimización", this::installOptimizationTools)));
+            case "Red" -> panel.add(actionCard("Optimización de red",
+                    "Primero consulta las recomendaciones del módulo de red. No se aplican sysctl ni cambios de NetworkManager a ciegas.",
+                    button("Consultar recomendaciones", () -> showMessage("Consulta el diagnóstico de red mostrado abajo. Los cambios de red automáticos aún no tienen un perfil validado para este equipo."))));
+            default -> { return null; }
+        }
+        return panel;
+    }
+
+    private JPanel actionCard(String title, String description, JButton... buttons) {
+        JPanel card = new GlassPanel(new BorderLayout(0, 12));
+        card.setBorder(new EmptyBorder(17, 18, 17, 18));
+        JLabel heading = new JLabel(title);
+        heading.setForeground(TEXT);
+        heading.setFont(new Font("SansSerif", Font.BOLD, 15));
+        JLabel subtitle = new JLabel("<html><div style='width:620px'>" + description + "</div></html>");
+        subtitle.setForeground(MUTED);
+        subtitle.setFont(new Font("SansSerif", Font.PLAIN, 12));
+        JPanel buttonRow = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
+        buttonRow.setOpaque(false);
+        for (JButton button : buttons) buttonRow.add(button);
+        JPanel text = new JPanel();
+        text.setOpaque(false);
+        text.setLayout(new BoxLayout(text, BoxLayout.Y_AXIS));
+        text.add(heading);
+        text.add(Box.createVerticalStrut(6));
+        text.add(subtitle);
+        card.add(text, BorderLayout.NORTH);
+        card.add(buttonRow, BorderLayout.SOUTH);
+        card.setMaximumSize(new Dimension(Integer.MAX_VALUE, 180));
+        card.setAlignmentX(Component.LEFT_ALIGNMENT);
+        return card;
+    }
+
+    private JButton button(String label, Runnable action) {
+        JButton b = new JButton(label);
+        styleButton(b);
+        b.setFont(new Font("SansSerif", Font.BOLD, 11));
+        b.addActionListener(e -> action.run());
+        return b;
+    }
+
+    private void showMessage(String message) {
+        JOptionPane.showMessageDialog(frame, message, "Linux Optimizer", JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    private void confirmAction(String title, String message, Callable<String> task) {
+        if (JOptionPane.showConfirmDialog(frame, message, title, JOptionPane.YES_NO_OPTION,
+                JOptionPane.WARNING_MESSAGE) != JOptionPane.YES_OPTION) return;
+        status.setText("Ejecutando: " + title + "…");
+        new SwingWorker<String, Void>() {
+            @Override protected String doInBackground() throws Exception { return task.call(); }
+            @Override protected void done() {
+                try {
+                    String result = get();
+                    status.setText(title + " • finalizado");
+                    JOptionPane.showMessageDialog(frame, result, title, JOptionPane.INFORMATION_MESSAGE);
+                    refresh();
+                } catch (Exception ex) {
+                    Throwable cause = ex.getCause() == null ? ex : ex.getCause();
+                    status.setText(title + " • error");
+                    JOptionPane.showMessageDialog(frame, cause.getMessage(), title, JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        }.execute();
+    }
+
+    private void applyPowerProfile(String profile) {
+        confirmAction("Aplicar perfil de energía",
+                "Se aplicará '" + profile + "'. Se guardará el perfil anterior para poder revertirlo. ¿Continuar?",
+                () -> { new OptimizationCenter().applyPowerProfile(profile); return "Perfil aplicado: " + profile; });
+    }
+
+    private void restorePowerProfile() {
+        confirmAction("Restaurar perfil", "¿Restaurar el perfil de energía anterior guardado por Linux Optimizer?",
+                () -> { new OptimizationCenter().restorePowerProfile(); return "Perfil anterior restaurado."; });
+    }
+
+    private void chooseGovernor() {
+        try {
+            OptimizationCenter center = new OptimizationCenter();
+            List<String> governors = center.availableGovernors();
+            String selected = (String) JOptionPane.showInputDialog(frame, "Selecciona un gobernador disponible:",
+                    "Gobernador CPU", JOptionPane.QUESTION_MESSAGE, null, governors.toArray(), center.currentGovernor());
+            if (selected == null || selected.isBlank()) return;
+            confirmAction("Cambiar gobernador CPU", "Se aplicará '" + selected + "' mediante sudo y se guardará el valor anterior.",
+                    () -> { center.applyGovernor(selected); return "Gobernador aplicado: " + selected; });
+        } catch (Exception ex) { showMessage("No se pudo consultar los gobernadores: " + ex.getMessage()); }
+    }
+
+    private void restoreGovernor() {
+        confirmAction("Restaurar gobernador", "¿Restaurar el gobernador CPU anterior guardado?",
+                () -> { new OptimizationCenter().restoreGovernor(); return "Gobernador anterior restaurado."; });
+    }
+
+    private void toggleZram() {
+        try {
+            OptimizationCenter center = new OptimizationCenter();
+            boolean active = center.isZramActive();
+            if (active && !center.isManagedZram()) {
+                showMessage("ZRAM ya está activa, pero no fue configurada por Linux Optimizer. No se modificará.");
+                return;
+            }
+            boolean enable = !active;
+            confirmAction(enable ? "Activar ZRAM" : "Desactivar ZRAM",
+                    enable ? "Se creará una configuración ZRAM administrada y reversible. Requiere zram-generator y sudo. ¿Continuar?"
+                            : "Se retirará únicamente la configuración ZRAM administrada por Linux Optimizer. ¿Continuar?",
+                    () -> { int code = center.configureManagedZram(enable); if (code != 0) throw new IllegalStateException("El script terminó con código " + code); return enable ? "ZRAM configurada." : "Configuración ZRAM retirada."; });
+        } catch (Exception ex) { showMessage("No se pudo consultar ZRAM: " + ex.getMessage()); }
+    }
+
+    private void toggleTrim() {
+        confirmAction("Administrar TRIM", "Se comprobará el estado y el tipo de almacenamiento. Si hay SSD/NVMe se habilitará o deshabilitará fstrim.timer. ¿Continuar?",
+                () -> {
+                    OptimizationCenter center = new OptimizationCenter();
+                    boolean enabled = center.isTrimTimerEnabled();
+                    if (enabled) {
+                        int code = center.disableTrimTimer();
+                        if (code != 0) throw new IllegalStateException("systemctl terminó con código " + code);
+                        return "fstrim.timer deshabilitado.";
+                    }
+                    if (!center.hasSolidStateDrive()) return "No se detectó almacenamiento no rotacional. No se aplicó ningún cambio.";
+                    int code = center.enableTrimTimer();
+                    if (code != 0) throw new IllegalStateException("systemctl terminó con código " + code);
+                    return "fstrim.timer habilitado.";
+                });
+    }
+
+    private void installOptimizationTools() { installToolProfile(false); }
+    private void installGamingTools() { installToolProfile(true); }
+
+    private void installToolProfile(boolean gamingOnly) {
+        try {
+            LinuxPlatformSupport support = new LinuxPlatformSupport();
+            LinuxPlatformSupport.Platform platform = support.detect();
+            if (support.isImmutableOrImageBased(platform)) {
+                showMessage("Esta distribución es inmutable o basada en imágenes. La instalación genérica está bloqueada; utiliza el mecanismo oficial de tu distribución.");
+                return;
+            }
+            Map<String, List<String>> categories = support.toolCategories(platform);
+            if (categories.isEmpty()) {
+                showMessage("No hay perfiles de paquetes validados para " + platform.name() + ". No se ejecutó ningún comando.");
+                return;
+            }
+            List<String> names = new ArrayList<>(categories.keySet());
+            String selected = (String) JOptionPane.showInputDialog(frame,
+                    "Distribución: " + platform.name() + "\nSelecciona un perfil de paquetes:",
+                    "Instalador de optimización", JOptionPane.QUESTION_MESSAGE, null, names.toArray(), names.get(0));
+            if (selected == null) return;
+            List<String> packages = categories.get(selected);
+            String preview = "Perfil: " + selected + "\nPaquetes: " + String.join(", ", packages)
+                    + "\n\nEl gestor mostrará su transacción y pedirá confirmación. No se eliminarán paquetes.";
+            confirmAction("Instalar " + selected, preview, () -> {
+                int exit = support.install(platform, packages);
+                if (exit != 0) throw new IllegalStateException("El gestor de paquetes terminó con código " + exit);
+                return "Instalación finalizada: " + selected;
+            });
+        } catch (Exception ex) { showMessage("No se pudo preparar el instalador: " + ex.getMessage()); }
+    }
+
+    private void installGraphicsProfile() {
+        try {
+            LinuxPlatformSupport support = new LinuxPlatformSupport();
+            LinuxPlatformSupport.Platform platform = support.detect();
+            if (support.isImmutableOrImageBased(platform)) {
+                showMessage("Distribución inmutable: utiliza el flujo oficial de drivers de tu sistema.");
+                return;
+            }
+            CrossDistroGraphicsCatalog catalog = new CrossDistroGraphicsCatalog();
+            String[] profiles = {"Intel", "AMD", "NVIDIA", "Compatibilidad Wine/Proton", "Componentes comunes"};
+            String selected = (String) JOptionPane.showInputDialog(frame,
+                    "Sistema: " + platform.name() + "\nElige el perfil; verifica fabricante y compatibilidad antes de continuar:",
+                    "Perfiles gráficos", JOptionPane.WARNING_MESSAGE, null, profiles, profiles[0]);
+            if (selected == null) return;
+            CrossDistroGraphicsCatalog.Vendor vendor = switch (selected) {
+                case "Intel" -> CrossDistroGraphicsCatalog.Vendor.INTEL;
+                case "AMD" -> CrossDistroGraphicsCatalog.Vendor.AMD;
+                case "NVIDIA" -> CrossDistroGraphicsCatalog.Vendor.NVIDIA;
+                case "Componentes comunes" -> CrossDistroGraphicsCatalog.Vendor.COMMON;
+                default -> null;
+            };
+            List<String> packages = selected.equals("Compatibilidad Wine/Proton")
+                    ? catalog.compatibilityPackages(platform.family()) : catalog.packages(vendor, platform.family());
+            if (packages.isEmpty()) {
+                showMessage("No existe un perfil validado para esta combinación de distribución y perfil. No se ejecutó ningún comando.");
+                return;
+            }
+            String command = String.join(" ", support.installCommand(platform, packages));
+            confirmAction("Instalar perfil gráfico", "Distribución: " + platform.name() + "\nPaquetes: " + String.join(", ", packages)
+                            + "\nComando revisable: " + command
+                            + "\n\nNVIDIA requiere verificar GPU, kernel, Secure Boot y repositorios. No se eliminarán drivers.",
+                    () -> { int exit = new com.x504.optimizer.install.GraphicsDriverInstaller().install(support, platform, packages);
+                        if (exit != 0) throw new IllegalStateException("El gestor terminó con código " + exit);
+                        return "Perfil gráfico instalado. Revisa los mensajes del gestor y reinicia solo si la distribución lo requiere."; });
+        } catch (Exception ex) { showMessage("No se pudo preparar el perfil gráfico: " + ex.getMessage()); }
+    }
+
+    private void createSteamOptions() {
+        JCheckBox gameMode = new JCheckBox("GameMode");
+        JCheckBox mangoHud = new JCheckBox("MangoHud");
+        JCheckBox gamescope = new JCheckBox("Gamescope");
+        JCheckBox protonLog = new JCheckBox("Registro Proton");
+        JCheckBox fsr = new JCheckBox("FSR de Proton");
+        JCheckBox wineD3d = new JCheckBox("WineD3D (alternativa de compatibilidad; puede reducir rendimiento)");
+        for (JCheckBox box : List.of(gameMode, mangoHud, gamescope, protonLog, fsr, wineD3d)) {
+            box.setOpaque(false); box.setForeground(TEXT);
+        }
+        JPanel choices = new JPanel();
+        choices.setOpaque(false); choices.setLayout(new BoxLayout(choices, BoxLayout.Y_AXIS));
+        for (JCheckBox box : List.of(gameMode, mangoHud, gamescope, protonLog, fsr, wineD3d)) choices.add(box);
+        if (JOptionPane.showConfirmDialog(frame, choices, "Generador de parámetros Steam", JOptionPane.OK_CANCEL_OPTION) != JOptionPane.OK_OPTION) return;
+        try {
+            var options = new SteamLaunchOptionsBuilder.Options(gameMode.isSelected(), mangoHud.isSelected(),
+                    gamescope.isSelected(), protonLog.isSelected(), fsr.isSelected(), wineD3d.isSelected());
+            String result = new SteamLaunchOptionsBuilder().build(options);
+            JTextArea output = new JTextArea(result, 3, 52);
+            output.setLineWrap(true); output.setWrapStyleWord(true); output.setEditable(false);
+            if (JOptionPane.showConfirmDialog(frame, new JScrollPane(output), "Copia en Steam → Propiedades → General → Parámetros de lanzamiento",
+                    JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
+                java.awt.Toolkit.getDefaultToolkit().getSystemClipboard().setContents(new java.awt.datatransfer.StringSelection(result), null);
+                status.setText("Parámetros de Steam copiados al portapapeles.");
+            }
+        } catch (Exception ex) { showMessage("No se pudieron generar los parámetros: " + ex.getMessage()); }
+    }
+
+    private void previewCleaner() {
+        try {
+            SystemCleaner cleaner = new SystemCleaner();
+            List<SystemCleaner.Entry> entries = cleaner.preview();
+            if (entries.isEmpty()) { showMessage("No hay cachés permitidas con más de 30 días para limpiar."); return; }
+            String[] categories = entries.stream().map(SystemCleaner.Entry::category).toArray(String[]::new);
+            String selected = (String) JOptionPane.showInputDialog(frame,
+                    String.join("\n", entries.stream().map(e -> e.category() + ": " + e.files() + " archivos, " + String.format("%.2f MiB", e.bytes()/1048576.0)).toList())
+                            + "\n\nSelecciona una categoría para limpiar:",
+                    "Vista previa de limpieza", JOptionPane.QUESTION_MESSAGE, null, categories, categories[0]);
+            if (selected == null) return;
+            confirmAction("Limpiar caché " + selected,
+                    "Se eliminarán únicamente archivos antiguos de la categoría seleccionada. No se tocarán shaders, navegadores, juegos ni archivos personales.",
+                    () -> "Archivos eliminados: " + cleaner.clean(selected));
+        } catch (Exception ex) { showMessage("No se pudo preparar la limpieza: " + ex.getMessage()); }
     }
 
     private JPanel metricCard(String label, JLabel value) {
