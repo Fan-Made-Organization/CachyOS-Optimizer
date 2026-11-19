@@ -44,7 +44,6 @@ public final class LinuxOptimizerGui {
     private final ButtonGroup navigationGroup = new ButtonGroup();
     private JButton updateButton;
     private AdvancedDiagnostics.Report lastReport;
-    private String portableDetails;
     private PlatformHardwareInspector.Report hardwareReport;
 
     private LinuxOptimizerGui() {
@@ -259,12 +258,6 @@ public final class LinuxOptimizerGui {
         panel.setOpaque(false);
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         panel.setAlignmentX(Component.CENTER_ALIGNMENT);
-        if (!isLinuxHost()) {
-            panel.add(actionCard("Acciones no disponibles en este sistema",
-                    "La interfaz es multiplataforma, pero las operaciones de optimización Linux requieren sus herramientas y APIs nativas.",
-                    button("Ver información", () -> showMessage("Este módulo de aplicación de cambios está disponible en Linux. En Windows/macOS solo se muestran funciones compatibles y no se ejecutan comandos Linux."))));
-            return panel;
-        }
         switch (page) {
             case "Información general" -> { return null; }
             case "Resumen" -> {
@@ -285,6 +278,11 @@ public final class LinuxOptimizerGui {
                 panel.add(actionCard("Memoria virtual ZRAM",
                         "Activa o desactiva únicamente la configuración administrada por Linux Optimizer.",
                         button("Configurar / revertir ZRAM", this::toggleZram)));
+                panel.add(Box.createVerticalStrut(10));
+                panel.add(actionCard("Swappiness de Linux",
+                        "Ajusta la preferencia del kernel para usar swap. El cambio es temporal hasta reiniciar y se puede revertir.",
+                        button("Ajustar swappiness", this::chooseSwappiness),
+                        button("Restaurar valor anterior", this::restoreSwappiness)));
             }
             case "Gráficos" -> panel.add(actionCard("Controladores y pila gráfica",
                     "Prepara perfiles de paquetes compatibles con tu distribución y GPU. No elimina ni reemplaza controladores automáticamente.",
@@ -344,10 +342,27 @@ public final class LinuxOptimizerGui {
         String[] values = {"balanced", "performance", "power-saver"};
         String[] labels = {"Equilibrado", "Rendimiento", "Ahorro de energía"};
         JComboBox<String> selector = new JComboBox<>(labels);
-        selector.setFont(new Font("SansSerif", Font.PLAIN, 13));
+        selector.setFont(new Font("SansSerif", Font.BOLD, 16));
         selector.setForeground(TEXT);
         selector.setBackground(PANEL_ALT);
         selector.setFocusable(false);
+        selector.setPreferredSize(new Dimension(520, 56));
+        selector.setMinimumSize(new Dimension(280, 56));
+        selector.setMaximumSize(new Dimension(Integer.MAX_VALUE, 56));
+        selector.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(new Color(91, 78, 135), 1, true),
+                new EmptyBorder(7, 12, 7, 12)));
+        selector.setRenderer(new DefaultListCellRenderer() {
+            @Override public Component getListCellRendererComponent(JList<?> list, Object value, int index,
+                    boolean isSelected, boolean cellHasFocus) {
+                JLabel label = (JLabel) super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                label.setBorder(new EmptyBorder(9, 12, 9, 12));
+                label.setFont(new Font("SansSerif", Font.BOLD, 15));
+                label.setForeground(isSelected ? Color.WHITE : TEXT);
+                label.setBackground(isSelected ? new Color(76, 62, 120) : PANEL_ALT);
+                return label;
+            }
+        });
         JLabel hint = new JLabel("Equilibrado: uso general y consumo moderado.");
         hint.setForeground(MUTED);
         hint.setFont(new Font("SansSerif", Font.PLAIN, 11));
@@ -388,8 +403,8 @@ public final class LinuxOptimizerGui {
         card.add(title, BorderLayout.NORTH);
         card.add(center, BorderLayout.CENTER);
         card.add(buttons, BorderLayout.SOUTH);
-        card.setMaximumSize(new Dimension(Integer.MAX_VALUE, 230));
-        card.setPreferredSize(new Dimension(600, 180));
+        card.setMaximumSize(new Dimension(Integer.MAX_VALUE, 270));
+        card.setPreferredSize(new Dimension(600, 220));
         card.setAlignmentX(Component.CENTER_ALIGNMENT);
         return card;
     }
@@ -740,10 +755,6 @@ public final class LinuxOptimizerGui {
     }
 
     private void refresh() {
-        if (!isLinuxHost()) {
-            refreshPortableHost();
-            return;
-        }
         status.setText("Analizando el sistema Linux…");
         new SwingWorker<AdvancedDiagnostics.Report, Void>() {
             protected AdvancedDiagnostics.Report doInBackground() {
@@ -790,55 +801,7 @@ public final class LinuxOptimizerGui {
         return System.getProperty("os.name", "").toLowerCase(java.util.Locale.ROOT).contains("linux");
     }
 
-    /** Resumen portable para Windows y macOS; los módulos de bajo nivel siguen siendo Linux-only. */
-    private void refreshPortableHost() {
-        String os = System.getProperty("os.name", "Sistema desconocido");
-        String version = System.getProperty("os.version", "");
-        String arch = System.getProperty("os.arch", "");
-        String javaVersion = System.getProperty("java.version", "");
-        var bean = java.lang.management.ManagementFactory.getOperatingSystemMXBean();
-        long total = bean instanceof com.sun.management.OperatingSystemMXBean mx ? mx.getTotalMemorySize() : -1;
-        cpu.setText(Runtime.getRuntime().availableProcessors() + " procesadores lógicos");
-        ram.setText(total > 0 ? String.format("%.1f GiB", total / 1073741824.0) : "No disponible");
-        gpu.setText("Consultando adaptadores…");
-        distro.setText(os + "  •  " + version + "  •  " + arch);
-        portableDetails = "LINUX OPTIMIZER · MODO MULTIPLATAFORMA\n\n"
-                + "Sistema operativo: " + os + "\nVersión: " + version
-                + "\nArquitectura: " + arch + "\nJava: " + javaVersion
-                + "\nProcesadores lógicos: " + Runtime.getRuntime().availableProcessors()
-                + "\nMemoria física total: " + (total > 0 ? String.format("%.2f GiB", total / 1073741824.0) : "No expuesta por la JVM")
-                + "\n\nLa interfaz y el actualizador funcionan en este sistema."
-                + "\nEl inventario de GPU y almacenamiento usa las herramientas nativas disponibles."
-                + "\nLas métricas de temperatura y uso GPU dependen de los sensores/controladores del fabricante."
-                + "\nNo se ejecutan pruebas de estrés ni se modifican dispositivos."; 
-        status.setText("Modo multiplataforma • " + java.time.LocalTime.now().withNano(0));
-        renderDetails();
-        new SwingWorker<PlatformHardwareInspector.Report, Void>() {
-            @Override protected PlatformHardwareInspector.Report doInBackground() {
-                return new PlatformHardwareInspector().inspect();
-            }
-            @Override protected void done() {
-                try {
-                    PlatformHardwareInspector.Report report = get();
-                    gpu.setText(report.graphics().isEmpty() ? "No detectada" : report.graphics().get(0));
-                    portableDetails += "\n\n━━ GPU / GRÁFICOS ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
-                            + String.join("\n", report.graphics())
-                            + "\n\n━━ ALMACENAMIENTO ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
-                            + String.join("\n", report.storage());
-                    renderDetails();
-                } catch (Exception ex) {
-                    portableDetails += "\n\nNo se pudo completar el inventario de hardware: " + ex.getMessage();
-                    renderDetails();
-                }
-            }
-        }.execute();
-    }
     private void renderDetails() {
-        if (!isLinuxHost() && portableDetails != null) {
-            details.setText(portableDetails);
-            details.setCaretPosition(0);
-            return;
-        }
         if (lastReport == null) { details.setText("Esperando el primer análisis…"); return; }
         List<String> lines = switch (activePage) {
             case "CPU y memoria" -> combine("CPU", lastReport.cpu(), "MEMORIA", lastReport.memory());
@@ -851,9 +814,9 @@ public final class LinuxOptimizerGui {
                     "RED", lastReport.network(), "SERVICIOS", lastReport.services(),
                     "KERNEL", lastReport.kernel(), "GAMING", lastReport.gaming());
         };
-        if (hardwareReport != null && (activePage.equals("Gráficos") || activePage.equals("Almacenamiento") || activePage.equals("Resumen") || activePage.equals("Información general") || activePage.equals("Información general"))) {
+        if (hardwareReport != null && (activePage.equals("Gráficos") || activePage.equals("Almacenamiento") || activePage.equals("Resumen"))) {
             lines = new java.util.ArrayList<>(lines);
-            if (activePage.equals("Gráficos") || activePage.equals("Resumen") || activePage.equals("Información general")) {
+            if (activePage.equals("Gráficos") || activePage.equals("Resumen")) {
                 lines.add("━━ INFORMACIÓN DEL ADAPTADOR GRÁFICO ━━━━━━━━━━━");
                 lines.addAll(hardwareReport.graphics());
                 lines.add("");
