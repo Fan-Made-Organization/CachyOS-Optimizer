@@ -195,6 +195,65 @@ public final class Main {
         report.warnings().forEach(line -> System.out.println(" ! " + line));
         System.out.println("\nEl soporte detecta diferencias entre distribuciones; no cambia el kernel ni el cargador de arranque.");
     }
+    private static void runOptimizationCenter() {
+        try (var scanner = new java.util.Scanner(System.in)) { runOptimizationCenter(scanner); }
+    }
+
+    private static void runOptimizationCenter(java.util.Scanner scanner) {
+        OptimizationCenter center = new OptimizationCenter();
+        while (true) {
+            System.out.println("\n=== CENTRO DE OPTIMIZACIÓN ===");
+            center.categoryStatus().forEach(System.out::println);
+            System.out.println("\n1) CPU: perfiles de energía");
+            System.out.println("2) RAM: revisar memoria y zram");
+            System.out.println("3) GPU: revisar controlador y herramientas");
+            System.out.println("8) Instalar controladores gráficos (OpenGL/Vulkan/Intel/AMD/NVIDIA/DirectX)");
+            System.out.println("4) Gaming: instalar herramientas");
+            System.out.println("5) Almacenamiento: administrar TRIM programado");
+            System.out.println("6) Kernel: información y compatibilidad");
+            System.out.println("7) Steam: creador de parámetros de lanzamiento");
+            System.out.println("0) Volver");
+            System.out.print("Selecciona una categoría: ");
+            if (!scanner.hasNextLine()) return;
+            String choice = scanner.nextLine().strip();
+            try {
+                switch (choice) {
+                    case "1" -> runCpuOptimization(center, scanner);
+                    case "2" -> runRamOptimization(center, scanner);
+                    case "3" -> {
+                        System.out.println("\n=== GPU Y CONTROLADORES ===");
+                        center.gpuSummary().forEach(line -> System.out.println("• " + line));
+                        System.out.println("No se instala ni reemplaza ningún controlador automáticamente.");
+                        System.out.println("Intel suele usar i915/xe; AMD usa amdgpu; NVIDIA puede usar nouveau o el controlador propietario.");
+                        System.out.println("La elección depende de la GPU, kernel y sesión gráfica. Revisa también Vulkan/OpenGL en el diagnóstico.");
+                    }
+                    case "4" -> runInstallTools(scanner);
+                    case "8" -> runGraphicsDriverInstaller(scanner);
+                    case "5" -> runStorageOptimization(center, scanner);
+                    case "6" -> {
+                        System.out.println("\nKernel activo: " + System.getProperty("os.version"));
+                        System.out.println("Kernels instalados en /usr/lib/modules:");
+                        var kernels = center.installedKernels();
+                        if (kernels.isEmpty()) System.out.println("  No se encontraron directorios de módulos.");
+                        else kernels.forEach(kernel -> System.out.println("  • " + kernel));
+                        System.out.println("No se elimina ni reemplaza ningún kernel. Conserva siempre un kernel de respaldo arrancable.");
+                    }
+                    case "7" -> runSteamOptions(scanner);
+                    case "0" -> { return; }
+                    default -> System.out.println("Opción no válida.");
+                }
+            } catch (java.io.IOException ex) {
+                System.err.println("No se pudo completar la operación: " + ex.getMessage());
+            } catch (InterruptedException ex) {
+                Thread.currentThread().interrupt();
+                System.err.println("Operación interrumpida.");
+                return;
+            } catch (IllegalArgumentException | IllegalStateException ex) {
+                System.err.println("Operación no disponible: " + ex.getMessage());
+            }
+        }
+    }
+
     private static void runGraphicsDriverInstaller(java.util.Scanner scanner) {
         GraphicsDriverInstaller installer = new GraphicsDriverInstaller();
         if (!new OptimizationToolsInstaller().isArchBased()) {
