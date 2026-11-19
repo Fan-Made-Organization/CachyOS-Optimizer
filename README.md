@@ -150,7 +150,11 @@ El inventario sin controlador asociado no demuestra por sí solo un fallo o conf
 | Registro local de auditoría | Implementado con rotación básica |
 | Interfaz gráfica | No prevista; el proyecto prioriza una interfaz de terminal. |
 | Microbenchmark CPU local | Implementado como prueba opcional; no mide FPS ni GPU |
-| Exportación de informes JSON/HTML | Implementación inicial |\n| Monitor CPU/RAM y carga en vivo | Implementación inicial, sesión limitada a 5 minutos |\n| Benchmarks sintéticos de RAM y almacenamiento | Implementación inicial, tamaños acotados |\n| Inventario PCI/USB y revisión indicativa de controladores | Implementación inicial |\n| System Core y captura común de módulos | Implementación inicial |
+| Exportación de informes JSON/HTML | Implementación inicial |
+| Monitor CPU/RAM y carga en vivo | Implementación inicial, sesión limitada a 5 minutos |
+| Benchmarks sintéticos de RAM y almacenamiento | Implementación inicial, tamaños acotados |
+| Inventario PCI/USB y revisión indicativa de controladores | Implementación inicial |
+| System Core y captura común de módulos | Implementación inicial |
 
 El código Java que Maven compila se encuentra en `src/main/java`. Los archivos bajo `src/main/resources/java` son recursos heredados y no forman parte del conjunto de clases compiladas por la configuración Maven actual.
 
