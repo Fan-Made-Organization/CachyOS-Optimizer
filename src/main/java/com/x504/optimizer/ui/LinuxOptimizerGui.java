@@ -674,31 +674,135 @@ public final class LinuxOptimizerGui {
     }
 
     private void createSteamOptions() {
-        JCheckBox gameMode = new JCheckBox("GameMode");
-        JCheckBox mangoHud = new JCheckBox("MangoHud");
-        JCheckBox gamescope = new JCheckBox("Gamescope");
-        JCheckBox protonLog = new JCheckBox("Registro Proton");
-        JCheckBox fsr = new JCheckBox("FSR de Proton");
-        JCheckBox wineD3d = new JCheckBox("WineD3D (alternativa de compatibilidad; puede reducir rendimiento)");
+        // Diálogo propio para evitar texto oscuro sobre fondo oscuro por el Look & Feel.
+        JDialog dialog = new JDialog(frame, "Generador de parámetros de Steam", true);
+        dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+        JPanel root = new JPanel();
+        root.setBackground(BG);
+        root.setBorder(new EmptyBorder(22, 24, 20, 24));
+        root.setLayout(new BoxLayout(root, BoxLayout.Y_AXIS));
+
+        JLabel title = new JLabel("Configura el lanzamiento del juego");
+        title.setForeground(TEXT);
+        title.setFont(new Font("SansSerif", Font.BOLD, 19));
+        JLabel intro = new JLabel("<html>Selecciona las herramientas que quieres utilizar. Solo se generará texto para Steam.</html>");
+        intro.setForeground(MUTED);
+        intro.setFont(new Font("SansSerif", Font.PLAIN, 12));
+        root.add(title);
+        root.add(Box.createVerticalStrut(7));
+        root.add(intro);
+        root.add(Box.createVerticalStrut(16));
+
+        JCheckBox gameMode = steamCheck("GameMode", "Prioriza recursos para el juego mientras se ejecuta.");
+        JCheckBox mangoHud = steamCheck("MangoHud", "Muestra información de rendimiento dentro del juego.");
+        JCheckBox gamescope = steamCheck("Gamescope", "Ejecuta el juego dentro de un compositor anidado.");
+        JCheckBox protonLog = steamCheck("Registro de Proton", "Activa un registro útil para diagnosticar compatibilidad.");
+        JCheckBox fsr = steamCheck("FSR de Proton", "Activa el escalado FSR cuando el juego lo admite.");
+        JCheckBox wineD3d = steamCheck("WineD3D (OpenGL)", "Alternativa de compatibilidad; puede rendir menos que DXVK/Vulkan.");
         for (JCheckBox box : List.of(gameMode, mangoHud, gamescope, protonLog, fsr, wineD3d)) {
-            box.setOpaque(false); box.setForeground(TEXT);
+            root.add(box);
+            root.add(Box.createVerticalStrut(7));
         }
-        JPanel choices = new JPanel();
-        choices.setOpaque(false); choices.setLayout(new BoxLayout(choices, BoxLayout.Y_AXIS));
-        for (JCheckBox box : List.of(gameMode, mangoHud, gamescope, protonLog, fsr, wineD3d)) choices.add(box);
-        if (JOptionPane.showConfirmDialog(frame, choices, "Generador de parámetros Steam", JOptionPane.OK_CANCEL_OPTION) != JOptionPane.OK_OPTION) return;
-        try {
-            var options = new SteamLaunchOptionsBuilder.Options(gameMode.isSelected(), mangoHud.isSelected(),
-                    gamescope.isSelected(), protonLog.isSelected(), fsr.isSelected(), wineD3d.isSelected());
-            String result = new SteamLaunchOptionsBuilder().build(options);
-            JTextArea output = new JTextArea(result, 3, 52);
-            output.setLineWrap(true); output.setWrapStyleWord(true); output.setEditable(false);
-            if (JOptionPane.showConfirmDialog(frame, new JScrollPane(output), "Copia en Steam → Propiedades → General → Parámetros de lanzamiento",
-                    JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
-                java.awt.Toolkit.getDefaultToolkit().getSystemClipboard().setContents(new java.awt.datatransfer.StringSelection(result), null);
-                status.setText("Parámetros de Steam copiados al portapapeles.");
+
+        JPanel advanced = new JPanel(new GridLayout(2, 2, 10, 7));
+        advanced.setOpaque(false);
+        JSpinner width = new JSpinner(new SpinnerNumberModel(1920, 640, 7680, 10));
+        JSpinner height = new JSpinner(new SpinnerNumberModel(1080, 480, 4320, 10));
+        JSpinner refreshRate = new JSpinner(new SpinnerNumberModel(60, 30, 360, 1));
+        JSpinner fsrStrength = new JSpinner(new SpinnerNumberModel(2, 0, 5, 1));
+        advanced.add(steamField("Ancho Gamescope", width));
+        advanced.add(steamField("Alto Gamescope", height));
+        advanced.add(steamField("Frecuencia (Hz)", refreshRate));
+        advanced.add(steamField("Intensidad FSR (0–5)", fsrStrength));
+        JLabel advancedHint = new JLabel("La resolución solo se usa si activas Gamescope.");
+        advancedHint.setForeground(MUTED);
+        advancedHint.setFont(new Font("SansSerif", Font.PLAIN, 11));
+        root.add(Box.createVerticalStrut(8));
+        root.add(advanced);
+        root.add(Box.createVerticalStrut(7));
+        root.add(advancedHint);
+
+        JPanel buttons = new JPanel(new FlowLayout(FlowLayout.RIGHT, 8, 0));
+        buttons.setOpaque(false);
+        buttons.add(button("Cancelar", dialog::dispose));
+        buttons.add(button("Generar parámetros", () -> {
+            try {
+                var options = new SteamLaunchOptionsBuilder.AdvancedOptions(
+                        gameMode.isSelected(), mangoHud.isSelected(), gamescope.isSelected(),
+                        protonLog.isSelected(), fsr.isSelected(),
+                        (Integer) width.getValue(), (Integer) height.getValue(),
+                        (Integer) refreshRate.getValue(), (Integer) fsrStrength.getValue(),
+                        wineD3d.isSelected());
+                String result = new SteamLaunchOptionsBuilder().build(options);
+                dialog.dispose();
+                showSteamOutput(result);
+            } catch (Exception ex) {
+                showMessage("No se pudieron generar los parámetros: " + ex.getMessage());
             }
-        } catch (Exception ex) { showMessage("No se pudieron generar los parámetros: " + ex.getMessage()); }
+        }));
+        root.add(Box.createVerticalStrut(17));
+        root.add(buttons);
+        dialog.setContentPane(root);
+        dialog.setSize(690, 650);
+        dialog.setMinimumSize(new Dimension(620, 600));
+        dialog.setLocationRelativeTo(frame);
+        dialog.setVisible(true);
+    }
+
+    private JCheckBox steamCheck(String label, String description) {
+        JCheckBox box = new JCheckBox("<html><b>" + label + "</b><br><span style='color:#AAB5CA'>" + description + "</span></html>");
+        box.setUI(new javax.swing.plaf.basic.BasicCheckBoxUI());
+        box.setOpaque(true);
+        box.setBackground(PANEL);
+        box.setForeground(TEXT);
+        box.setFont(new Font("SansSerif", Font.PLAIN, 12));
+        box.setBorder(new EmptyBorder(9, 12, 9, 12));
+        box.setFocusPainted(false);
+        box.setAlignmentX(Component.LEFT_ALIGNMENT);
+        box.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        box.setPreferredSize(new Dimension(620, 52));
+        box.setMaximumSize(new Dimension(Integer.MAX_VALUE, 58));
+        return box;
+    }
+
+    private JPanel steamField(String label, JSpinner spinner) {
+        JPanel panel = new JPanel(new BorderLayout(0, 5));
+        panel.setOpaque(false);
+        JLabel caption = new JLabel(label);
+        caption.setForeground(MUTED);
+        caption.setFont(new Font("SansSerif", Font.BOLD, 10));
+        spinner.setFont(new Font("SansSerif", Font.BOLD, 13));
+        spinner.setPreferredSize(new Dimension(125, 34));
+        panel.add(caption, BorderLayout.NORTH);
+        panel.add(spinner, BorderLayout.CENTER);
+        return panel;
+    }
+
+    private void showSteamOutput(String result) {
+        JTextArea output = new JTextArea(result, 3, 52);
+        output.setLineWrap(true);
+        output.setWrapStyleWord(true);
+        output.setEditable(false);
+        output.setBackground(PANEL);
+        output.setForeground(TEXT);
+        output.setCaretColor(TEXT);
+        output.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 13));
+        output.setBorder(new EmptyBorder(12, 12, 12, 12));
+        JScrollPane scroll = new JScrollPane(output);
+        scroll.setPreferredSize(new Dimension(570, 105));
+        scroll.getViewport().setBackground(PANEL);
+        JPanel panel = new JPanel(new BorderLayout(0, 9));
+        panel.setBackground(BG);
+        JLabel instruction = new JLabel("<html>Copia esta línea en <b>Steam → Propiedades → General → Parámetros de lanzamiento</b>.</html>");
+        instruction.setForeground(TEXT);
+        panel.add(instruction, BorderLayout.NORTH);
+        panel.add(scroll, BorderLayout.CENTER);
+        if (JOptionPane.showConfirmDialog(frame, panel, "Parámetros generados",
+                JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE) == JOptionPane.OK_OPTION) {
+            java.awt.Toolkit.getDefaultToolkit().getSystemClipboard().setContents(
+                    new java.awt.datatransfer.StringSelection(result), null);
+            status.setText("Parámetros de Steam copiados al portapapeles.");
+        }
     }
 
     private void previewCleaner() {
