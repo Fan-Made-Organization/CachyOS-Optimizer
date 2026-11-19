@@ -22,7 +22,7 @@ public final class Main {
 
     public static void main(String[] args) {
         if (args.length == 0 || args[0].equals("--menu")) { runTerminalMenu(); return; }
-        if (args.length > 0 && args[0].equals("--diagnostics")) { runDiagnostics(args); return; }
+        if (args.length > 0 && (args[0].equals("--diagnostics") || args[0].equals("--benchmark"))) { runDiagnostics(args); return; }
         if (args.length > 0 && args[0].equals("--help")) {
             printHelp();
             return;
@@ -35,7 +35,7 @@ public final class Main {
             runRestore(args);
             return;
         }
-
+        printHelp();
     }
 
     private static void runDiagnostics(String[] args) {
