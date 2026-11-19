@@ -816,7 +816,6 @@ public final class Main {
                   --benchmark  Ejecuta un microbenchmark breve de CPU.
                   --benchmark-memory [MiB]  Prueba RAM sintética (8-64 MiB).
                   --benchmark-storage [MiB] Prueba temporal de disco (8-32 MiB).
-                  --monitor [segundos]      Monitor CPU/RAM (1-300 s).
                   --benchmark-suite [MiB]   CPU + RAM + disco; guarda historial.
                   --compare-benchmarks A B  Compara dos CSV (antes/después).
                   --install-tools          Instala herramientas por categoría en familias compatibles (Arch, Debian, Fedora, SUSE, Alpine).\n                  --linux-support         Muestra compatibilidad de distro y kernel.\n                  --advanced-diagnostics Inspecciona almacenamiento, servicios, módulos y gaming.
