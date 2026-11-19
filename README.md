@@ -53,7 +53,9 @@ Su objetivo es ayudar a entender el equipo antes de cambiar configuraciones: det
 | KDE Plasma | Información del entorno KDE cuando está presente. |
 | Steam | Detección de Steam y elementos relacionados que puedan inspeccionarse. |
 | Proton | Información disponible sobre Proton y compatibilidad de juegos. |
-| Diagnóstico general | Agrupa las comprobaciones generales del sistema. |\n| Kernel y arranque | Kernel activo, variantes identificables, árboles de módulos, headers, módulos cargados, UEFI y rutas comunes de GRUB/systemd-boot. |\n| Compatibilidad de distribución Linux | Familia de distribución, versión e identificación del gestor de paquetes. |
+| Diagnóstico general | Agrupa las comprobaciones generales del sistema. |
+| Kernel y arranque | Kernel activo, variantes identificables, árboles de módulos, headers, módulos cargados, UEFI y rutas comunes de GRUB/systemd-boot. |
+| Compatibilidad de distribución Linux | Familia de distribución, versión e identificación del gestor de paquetes. |
 | Hardware Intelligence | Capacidades anunciadas de CPU, topología básica y recuento PCI. |
 | Driver Inspector | Asociaciones de dispositivos PCI con controladores del kernel y módulos cargados. |
 | System Health Monitor | Memoria, carga promedio, espacio raíz y disponibilidad de sensores. |
@@ -146,7 +148,9 @@ El menú incluye **Instalar herramientas de optimización** y el comando `--inst
 - Gaming y monitorización: `gamemode`, `lib32-gamemode`, `mangohud`, `lib32-mangohud`, `gamescope`, `goverlay`, `vkbasalt`, `lib32-vkbasalt`, `protontricks`.
 - Monitorización y diagnóstico adicional: `btop`, `fastfetch`, `stress-ng`, `intel-gpu-tools` y `radeontop` (las utilidades específicas de GPU muestran datos según el hardware compatible).
 
-En la primera ejecución, el lanzador solicita elegir idioma (Español, English o Português Brasil) y guarda la preferencia en `~/.config/cachyos-optimizer/language`. La preferencia se conserva para los siguientes inicios. El código visible de la aplicación todavía está principalmente en español; la selección ya prepara el idioma del proceso y del lanzador, pero la traducción completa de todos los menús está pendiente.\n\nAntes de empezar la instalación de herramientas, muestra la lista y pide confirmación. Después usa el gestor de paquetes detectado (Pacman, APT, DNF/YUM o Zypper) sin opciones de confirmación automática, por lo que el gestor presenta su resumen y solicita aprobación.
+En la primera ejecución, el lanzador solicita elegir idioma (Español, English o Português Brasil) y guarda la preferencia en `~/.config/cachyos-optimizer/language`. La preferencia se conserva para los siguientes inicios. El código visible de la aplicación todavía está principalmente en español; la selección ya prepara el idioma del proceso y del lanzador, pero la traducción completa de todos los menús está pendiente.
+
+Antes de empezar la instalación de herramientas, muestra la lista y pide confirmación. Después usa el gestor de paquetes detectado (Pacman, APT, DNF/YUM o Zypper) sin opciones de confirmación automática, por lo que el gestor presenta su resumen y solicita aprobación.
 
 **Alcance importante:** esta opción instala herramientas de usuario; no instala controladores a ciegas ni activa servicios automáticamente. `power-profiles-daemon` y `thermald` pueden requerir habilitación manual según el equipo. No se activa TLP junto a otros gestores de energía para evitar conflictos. Los cambios de perfil/gobernador se realizan desde el centro con confirmación. Esos cambios dependen del hardware y requieren módulos específicos, comprobaciones y reversión. Si Pacman no encuentra un paquete o una dependencia, la transacción puede cancelarse sin completar.
 
