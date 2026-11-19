@@ -183,17 +183,81 @@ public final class Main {
     }
 
     private static void runLinuxSupport() {
-        var platform = new LinuxPlatformSupport().detect();
-        System.out.println("\n=== SOPORTE LINUX ===");
+        try (var scanner = new java.util.Scanner(System.in)) { runLinuxSupport(scanner); }
+    }
+
+    private static void runLinuxSupport(java.util.Scanner scanner) {
+        LinuxPlatformSupport support = new LinuxPlatformSupport();
+        var platform = support.detect();
+        KernelManager kernels = new KernelManager();
+        System.out.println("\n=== SOPORTE LINUX Y GESTOR DE KERNELS ===");
         System.out.println("Distribución: " + platform.name());
         System.out.println("ID / versión: " + platform.id() + " / " + platform.version());
-        System.out.println("Familia: " + platform.family());
-        System.out.println("Gestor de paquetes: " + platform.packageManager());
+        System.out.println("Familia: " + platform.family() + " | Gestor: " + platform.packageManager());
         System.out.println("Kernel activo: " + System.getProperty("os.version"));
         var report = new KernelModule().inspect();
         report.findings().forEach(line -> System.out.println(" • " + line));
         report.warnings().forEach(line -> System.out.println(" ! " + line));
-        System.out.println("\nEl soporte detecta diferencias entre distribuciones; no cambia el kernel ni el cargador de arranque.");
+
+        var inventory = kernels.inspectBootInventory();
+        System.out.println("\n=== INVENTARIO DE RESPALDO ===");
+        System.out.println("Árboles de módulos: " + (inventory.installedModuleTrees().isEmpty() ? "no detectados" : String.join(", ", inventory.installedModuleTrees())));
+        System.out.println("Archivos de kernel/initramfs detectados: " + (inventory.bootFiles().isEmpty() ? "ninguno en rutas comunes" : String.join(", ", inventory.bootFiles())));
+        System.out.println("Posible kernel/entrada de respaldo: " + (inventory.hasPossibleFallback() ? "sí, requiere verificación manual" : "no confirmado"));
+        System.out.println("\n=== OPCIONES DE KERNEL DISPONIBLES ===");
+        var options = kernels.options(platform);
+        if (options.isEmpty()) {
+            System.out.println("Esta distribución no tiene un perfil de instalación validado. Se mantiene el modo de solo lectura.");
+        } else {
+            for (int i = 0; i < options.size(); i++) {
+                var option = options.get(i);
+                System.out.println((i + 1) + ") " + option.label());
+                System.out.println("   Paquetes: " + String.join(", ", option.packages()));
+                System.out.println("   " + option.note());
+            }
+            System.out.println("0) Volver");
+            System.out.print("Selecciona un kernel para ver el plan de instalación (no se ejecuta todavía): ");
+            if (!scanner.hasNextLine()) return;
+            String choice = scanner.nextLine().strip();
+            if (!choice.equals("0")) {
+                try {
+                    int index = Integer.parseInt(choice) - 1;
+                    if (index < 0 || index >= options.size()) throw new IllegalArgumentException("Selección fuera de rango.");
+                    var selected = options.get(index);
+                    var command = kernels.installCommand(support, platform, selected);
+                    System.out.println("\nPlan revisable:");
+                    System.out.println("  " + String.join(" ", command));
+                    System.out.println("El gestor de paquetes mostrará dependencias y pedirá su propia confirmación.");
+                    if (!inventory.hasPossibleFallback()) {
+                        System.out.println("BLOQUEO DE SEGURIDAD: no se detectó un kernel/entrada de respaldo verificable.");
+                        System.out.println("No se ejecutará la instalación desde aquí. Primero conserva y verifica un kernel arrancable.");
+                    } else {
+                        System.out.println("ATENCIÓN: la detección de respaldo es heurística. Verifica manualmente que el kernel actual y su entrada arrancan.");
+                        System.out.print("Escribe INSTALAR para iniciar la instalación de estos paquetes; cualquier otra entrada cancela: ");
+                        if (scanner.hasNextLine() && scanner.nextLine().strip().equals("INSTALAR")) {
+                            int exit = support.install(platform, selected.packages());
+                            if (exit == 0) {
+                                System.out.println("El gestor de paquetes terminó correctamente. Verifica initramfs y entradas de arranque antes de reiniciar.");
+                                writeAuditEvent("kernel_packages_installed", platform.family() + ": " + String.join(",", selected.packages()));
+                            } else System.err.println("El gestor de paquetes terminó con código " + exit + ". No reinicies hasta revisar sus mensajes.");
+                        } else System.out.println("Instalación cancelada.");
+                    }
+                } catch (NumberFormatException | IllegalArgumentException ex) {
+                    System.err.println("Selección inválida: " + ex.getMessage());
+                } catch (IOException ex) {
+                    System.err.println("No se pudo iniciar el gestor de paquetes: " + ex.getMessage());
+                } catch (InterruptedException ex) {
+                    Thread.currentThread().interrupt();
+                    System.err.println("Instalación interrumpida.");
+                    return;
+                } catch (IllegalStateException ex) {
+                    System.err.println("No se pudo preparar el plan: " + ex.getMessage());
+                }
+            }
+        }
+        System.out.println("\n=== GUÍA DE RECUPERACIÓN ===");
+        kernels.recoveryGuide().forEach(line -> System.out.println(" • " + line));
+        System.out.println("\nCachyOS Optimizer nunca elimina kernels, no cambia el bootloader ni edita parámetros de arranque.");
     }
     private static void runOptimizationCenter() {
         try (var scanner = new java.util.Scanner(System.in)) { runOptimizationCenter(scanner); }
