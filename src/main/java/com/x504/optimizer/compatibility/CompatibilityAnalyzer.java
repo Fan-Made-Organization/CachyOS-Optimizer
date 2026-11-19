@@ -4,7 +4,7 @@ import com.x504.optimizer.system.SystemInfo;
 import java.util.ArrayList;
 import java.util.List;
 
-/** Calcula compatibilidad con evidencia detectada; no inventa una puntuación fija. */
+/** Calcula compatibilidad con evidencia detectada; los datos desconocidos no suman puntos. */
 public final class CompatibilityAnalyzer {
     public CompatibilityReport analyze(SystemInfo info) {
         List<CompatibilityItem> items = new ArrayList<>();
@@ -21,22 +21,20 @@ public final class CompatibilityAnalyzer {
                 "Desconocido".equalsIgnoreCase(info.desktop()) || "No detectado".equalsIgnoreCase(info.desktop())
                         ? CompatibilityStatus.UNKNOWN : CompatibilityStatus.PARTIAL,
                 info.desktop()));
+
         int points = 0;
         int known = 0;
         int unknown = 0;
         for (CompatibilityItem item : items) {
-            if (item.status() == CompatibilityStatus.UNKNOWN) unknown++;
-            else {
-                known++;
-                points += switch (item.status()) {
-                    case COMPATIBLE -> 100;
-                    case PARTIAL -> 60;
-                    case INCOMPATIBLE -> 0;
-                    case UNKNOWN -> 0;
-                };
+            switch (item.status()) {
+                case COMPATIBLE -> { points += 100; known++; }
+                case PARTIAL -> { points += 60; known++; }
+                case INCOMPATIBLE -> known++;
+                case UNKNOWN -> unknown++;
             }
         }
-        int percentage = known == 0 ? 0 : (int) Math.round((double) points / known);
+        // El porcentaje mide el total de comprobaciones; lo desconocido no se considera compatible.
+        int percentage = items.isEmpty() ? 0 : (int) Math.round((double) points / items.size());
         return new CompatibilityReport(items, percentage, known, unknown);
     }
 
