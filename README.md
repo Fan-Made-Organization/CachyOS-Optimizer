@@ -475,3 +475,44 @@ El comando `--advanced-diagnostics` amplía el diagnóstico con CPU (frecuencias
 La aplicación comprueba en segundo plano la última GitHub Release al abrir la interfaz gráfica. También puedes pulsar **Buscar actualizaciones**. Si encuentra una versión nueva, descarga el JAR y su checksum SHA-256, verifica la integridad y lo prepara en `~/.local/share/linux-optimizer/`. El lanzador aplica el archivo verificado en el siguiente inicio; nunca reemplaza el programa mientras está ejecutándose.
 
 Las releases se publican al crear y subir una etiqueta Git con formato `vX.Y.Z`. El flujo `.github/workflows/release.yml` ejecuta `mvn clean verify` y adjunta `linux-optimizer.jar` más su checksum. Hasta que exista una primera GitHub Release, la aplicación indicará que todavía no hay una versión publicada.
+
+
+## Compatibilidad multiplataforma
+
+Linux Optimizer comparte el mismo código Java y la misma interfaz Swing en Linux, Windows y macOS. No hay una reescritura de la interfaz por sistema operativo.
+
+- **Linux:** diagnóstico avanzado de distro, kernel, controladores, servicios, almacenamiento, red y herramientas de gaming; las capacidades concretas dependen de la distribución.
+- **Windows y macOS:** interfaz gráfica, navegación animada, actualización desde GitHub y monitorización de CPU/RAM mediante Java MXBeans. Las métricas de temperatura y GPU se muestran solo cuando existe una fuente compatible; los módulos Linux de sysfs, systemd, DRM y gestores de paquetes no se ejecutan en esos sistemas.
+- **Otras distribuciones Linux:** la interfaz y el núcleo Java son comunes. Los perfiles de instalación de paquetes se habilitan únicamente en familias con comandos y nombres de paquetes conocidos; NixOS, Gentoo, Void y sistemas inmutables mantienen sus limitaciones documentadas.
+
+### Instalar en Windows
+
+Requisitos: Java 21 y Maven. Desde PowerShell, en la carpeta clonada:
+
+```powershell
+mvn clean package
+.\scripts\install-app.ps1
+```
+
+El instalador crea un acceso directo en el menú Inicio. Para quitarlo:
+
+```powershell
+.\scripts\uninstall-app.ps1
+```
+
+### Instalar en Linux
+
+```bash
+bash scripts/install-app.sh
+```
+
+### macOS
+
+Con Java 21 y Maven instalados:
+
+```bash
+mvn clean package
+java -jar target/linux-optimizer-0.1.0-SNAPSHOT.jar --gui
+```
+
+La compilación multiplataforma se valida en GitHub Actions para Ubuntu, Windows y macOS. Las pruebas completas de diagnóstico Linux se ejecutan en Ubuntu; Windows y macOS verifican compilación y empaquetado.
