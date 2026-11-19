@@ -88,7 +88,7 @@ class LinuxPlatformSupportTest {
 
     @Test void quotedOsReleaseValuesAreUnwrapped() throws Exception {
         Path file = temp.resolve("quoted-os-release");
-        Files.writeString(file, "ID=arch\\nPRETTY_NAME=\\\"Arch Linux\\\"\\nVERSION_ID=\\\"rolling\\\"\\n");
+        Files.writeString(file, "ID=arch\nPRETTY_NAME=\"Arch Linux\"\nVERSION_ID=\"rolling\"\n");
         var detected = new LinuxPlatformSupport(file).detect();
         assertEquals("Arch Linux", detected.name());
         assertEquals("rolling", detected.version());
