@@ -177,7 +177,9 @@ El instalador de herramientas usa listas pequeñas y específicas por familia. M
 
 **Soporte de kernels:** inspecciona la versión activa, kernels con árboles de módulos instalados, presencia de headers/build, módulos cargados, parámetros de arranque, estado de lockdown, UEFI y rutas comunes de GRUB/systemd-boot. Reconoce etiquetas habituales como LTS, Zen, Hardened, CachyOS, XanMod y Liquorix cuando aparecen en la versión. La identificación por nombre es orientativa.
 
-**Límite deliberado:** la administración de kernels es de solo lectura en esta versión. No instala ni elimina kernels, no regenera initramfs, no modifica GRUB/systemd-boot y no cambia parámetros de arranque. Antes de implementar operaciones de ese nivel se necesita detectar con precisión el gestor de arranque, los kernels de respaldo, el esquema de paquetes y un procedimiento de recuperación específico por distribución.
+**Gestor guiado de kernels:** la opción 10 ahora propone paquetes oficiales para Arch/CachyOS (estándar, LTS y Zen), Debian/Ubuntu, Fedora y openSUSE, incluyendo los paquetes de headers/devel correspondientes. Antes de ejecutar muestra el comando, inspecciona árboles de módulos y archivos comunes de /boot, y exige escribir `INSTALAR`. Si no detecta un posible kernel alternativo o más de una imagen de kernel, bloquea la instalación. Esta comprobación es heurística: el usuario debe verificar manualmente que el kernel actual y el respaldo realmente arrancan. Distribuciones desconocidas permanecen en solo lectura.
+
+El gestor nunca elimina kernels, no modifica GRUB/systemd-boot, no regenera initramfs manualmente ni cambia parámetros de arranque. Tras instalar, revisa la salida del gestor de paquetes y verifica initramfs/entradas de arranque antes de reiniciar. La guía de recuperación explica cómo seleccionar el kernel anterior desde GRUB/systemd-boot. Los nombres de paquetes pueden variar en derivadas y repositorios personalizados; no se garantiza compatibilidad universal.
 
 Ejecuta el informe con:
 
@@ -219,7 +221,7 @@ Las opciones son plantillas: no instalan herramientas ni garantizan compatibilid
 ### 16. Límites de seguridad
 - El diagnóstico normal es de solo lectura; las acciones disponibles se muestran por separado y requieren confirmación explícita.
 - Los comandos administrativos usan una lista cerrada de operaciones y no interpolan parámetros libres de shell.
-- Los cambios de CPU, zram y TRIM tienen mecanismos de reversión documentados; GPU y kernel permanecen en modo de inspección.
+- Los cambios de CPU, zram y TRIM tienen mecanismos de reversión documentados; GPU permanece en modo de inspección. El gestor de kernels puede instalar paquetes oficiales con confirmación explícita, pero nunca elimina kernels ni modifica el bootloader.
 - El respaldo restaura copias verificadas en otra carpeta; no altera automáticamente los archivos originales.
 
 ## Estado real del proyecto
@@ -234,7 +236,7 @@ Las opciones son plantillas: no instalan herramientas ni garantizan compatibilid
 | Validación y preparación de acciones | Implementada; algunas acciones optativas se ejecutan con confirmación y reversión documentada |
 | Backup de archivos seleccionados y restauración verificada a otra carpeta | Implementado |
 | Instalación guiada de herramientas de diagnóstico y gaming en Arch/CachyOS | Implementada; confirmación previa y Pacman interactivo |
-| Centro guiado CPU/RAM/GPU/Gaming/almacenamiento/kernel | Implementado parcialmente; perfiles de energía, gobernadores CPU, zram administrado y TRIM son acciones optativas; GPU/kernel son inspección guiada |
+| Centro guiado CPU/RAM/GPU/Gaming/almacenamiento/kernel | Implementado parcialmente; CPU, zram y TRIM tienen acciones reversibles; GPU es informativo; gestor de kernels ofrece instalación guiada por distro y guía de recuperación, sin eliminación ni cambios de bootloader |
 | Creador de parámetros de Steam | Implementado; plantillas, perfiles de juego, Gamescope con resolución/Hz y guardado local sin sobrescritura |
 | Configuración zram administrada y reversible | Implementada con `zram-generator`; no sobrescribe configuración existente |
 | Restauración sobre rutas originales y rollback del sistema | **Pendiente** |
