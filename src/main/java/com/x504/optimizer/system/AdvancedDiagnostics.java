@@ -59,10 +59,27 @@ public final class AdvancedDiagnostics {
         return false;
     }
     private static CommandResult run(List<String> cmd,int seconds) {
-        try { Process p=new ProcessBuilder(cmd).redirectErrorStream(true).start();
-            if(!p.waitFor(seconds,TimeUnit.SECONDS)){p.destroyForcibly();return null;}
-            return new CommandResult(p.exitValue(),new String(p.getInputStream().readAllBytes(),java.nio.charset.StandardCharsets.UTF_8));
-        } catch(IOException e){return null;} catch(InterruptedException e){Thread.currentThread().interrupt();return null;}
+        Path output = null;
+        try {
+            output = Files.createTempFile("linux-optimizer-diagnostic-", ".log");
+            Process process = new ProcessBuilder(cmd).redirectErrorStream(true).redirectOutput(output.toFile()).start();
+            if (!process.waitFor(seconds, TimeUnit.SECONDS)) {
+                process.destroyForcibly();
+                process.waitFor(1, TimeUnit.SECONDS);
+                return null;
+            }
+            return new CommandResult(process.exitValue(),
+                    Files.readString(output, java.nio.charset.StandardCharsets.UTF_8));
+        } catch (IOException e) {
+            return null;
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            return null;
+        } finally {
+            if (output != null) {
+                try { Files.deleteIfExists(output); } catch (IOException ignored) { }
+            }
+        }
     }
     private record CommandResult(int code,String output){}
 }
