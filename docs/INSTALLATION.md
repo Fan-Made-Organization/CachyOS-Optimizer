@@ -5,8 +5,8 @@
 En una terminal de Linux:
 
 ```bash
-git clone https://github.com/Fan-Made-Organization/CachyOS-Optimizer.git
-cd CachyOS-Optimizer
+git clone https://github.com/Fan-Made-Organization/Linux-Optimizer.git
+cd Linux-Optimizer
 bash scripts/launch.sh
 ```
 
@@ -47,7 +47,7 @@ Java 21, Maven y las dependencias Maven se guardan localmente en `.tools/` y `.c
 
 ## Clonar con GitHub Desktop u otro cliente
 
-También puedes clonar el repositorio desde GitHub Desktop o cualquier cliente Git. Cuando termine la clonación, abre una terminal dentro de la carpeta `CachyOS-Optimizer` y ejecuta:
+También puedes clonar el repositorio desde GitHub Desktop o cualquier cliente Git. Cuando termine la clonación, abre una terminal dentro de la carpeta `Linux-Optimizer` y ejecuta:
 
 ```bash
 bash scripts/launch.sh
@@ -60,7 +60,7 @@ Con Java 21 y Maven ya configurados:
 ```bash
 mvn clean verify
 mvn package
-java -jar target/cachyos-optimizer-0.1.0-SNAPSHOT.jar
+java -jar target/linux-optimizer-0.1.0-SNAPSHOT.jar
 ```
 
 Scripts disponibles:
@@ -70,3 +70,9 @@ Scripts disponibles:
 - `scripts/package.sh`: genera el JAR.
 - `scripts/launch.sh`: prepara el entorno si hace falta y ejecuta la aplicación.
 - `scripts/clean.sh`: elimina los artefactos de compilación.
+
+## Distribuciones y requisitos del entorno
+
+El lanzador está preparado para GNU/Linux y automatiza la preparación de Java 21 y Maven en Linux x86_64 y ARM64. La aplicación puede compilarse manualmente en otros entornos con JDK 21 y Maven, pero eso no implica que sus módulos de diagnóstico o acciones sean compatibles fuera de Linux. La detección de distribución no instala dependencias por sí sola. Algunos paquetes opcionales pueden no existir en los repositorios habilitados, tener otros nombres o requerir repositorios adicionales; revisa siempre la transacción del gestor. En sistemas inmutables, contenedores o entornos administrados, utiliza el método recomendado por la distribución.
+
+Para actualizar una copia, ejecuta `git pull` dentro del repositorio y vuelve a iniciar con `bash scripts/launch.sh`. Si el repositorio local conserva el remoto anterior, comprueba `git remote -v`.
