@@ -201,11 +201,11 @@ public final class OptimizationCenter {
     public List<String> categoryStatus() {
         List<String> lines = new ArrayList<>();
         lines.add("CPU: perfiles de energía y gobernador disponible; cambios reversibles con respaldo del valor anterior.");
-        lines.add("RAM: inspección de zram y memoria; no se fuerza la liberación de cachés ni se mata procesos.");
-        lines.add("GPU: detección y herramientas; no se cambian controladores ni parámetros gráficos a ciegas.");
+        lines.add("RAM: detección y configuración zram administrada/reversible; no se purgan cachés ni se matan procesos.");
+        lines.add("GPU: inventario DRM, fabricante PCI y controlador; sin cambios automáticos de drivers.");
         lines.add("Gaming: GameMode, MangoHud, Gamescope y herramientas opcionales.");
         lines.add("Almacenamiento: TRIM programado con fstrim.timer si se detecta SSD/NVMe.");
-        lines.add("Kernel: inspección y recomendaciones; no se sustituye el kernel automáticamente.");
+        lines.add("Kernel: inventario de versiones instaladas y kernel activo; sin eliminar ni sustituir kernels.");
         return List.copyOf(lines);
     }
 
