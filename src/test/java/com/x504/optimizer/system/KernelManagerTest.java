@@ -40,6 +40,16 @@ class KernelManagerTest {
         assertThrows(IllegalArgumentException.class, () -> manager.installCommand(support, arch, debianOption));
     }
 
+    @Test void buildsReadOnlyPackageQueriesForEverySupportedFamily() {
+        assertEquals(List.of("pacman", "-Q", "linux"), manager.packageQueryCommand(platform(LinuxPlatformSupport.Family.ARCH, "pacman"), "linux"));
+        assertEquals(List.of("dpkg-query", "-W", "-f=${Status}", "--", "linux-image-amd64"), manager.packageQueryCommand(platform(LinuxPlatformSupport.Family.DEBIAN, "apt-get"), "linux-image-amd64"));
+        assertEquals(List.of("rpm", "-q", "kernel"), manager.packageQueryCommand(platform(LinuxPlatformSupport.Family.FEDORA, "dnf"), "kernel"));
+        assertEquals(List.of("zypper", "search", "--installed-only", "--match-exact", "--type", "package", "kernel-default"), manager.packageQueryCommand(platform(LinuxPlatformSupport.Family.SUSE, "zypper"), "kernel-default"));
+    }
+
+    @Test void rejectsUnsafePackageQueryNames() {
+        assertThrows(IllegalArgumentException.class, () -> manager.packageQueryCommand(platform(LinuxPlatformSupport.Family.ARCH, "pacman"), "linux;rm"));
+    }
     @Test void recoveryGuideNeverRecommendsRemovingExistingKernel() {
         var guide = String.join(" ", manager.recoveryGuide()).toLowerCase();
         assertTrue(guide.contains("kernel anterior"));
