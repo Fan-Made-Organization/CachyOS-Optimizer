@@ -26,6 +26,17 @@ class LinuxPlatformSupportTest {
         var arch = new LinuxPlatformSupport.Platform("arch", "Arch", "", "", LinuxPlatformSupport.Family.ARCH, "pacman");
         assertThrows(IllegalArgumentException.class, () -> support.installCommand(arch, List.of("tool;rm")));
     }
+    @Test void recognizesMajorDistributionFamiliesFromOsRelease() throws Exception {
+        assertFamily("ID=debian\\nPRETTY_NAME=\\\"Debian GNU/Linux\\\"\\n", LinuxPlatformSupport.Family.DEBIAN);
+        assertFamily("ID=fedora\\nPRETTY_NAME=\\\"Fedora Linux\\\"\\n", LinuxPlatformSupport.Family.FEDORA);
+        assertFamily("ID=opensuse-tumbleweed\\nID_LIKE=opensuse suse\\n", LinuxPlatformSupport.Family.SUSE);
+        assertFamily("ID=cachyos\\nID_LIKE=arch\\n", LinuxPlatformSupport.Family.ARCH);
+    }
+    private void assertFamily(String release, LinuxPlatformSupport.Family expected) throws Exception {
+        Path file = temp.resolve("os-release");
+        Files.writeString(file, release);
+        assertEquals(expected, new LinuxPlatformSupport(file).detect().family());
+    }
     @Test void currentHostDetectionAlwaysReturnsAPlatform() {
         var platform = support.detect();
         assertNotNull(platform.family());
