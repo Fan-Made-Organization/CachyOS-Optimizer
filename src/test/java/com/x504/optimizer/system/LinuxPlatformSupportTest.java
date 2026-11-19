@@ -82,6 +82,9 @@ class LinuxPlatformSupportTest {
         assertTrue(categories.containsKey("Red"));
         assertTrue(categories.containsKey("Monitorización"));
         assertTrue(categories.containsKey("Gaming"));
+        assertTrue(categories.containsKey("Audio y multimedia"));
+        assertTrue(categories.containsKey("Desarrollo y depuración"));
+        assertTrue(categories.containsKey("Energía y sensores"));
         assertTrue(categories.get("Gaming").contains("gamescope"));
         assertEquals(support.diagnosticTools(arch).size(), support.diagnosticTools(arch).stream().distinct().count());
     }
