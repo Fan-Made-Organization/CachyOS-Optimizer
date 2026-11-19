@@ -151,7 +151,15 @@ Ejecutar directamente:
 bash scripts/launch.sh --install-tools
 ```
 
-### 11. Centro de optimización guiada
+### 11. Instalador de controladores gráficos
+
+El centro de optimización incorpora una sección separada para paquetes gráficos de Arch/CachyOS. Permite elegir un conjunto por fabricante: Intel (Mesa/OpenGL, ANV Vulkan e Intel Media), AMD (Mesa/OpenGL, RADV Vulkan y VA-API), NVIDIA (nvidia-open y bibliotecas de usuario), o compatibilidad DirectX para Wine/Proton (DXVK/VKD3D). También ofrece los componentes comunes Mesa y Vulkan loader. La lista se muestra antes de ejecutar Pacman y requiere confirmación; no se mezclan paquetes de Intel/AMD/NVIDIA ni se desinstala el controlador actual.
+
+**Compatibilidad importante:** el paquete NVIDIA `nvidia-open` requiere una GPU compatible con el módulo abierto y un kernel compatible; no es apropiado para todas las generaciones. Comprueba el modelo exacto y el paquete correspondiente a tu kernel antes de confirmar. En algunos sistemas CachyOS puede ser preferible instalar el paquete NVIDIA específico de su kernel mediante las herramientas oficiales de la distribución. Conserva un kernel de respaldo.
+
+Linux no instala un “driver DirectX” nativo: DXVK y VKD3D traducen Direct3D a Vulkan para Wine/Proton. Proton normalmente incluye versiones propias, así que instalar capas globales no es obligatorio. FSR tampoco es un controlador; depende del juego, Proton o Gamescope. La instalación de paquetes no garantiza que una aplicación o juego utilice una función concreta. Después de instalar, reinicia la sesión si corresponde y ejecuta `--diagnostics` para comprobar OpenGL/Vulkan.
+
+### 12. Centro de optimización guiada
 
 Abre el centro desde el menú principal (opción 7) o ejecuta `bash scripts/launch.sh --optimizer`. Reúne seis áreas:
 
