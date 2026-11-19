@@ -1,10 +1,14 @@
 package com.x504.optimizer.system;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 class LinuxPlatformSupportTest {
+    @TempDir Path temp;
     private final LinuxPlatformSupport support = new LinuxPlatformSupport();
     @Test void buildsSafeArchCommand() {
         var platform = new LinuxPlatformSupport.Platform("arch", "Arch Linux", "", "", LinuxPlatformSupport.Family.ARCH, "pacman");
