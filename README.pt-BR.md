@@ -107,7 +107,7 @@ O código Java compilado pelo Maven fica em `src/main/java`. Os arquivos em `src
 - **Linguagem:** Java 21.
 - **Desktop:** o KDE Plasma é identificado quando está disponível.
 - **Jogos:** Steam, Proton e ferramentas gráficas são inspecionados quando podem ser detectados.
-- **Outras distribuições:** podem fornecer dados úteis, mas ainda não há garantia do mesmo nível de detecção ou compatibilidade.
+- **Outras distribuições Linux:** os diagnósticos somente leitura podem funcionar; a instalação automática fica desativada para famílias desconhecidas.
 
 ## Requisitos
 
